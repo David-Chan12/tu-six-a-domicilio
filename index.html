@@ -192,6 +192,21 @@
   </a>
 </nav>
 
+<div id="widget-clima" style="
+  margin: 20px auto;
+  padding: 10px;
+  border: 1px solid #0077b6;
+  border-radius: 10px;
+  background-color: #e6f4ff;
+  text-align: center;
+  max-width: 400px;
+  font-family: 'PT Sans', sans-serif;
+  font-weight: bold;
+">
+  🌦️ Cargando clima...
+</div>
+
+
 <section id="catalogo">
   <h2>Nuestro Catálogo</h2>
   <div class="grid-productos">
@@ -266,6 +281,8 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+
 
 <script>
 // Configuración Firebase (Se mantiene igual)
@@ -388,10 +405,87 @@ function cargarPedidos() {
     });
   });
 }
+
+// ========== SERVICIO DEL CLIMA ==========
+async function cargarClima() {
+
+  const ciudad = "Valladolid";
+  const apiKey = "78d8b8e9819bf1c82f10d86068d21f1a";
+
+  const url =
+    `https://api.openweathermap.org/data/2.5/weather?q=${ciudad}&appid=${apiKey}&units=metric&lang=es`;
+
+  try {
+
+    const respuesta = await fetch(url);
+
+    if (!respuesta.ok) {
+      throw new Error("No se pudo obtener el clima");
+    }
+
+    const datos = await respuesta.json();
+
+    // Temperatura y descripción
+    const temperatura = Math.round(datos.main.temp);
+    const descripcion = datos.weather[0].description;
+
+    const climaTexto = `🌡️ ${temperatura}°C, ${descripcion}`;
+
+    // Recomendaciones dinámicas
+    let recomendacion = "";
+
+    if (temperatura > 25) {
+
+      recomendacion =
+        "☀️ ¿Día caluroso? Perfecto para unas cervezas bien muertas 🍺😎";
+
+    } else if (temperatura < 15) {
+
+      recomendacion =
+        "❄️ Los días fríos evitan que se caliente tu cheva ☝️🤓";
+
+    } else {
+
+      recomendacion =
+        "🌤️ El clima perfecto para un 12 de Tecate 🤙";
+
+    }
+
+    // Mostrar datos en el contenedor
+    const contenedor = document.getElementById("widget-clima");
+
+    if (contenedor) {
+
+      contenedor.innerHTML = `
+        <strong>Clima hoy en ${ciudad}:</strong><br>
+        ${climaTexto}<br><br>
+        <em>${recomendacion}</em>
+      `;
+
+    }
+
+  } catch (error) {
+
+    console.error("Error al cargar clima:", error);
+
+    const contenedor = document.getElementById("widget-clima");
+
+    if (contenedor) {
+
+      contenedor.innerHTML =
+        "⚠️ Sistema en mantenimiento, por favor siga con su pedido 😉";
+
+    }
+  }
+}
+
+// Ejecutar automáticamente
+document.addEventListener("DOMContentLoaded", () => {
+  cargarClima();
+});
 </script>
 </body>
-<<<<<<< HEAD
+
 </html>
-=======
 </html>
->>>>>>> 1404bce76bff0c62e7da587924cc597f7dbf6006
+
