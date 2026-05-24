@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tu Six a Domicilio - Oficial</title>
+  
+  <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700|Merriweather:400,700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --rojo-six: #fb0101;
+      --negro-google: #212121;
+      --gris-fondo: #f8f9fa;
+      --blanco: #ffffff;
+    }
+
+    body {
+      font-family: 'Merriweather', serif;
+      margin: 0;
+      background-color: var(--gris-fondo);
+      color: var(--negro-google);
+    }
+
+    /* HEADER ESTILO GOOGLE SITES */
+    header {
+      background-color: var(--rojo-six);
+      background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://lh3.googleusercontent.com/sitesv/AA5AbUAZRdESUIyFqaYVcQVSZh_pG9SLvQbrmM1WRYsPd4TuZaGMyBwn0mhdPRiRWt-EaabOdCkY6oU-9azTHQTkM8U5CvsUat6g9nX7d7RyhOgP41dXsgqP-KYAHRJUrnlMynP8Ht3AExVb-LfCKXEfxgcNs3KRFsliakNBwf5m7o4KKHpGCLblAZy-y8rdqxw2fj3kVHKimEX-0CGaOjKlSc3P4J6icpKrmUzr=w1280');
+      background-size: cover;
+      background-position: center;
+      color: var(--blanco);
+      padding: 80px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-family: 'PT Sans', sans-serif;
+      font-size: 56pt;
+      margin: 0;
+      text-transform: uppercase;
+    }
+
+    nav {
+      background-color: var(--blanco);
+      padding: 15px;
+      display: flex;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav a {
+      color: var(--negro-google);
+      margin: 0 20px;
+      text-decoration: none;
+      font-family: 'PT Sans', sans-serif;
+      font-weight: 700;
+    }
+
+/* BOTÓN ADMIN */
+.btn-admin {
+  background-color: var(--rojo-six);
+  color: white !important;
+  padding: 10px 18px;
+  border-radius: 6px;
+  transition: 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.btn-admin:hover {
+  background-color: #c70000;
+  transform: translateY(-2px);
+}
+
+    section {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    h2 {
+      font-family: 'PT Sans', sans-serif;
+      font-size: 28pt;
+      border-bottom: 2px solid var(--rojo-six);
+      display: inline-block;
+      margin-bottom: 30px;
+    }
+
+    /* AJUSTE CATÁLOGO: Imágenes completas sin cortes */
+    .grid-productos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .card-producto {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      text-align: center;
+      padding-bottom: 15px;
+    }
+
+    .card-producto img {
+      width: 100%;
+      height: 180px;
+      object-fit: contain; /* Cambio clave para que los logos se vean completos */
+      background-color: #fff;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    /* SECCIÓN GALERÍA DE USUARIOS */
+    .galeria-usuarios {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      background: #eee;
+      padding: 20px;
+      border-radius: 10px;
+      min-height: 100px;
+    }
+
+    .foto-usuario {
+      width: calc(33.33% - 10px);
+      height: 200px;
+      border: 3px solid white;
+      object-fit: cover;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    /* FORMULARIOS Y BOTONES */
+    #auth-section, #zonaPrivada, #subirFotoContainer {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      margin-bottom: 30px;
+    }
+
+    input[type="text"], input[type="email"], input[type="password"], select {
+      padding: 12px;
+      margin: 10px 0;
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: var(--rojo-six);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-family: 'PT Sans', sans-serif;
+      font-weight: 700;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    .oculto { display: none !important; }
+
+    .pedido-item {
+      background: #fff;
+      border-left: 6px solid var(--rojo-six);
+      padding: 15px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Tu Six a Domicilio</h1>
+  <p>¿Se acabó la fiesta? Nosotros te llevamos lo que necesitas.</p>
+</header>
+
+<nav>
+  <a href="#">INICIO</a>
+  <a href="#catalogo">CATÁLOGO</a>
+  <a href="#galeria">FOTOS DE CLIENTES</a>
+  <a href="#auth-section">MI CUENTA</a>
+
+  <!-- NUEVO BOTÓN ADMIN -->
+  <a href="admin.html" class="btn-admin">
+    ADMIN
+  </a>
+</nav>
+
+<section id="catalogo">
+  <h2>Nuestro Catálogo</h2>
+  <div class="grid-productos">
+    <div class="card-producto">
+      <img src="https://www.pngitem.com/pimgs/m/364-3641263_tecate-png-tecate-png-tecate-logo-2019-transparent.png" alt="Cerveza">
+      <h3>Cerveza</h3>
+      <p>Bien fría, lista para entregar.</p>
+    </div>
+    <div class="card-producto">
+      <img src="https://static.wikia.nocookie.net/horadeaventura/images/7/72/Sabritas_logo.jpg/revision/latest?cb=20130808193834&path-prefix=es" alt="Botanas">
+      <h3>Botanas Mix</h3>
+      <p>El complemento ideal.</p>
+    </div>
+    <div class="card-producto">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_KRzMoZbv2oWkrCOV0vYK69jsWI2ib2YZfg&s" alt="Hielo">
+      <h3>Hielo</h3>
+      <p>Que no se caliente la fiesta.</p>
+    </div>
+  </div>
+</section>
+
+<section id="galeria">
+  <h2>Comunidad Six</h2>
+  <p>Fotos compartidas por nuestros clientes disfrutando el servicio.</p>
+  <div id="contenedorFotos" class="galeria-usuarios">
+    <!-- Aquí se cargarán las fotos guardadas y las nuevas -->
+  </div>
+  
+  <div id="subirFotoContainer" class="oculto" style="margin-top:20px;">
+    <h3>Comparte tu foto desde tu dispositivo</h3>
+    <input type="file" id="inputArchivo" accept="image/*">
+    <br>
+    <button onclick="procesarArchivo()">Publicar mi Foto</button>
+  </div>
+</section>
+
+<!-- ... (Resto de secciones: auth, zonaPrivada, pedidos permanecen igual) ... -->
+
+<section id="auth-section">
+  <div id="logged-out-view">
+    <h2>Inicia Sesión o Regístrate</h2>
+    <input type="email" id="email" placeholder="Correo electrónico"><br>
+    <input type="password" id="password" placeholder="Contraseña"><br>
+    <button onclick="login()">ENTRAR</button>
+    <button onclick="registrar()" style="background:#444">CREAR CUENTA</button>
+  </div>
+
+  <div id="logged-in-view" class="oculto">
+    <h2>¡Bienvenido!</h2>
+    <p id="user-display-email" style="font-weight: bold; color: var(--rojo-six);"></p>
+    <button onclick="logout()" style="background:#777">CERRAR SESIÓN</button>
+  </div>
+</section>
+
+<section id="zonaPrivada" class="oculto">
+  <h2>Realizar Pedido</h2>
+  <input type="text" id="nombreCliente" placeholder="Tu Nombre">
+  <input type="text" id="direccionEntrega" placeholder="Dirección de entrega">
+  <input type="text" id="productosCompra" placeholder="¿Qué productos quieres?">
+  <select id="metodoPago">
+    <option value="Efectivo">Efectivo</option>
+    <option value="Tarjeta">Tarjeta</option>
+  </select>
+  <button onclick="guardarPedido()" style="width:100%">CONFIRMAR PEDIDO</button>
+</section>
+
+<section id="pedidos-realizados">
+  <h2>Pedidos en Curso</h2>
+  <div id="listaPedidos"></div>
+</section>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+// Configuración Firebase (Se mantiene igual)
+const firebaseConfig = {
+  apiKey: "AIzaSyAnP6eK_WXlhN9Adqpf-ryVRTY58l3PbjQ",
+  authDomain: "link-six.firebaseapp.com",
+  projectId: "link-six",
+  storageBucket: "link-six.firebasestorage.app",
+  messagingSenderId: "92853854893",
+  appId: "1:92853854893:web:bdf39a4ee799ea4bbf9c24"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// Al cargar la página, recuperamos fotos de LocalStorage
+window.onload = function() {
+  cargarFotosGuardadas();
+};
+
+auth.onAuthStateChanged(user => {
+  const loView = document.getElementById("logged-out-view");
+  const liView = document.getElementById("logged-in-view");
+  const zp = document.getElementById("zonaPrivada");
+  const sf = document.getElementById("subirFotoContainer");
+
+  if (user) {
+    loView.classList.add("oculto");
+    liView.classList.remove("oculto");
+    zp.classList.remove("oculto");
+    sf.classList.remove("oculto");
+    document.getElementById("user-display-email").innerText = user.email;
+  } else {
+    loView.classList.remove("oculto");
+    liView.classList.add("oculto");
+    zp.classList.add("oculto");
+    sf.classList.add("oculto");
+  }
+  cargarPedidos();
+});
+
+// FUNCIONES DE PERSISTENCIA PARA LA GALERÍA
+function procesarArchivo() {
+  const archivoInput = document.getElementById("inputArchivo");
+  const archivo = archivoInput.files[0];
+  
+  if (!archivo) return alert("Selecciona una imagen.");
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const base64Image = e.target.result;
+    
+    // Guardar en LocalStorage
+    let fotosExistentes = JSON.parse(localStorage.getItem("galeriaSix") || "[]");
+    fotosExistentes.unshift(base64Image); // Añadir al inicio
+    localStorage.setItem("galeriaSix", JSON.stringify(fotosExistentes));
+
+    // Mostrar en pantalla
+    mostrarImagenEnGaleria(base64Image);
+    archivoInput.value = "";
+  };
+  reader.readAsDataURL(archivo);
+}
+
+function cargarFotosGuardadas() {
+  const contenedor = document.getElementById("contenedorFotos");
+  contenedor.innerHTML = ""; // Limpiar
+  
+  // Fotos de ejemplo iniciales si no hay nada guardado
+  let fotos = JSON.parse(localStorage.getItem("galeriaSix") || "[]");
+  
+  if (fotos.length === 0) {
+    // Si está vacío, podrías poner fotos por defecto aquí
+    contenedor.innerHTML = '<p style="padding:20px;">Sé el primero en compartir una foto.</p>';
+  } else {
+    fotos.forEach(src => mostrarImagenEnGaleria(src));
+  }
+}
+
+function mostrarImagenEnGaleria(src) {
+  const img = document.createElement("img");
+  img.src = src;
+  img.className = "foto-usuario";
+  const contenedor = document.getElementById("contenedorFotos");
+  contenedor.insertBefore(img, contenedor.firstChild);
+}
+
+// Funciones de Pedidos (Se mantienen igual)
+function login() {
+  auth.signInWithEmailAndPassword(document.getElementById("email").value, document.getElementById("password").value).catch(e => alert(e.message));
+}
+function registrar() {
+  auth.createUserWithEmailAndPassword(document.getElementById("email").value, document.getElementById("password").value).then(() => alert("Cuenta creada")).catch(e => alert(e.message));
+}
+function logout() { auth.signOut(); }
+
+function guardarPedido() {
+  const p = {
+    cliente: document.getElementById("nombreCliente").value,
+    direccion: document.getElementById("direccionEntrega").value,
+    productos: document.getElementById("productosCompra").value,
+    pago: document.getElementById("metodoPago").value,
+    email: auth.currentUser.email,
+    fecha: new Date().toLocaleString()
+  };
+  db.collection("pedidos").add(p).then(() => {
+    alert("Pedido recibido");
+    cargarPedidos();
+  });
+}
+
+function cargarPedidos() {
+  db.collection("pedidos").orderBy("fecha", "desc").limit(5).get().then(snap => {
+    const cont = document.getElementById("listaPedidos");
+    cont.innerHTML = "";
+    snap.forEach(doc => {
+      const d = doc.data();
+      cont.innerHTML += `<div class="pedido-item"><strong>${d.cliente}</strong>: ${d.productos} <br><small>${d.fecha}</small></div>`;
+    });
+  });
+}
+</script>
+</body>
+</html>
