@@ -265,6 +265,11 @@
     }
 
     /* TABLES */
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -333,15 +338,66 @@
       font-family: 'PT Sans', sans-serif;
       font-weight: 700;
       transition: all 0.3s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
     }
 
-    .btn-primary {
-      background: var(--rojo-six);
-      color: white;
+    .btn-primary { background: var(--rojo-six); color: white; }
+    .btn-primary:hover { background: var(--rojo-oscuro); }
+    .btn-success { background: var(--verde-exito); color: white; }
+    .btn-warning { background: var(--amarillo-pendiente); color: #212121; }
+    .btn-danger { background: #dc3545; color: white; }
+
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
     }
 
-    .btn-primary:hover {
-      background: var(--rojo-oscuro);
+    .modal-content {
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .modal-content h3 {
+      margin-bottom: 20px;
+      font-family: 'PT Sans', sans-serif;
+    }
+
+    .modal-content label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .modal-content input, .modal-content select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid var(--gris-borde);
+      border-radius: 6px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
     }
 
     .login-container {
@@ -387,25 +443,15 @@
     }
 
     @media (max-width: 768px) {
-      .sidebar {
-        width: 80px;
-      }
-      .sidebar-header h2, .sidebar-header p, .admin-info h4, .admin-info p, .nav-menu li span {
+      .sidebar { width: 80px; }
+      .sidebar-header h2, .sidebar-header p, .admin-info h4, .admin-info p, .nav-menu li span, .logout-btn span {
         display: none;
       }
-      .main-content {
-        margin-left: 80px;
-      }
-      .nav-menu li {
-        justify-content: center;
-      }
-      .charts-row {
-        grid-template-columns: 1fr;
-      }
-      th, td {
-        font-size: 11px;
-        padding: 6px;
-      }
+      .main-content { margin-left: 80px; }
+      .nav-menu li { justify-content: center; }
+      .logout-btn { width: calc(100% - 20px); margin: 0 10px; }
+      .charts-row { grid-template-columns: 1fr; }
+      th, td { font-size: 11px; padding: 6px; }
     }
   </style>
 </head>
@@ -430,7 +476,7 @@
     </li>
     <li data-section="ventas">
       <i class="fas fa-chart-bar"></i>
-      <span>Ventas</span>
+      <span>Ventas y Pedidos</span>
     </li>
     <li data-section="productos">
       <i class="fas fa-box"></i>
@@ -467,7 +513,40 @@
       </p>
     </div>
   </div>
+  
   <div id="appContent" style="display: none;"></div>
+</div>
+
+<div id="productoModal" class="modal">
+  <div class="modal-content">
+    <h3 id="modalTitulo">Agregar Producto</h3>
+    <input type="hidden" id="prodId">
+    
+    <label>Nombre del Producto</label>
+    <input type="text" id="prodNombre" placeholder="Ej. Cerveza Tecate Light 355ml">
+    
+    <label>Precio ($)</label>
+    <input type="number" id="prodPrecio" min="1" placeholder="Ej. 22">
+    
+    <label>Stock Inicial</label>
+    <input type="number" id="prodStock" min="0" placeholder="Ej. 50">
+    
+    <label>Categoría</label>
+    <select id="prodCategoria">
+      <option value="Cervezas">Cervezas</option>
+      <option value="Botanas">Botanas</option>
+      <option value="Refrescos">Refrescos</option>
+      <option value="Hielo">Hielo</option>
+    </select>
+    
+    <label>URL de Imagen</label>
+    <input type="text" id="prodImagen" placeholder="https://ejemplo.com/imagen.png">
+    
+    <div class="modal-actions">
+      <button class="btn" style="background:#6c757d; color:white;" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn btn-success" onclick="guardarProducto()">Guardar</button>
+    </div>
+  </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -489,20 +568,38 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Administradores autorizados
 const ADMIN_EMAILS = ["admin@six.com"];
 
 let pedidosData = [];
 let productosData = [];
 let clientesMap = new Map();
 let charts = {};
+let seccionActual = "dashboard";
 
-// ========== FUNCIONES DE AUTENTICACIÓN ==========
+// Auth state observer
+auth.onAuthStateChanged(async (user) => {
+  if (user && ADMIN_EMAILS.includes(user.email)) {
+    document.getElementById("adminEmail").innerText = user.email;
+    document.getElementById("loginContainer").style.display = "none";
+    document.getElementById("appContent").style.display = "block";
+    
+    // Escucha en tiempo real de pedidos
+    db.collection("pedidos").orderBy("fechaTimestamp", "desc").onSnapshot(async (snapshot) => {
+      pedidosData = [];
+      snapshot.forEach(doc => pedidosData.push({ id: doc.id, ...doc.data() }));
+      await cargarProductos();
+      procesarClientes();
+      actualizarVistaActual();
+    });
+  } else {
+    logout();
+  }
+});
+
 async function loginAdmin() {
   const email = document.getElementById("loginEmail").value.trim();
   const password = document.getElementById("loginPassword").value;
   const errorDiv = document.getElementById("loginError");
-  
   errorDiv.style.display = "none";
   
   if (!email || !password) {
@@ -515,15 +612,9 @@ async function loginAdmin() {
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     if (!ADMIN_EMAILS.includes(userCredential.user.email)) {
       await auth.signOut();
-      errorDiv.innerText = "❌ Acceso denegado. No tienes permisos de administrador.";
+      errorDiv.innerText = "❌ Acceso denegado. Permisos insuficientes.";
       errorDiv.style.display = "block";
-      return;
     }
-    document.getElementById("adminEmail").innerText = userCredential.user.email;
-    document.getElementById("loginContainer").style.display = "none";
-    document.getElementById("appContent").style.display = "block";
-    await cargarDatos();
-    mostrarDashboard();
   } catch (error) {
     errorDiv.innerText = "❌ Error: " + error.message;
     errorDiv.style.display = "block";
@@ -534,40 +625,23 @@ function logout() {
   auth.signOut();
   document.getElementById("loginContainer").style.display = "flex";
   document.getElementById("appContent").style.display = "none";
-}
-
-// ========== CARGA DE DATOS ==========
-async function cargarDatos() {
-  await cargarPedidos();
-  await cargarProductos();
-  await cargarClientes();
-}
-
-async function cargarPedidos() {
-  const snapshot = await db.collection("pedidos").orderBy("fechaTimestamp", "desc").get();
-  pedidosData = [];
-  snapshot.forEach(doc => {
-    pedidosData.push({ id: doc.id, ...doc.data() });
-  });
+  document.getElementById("adminEmail").innerText = "No autenticado";
 }
 
 async function cargarProductos() {
   const snapshot = await db.collection("productos").get();
   productosData = [];
-  snapshot.forEach(doc => {
-    productosData.push({ id: doc.id, ...doc.data() });
-  });
+  snapshot.forEach(doc => productosData.push({ id: doc.id, ...doc.data() }));
   
   if (productosData.length === 0) {
     const productosEjemplo = [
-      { nombre: "Cerveza Corona", precio: 25, stock: 100, vendidos: 32, categoria: "Cervezas" },
-      { nombre: "Cerveza Modelo", precio: 28, stock: 90, vendidos: 28, categoria: "Cervezas" },
-      { nombre: "Coca Cola 600ml", precio: 18, stock: 80, vendidos: 25, categoria: "Refrescos" },
-      { nombre: "Sabritas Original", precio: 15, stock: 120, vendidos: 18, categoria: "Botanas" },
-      { nombre: "Hielo 5kg", precio: 30, stock: 50, vendidos: 15, categoria: "Hielo" },
-      { nombre: "Cheetos", precio: 15, stock: 70, vendidos: 12, categoria: "Botanas" },
-      { nombre: "Doritos", precio: 16, stock: 65, vendidos: 10, categoria: "Botanas" },
-      { nombre: "Cerveza Tecate", precio: 22, stock: 85, vendidos: 20, categoria: "Cervezas" }
+      { nombre: "Cerveza Corona", precio: 25, stock: 100, vendidos: 32, categoria: "Cervezas", imagen: "https://upload.wikimedia.org/wikipedia/commons/0/0b/Corona_Extra_logo.svg" },
+      { nombre: "Cerveza Modelo", precio: 28, stock: 90, vendidos: 28, categoria: "Cervezas", imagen: "https://upload.wikimedia.org/wikipedia/commons/7/79/Modelo_Especial_logo.png" },
+      { nombre: "Cerveza Tecate", precio: 22, stock: 85, vendidos: 20, categoria: "Cervezas", imagen: "https://upload.wikimedia.org/wikipedia/commons/7/71/Tecate_logo.png" },
+      { nombre: "Coca Cola 600ml", precio: 18, stock: 80, vendidos: 25, categoria: "Refrescos", imagen: "" },
+      { nombre: "Sabritas Original", precio: 15, stock: 120, vendidos: 18, categoria: "Botanas", imagen: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Sabritas_logo.svg" },
+      { nombre: "Doritos", precio: 16, stock: 65, vendidos: 10, categoria: "Botanas", imagen: "https://upload.wikimedia.org/wikipedia/commons/0/02/Doritos_logo.png" },
+      { nombre: "Hielo 5kg", precio: 30, stock: 50, vendidos: 15, categoria: "Hielo", imagen: "" }
     ];
     for (const p of productosEjemplo) {
       await db.collection("productos").add(p);
@@ -576,723 +650,29 @@ async function cargarProductos() {
   }
 }
 
-async function cargarClientes() {
-  const emailsUnicos = [...new Set(pedidosData.map(p => p.email).filter(e => e))];
+function procesarClientes() {
   clientesMap.clear();
-  for (const email of emailsUnicos) {
-    const pedidosCliente = pedidosData.filter(p => p.email === email);
-    clientesMap.set(email, {
-      email,
-      totalPedidos: pedidosCliente.length,
-      totalGastado: pedidosCliente.reduce((sum, p) => sum + (p.total || 0), 0),
-      ultimoPedido: pedidosCliente[0]?.fecha || 'N/A'
-    });
-  }
-}
-
-// ========== DASHBOARD GENERAL ==========
-function mostrarDashboard() {
-  const hoy = new Date().toLocaleDateString();
-  const pedidosHoy = pedidosData.filter(p => p.fecha?.includes(hoy)).length;
-  const ventasHoy = pedidosData.filter(p => p.fecha?.includes(hoy)).reduce((sum, p) => sum + (p.total || 0), 0);
-  const clientesNuevos = [...clientesMap.values()].filter(c => {
-    const ultimo = new Date(c.ultimoPedido);
-    const hoyDate = new Date();
-    return ultimo.toDateString() === hoyDate.toDateString();
-  }).length;
-  
-  // Top productos más vendidos
-  const ventasPorProducto = {};
   pedidosData.forEach(p => {
-    if (p.productos) {
-      const productosList = p.productos.split(',').map(prod => prod.trim().toLowerCase());
-      productosList.forEach(prod => {
-        ventasPorProducto[prod] = (ventasPorProducto[prod] || 0) + 1;
+    const selectorCliente = p.cliente || p.nombreCliente || "Cliente Anónimo";
+    const identificador = p.direccion || "Sin dirección";
+    const key = `${selectorCliente}_${identificador}`;
+    
+    if (!clientesMap.has(key)) {
+      clientesMap.set(key, {
+        nombre: selectorCliente,
+        direccion: identificador,
+        totalPedidos: 0,
+        totalGastado: 0,
+        ultimoPedido: p.fecha || 'N/A'
       });
     }
+    const c = clientesMap.get(key);
+    c.totalPedidos++;
+    c.totalGastado += (p.total || 0);
   });
-  const topProductos = Object.entries(ventasPorProducto)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5);
-  
-  // Estados de pedidos
-  const pendientes = pedidosData.filter(p => p.estado === "Pendiente" || !p.estado).length;
-  const preparacion = pedidosData.filter(p => p.estado === "En preparación").length;
-  const camino = pedidosData.filter(p => p.estado === "En camino").length;
-  const entregados = pedidosData.filter(p => p.estado === "Entregado").length;
-  
-  const html = `
-    <div class="top-bar">
-      <h1 class="page-title">Dashboard General</h1>
-      <div class="date-time">${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
-    </div>
-    
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-info"><h3>Ventas del día</h3><div class="number">$${ventasHoy.toLocaleString()}</div></div>
-        <div class="stat-icon" style="background:#e5f5e5;"><i class="fas fa-dollar-sign" style="color:var(--verde-exito);"></i></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-info"><h3>Pedidos de hoy</h3><div class="number">${pedidosHoy}</div></div>
-        <div class="stat-icon" style="background:#ffe5e5;"><i class="fas fa-shopping-cart" style="color:var(--rojo-six);"></i></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-info"><h3>Clientes nuevos hoy</h3><div class="number">${clientesNuevos}</div></div>
-        <div class="stat-icon" style="background:#e5e5ff;"><i class="fas fa-user-plus" style="color:#667eea;"></i></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-info"><h3>Total pedidos</h3><div class="number">${pedidosData.length}</div></div>
-        <div class="stat-icon" style="background:#fff3cd;"><i class="fas fa-chart-line" style="color:#fd7e14;"></i></div>
-      </div>
-    </div>
-    
-    <div class="charts-row">
-      <div class="chart-container">
-        <h4>📊 Pedidos por estado</h4>
-        <canvas id="estadosChart"></canvas>
-      </div>
-      <div class="chart-container">
-        <h4>🏆 Productos más vendidos</h4>
-        <div id="topProductosList">
-          ${topProductos.map(([prod, count], idx) => `
-            <div class="rank-item">
-              <div class="rank-number">${idx + 1}</div>
-              <div class="rank-name">${prod.charAt(0).toUpperCase() + prod.slice(1)}</div>
-              <div class="rank-value">${count} ventas</div>
-            </div>
-          `).join('')}
-          ${topProductos.length === 0 ? '<p>No hay datos aún</p>' : ''}
-        </div>
-      </div>
-    </div>
-    
-    <div class="section-card">
-      <div class="section-header">
-        <h3>📋 Pedidos recientes</h3>
-        <button class="btn btn-primary" onclick="cambiarSeccion('ventas')">Ver todos</button>
-      </div>
-      <table>
-        <thead><tr><th>ID</th><th>Cliente</th><th>Productos</th><th>Total</th><th>Estado</th><th>Fecha</th></tr></thead>
-        <tbody>
-          ${pedidosData.slice(0, 5).map(p => `
-            <tr>
-              <td>#${p.id?.slice(-5)}</td>
-              <td>${p.cliente || p.email?.split('@')[0]}</td>
-              <td>${p.productos?.substring(0, 30)}${p.productos?.length > 30 ? '...' : ''}</td>
-              <td>$${p.total || 0}</td>
-              <td><span class="estado-badge estado-${(p.estado || 'Pendiente').toLowerCase().replace(' ', '')}">${p.estado || 'Pendiente'}</span></td>
-              <td>${p.fecha?.split(',')[0] || 'N/A'}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
-  
-  document.getElementById("appContent").innerHTML = html;
-  
-  // Crear gráfica de estados
-  setTimeout(() => {
-    const ctx = document.getElementById('estadosChart')?.getContext('2d');
-    if (ctx) {
-      if (charts.estados) charts.estados.destroy();
-      charts.estados = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Pendiente', 'En preparación', 'En camino', 'Entregado'],
-          datasets: [{
-            data: [
-              pedidosData.filter(p => p.estado === "Pendiente" || !p.estado).length,
-              pedidosData.filter(p => p.estado === "En preparación").length,
-              pedidosData.filter(p => p.estado === "En camino").length,
-              pedidosData.filter(p => p.estado === "Entregado").length
-            ],
-            backgroundColor: ['#ffc107', '#fd7e14', '#17a2b8', '#28a745'],
-            borderWidth: 0
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: true }
-      });
-    }
-  }, 100);
 }
 
-// ========== SECCIÓN VENTAS ==========
-function mostrarVentas() {
-  // Ventas por día (últimos 7 días)
-  const ventasPorDia = {};
-  for (let i = 6; i >= 0; i--) {
-    const fecha = new Date();
-    fecha.setDate(fecha.getDate() - i);
-    const key = fecha.toLocaleDateString();
-    ventasPorDia[key] = 0;
-  }
-  
-  pedidosData.forEach(p => {
-    if (p.fecha && p.total) {
-      const fechaPedido = p.fecha.split(',')[0];
-      if (ventasPorDia[fechaPedido] !== undefined) {
-        ventasPorDia[fechaPedido] += p.total;
-      }
-    }
-  });
-  
-  // Pedidos por hora
-  const pedidosPorHora = Array(24).fill(0);
-  pedidosData.forEach(p => {
-    if (p.fecha) {
-      const hora = parseInt(p.fecha.split(' ')[1]?.split(':')[0] || 0);
-      if (!isNaN(hora)) pedidosPorHora[hora]++;
-    }
-  });
-  
-  const totalSemanal = Object.values(ventasPorDia).reduce((a, b) => a + b, 0);
-  const ingresosTotales = pedidosData.reduce((sum, p) => sum + (p.total || 0), 0);
-  
-  const html = `
-    <div class="top-bar">
-      <h1 class="page-title">📈 Ventas y Pedidos</h1>
-      <button class="btn btn-primary" onclick="exportarReporte()"><i class="fas fa-download"></i> Exportar CSV</button>
-    </div>
-    
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-info"><h3>Total Semanal</h3><div class="number">$${totalSemanal.toLocaleString()}</div></div>
-        <div class="stat-icon" style="background:#e5f5e5;"><i class="fas fa-calendar-week"></i></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-info"><h3>Ingresos Totales</h3><div class="number">$${ingresosTotales.toLocaleString()}</div></div>
-        <div class="stat-icon" style="background:#ffe5e5;"><i class="fas fa-chart-line"></i></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-info"><h3>Total Pedidos</h3><div class="number">${pedidosData.length}</div></div>
-        <div class="stat-icon" style="background:#e5e5ff;"><i class="fas fa-shopping-cart"></i></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-info"><h3>Ticket Promedio</h3><div class="number">$${Math.round(ingresosTotales / (pedidosData.length || 1))}</div></div>
-        <div class="stat-icon" style="background:#fff3cd;"><i class="fas fa-receipt"></i></div>
-      </div>
-    </div>
-    
-    <div class="charts-row">
-      <div class="chart-container">
-        <h4>📊 Ventas por día (últimos 7 días)</h4>
-        <canvas id="ventasDiariasChart"></canvas>
-      </div>
-      <div class="chart-container">
-        <h4>⏰ Pedidos por hora</h4>
-        <canvas id="pedidosHoraChart"></canvas>
-      </div>
-    </div>
-    
-    <div class="section-card">
-      <div class="section-header">
-        <h3>📋 Todos los pedidos</h3>
-        <select id="filtroEstado" onchange="filtrarPedidosTabla()">
-          <option value="todos">Todos</option>
-          <option value="Pendiente">Pendiente</option>
-          <option value="En preparación">En preparación</option>
-          <option value="En camino">En camino</option>
-          <option value="Entregado">Entregado</option>
-        </select>
-      </div>
-      <div id="tablaPedidosContainer">
-        ${renderTablaPedidos(pedidosData)}
-      </div>
-    </div>
-  `;
-  
-  document.getElementById("appContent").innerHTML = html;
-  
-  setTimeout(() => {
-    const ctxVentas = document.getElementById('ventasDiariasChart')?.getContext('2d');
-    if (ctxVentas) {
-      if (charts.ventas) charts.ventas.destroy();
-      charts.ventas = new Chart(ctxVentas, {
-        type: 'line',
-        data: {
-          labels: Object.keys(ventasPorDia),
-          datasets: [{ label: 'Ventas ($)', data: Object.values(ventasPorDia), borderColor: '#fb0101', backgroundColor: 'rgba(251,1,1,0.1)', tension: 0.4, fill: true }]
-        },
-        options: { responsive: true, maintainAspectRatio: true }
-      });
-    }
-    
-    const ctxHoras = document.getElementById('pedidosHoraChart')?.getContext('2d');
-    if (ctxHoras) {
-      if (charts.horas) charts.horas.destroy();
-      charts.horas = new Chart(ctxHoras, {
-        type: 'bar',
-        data: {
-          labels: Array.from({length: 24}, (_, i) => `${i}:00`),
-          datasets: [{ label: 'Pedidos', data: pedidosPorHora, backgroundColor: '#fb0101', borderRadius: 8 }]
-        },
-        options: { responsive: true, maintainAspectRatio: true }
-      });
-    }
-  }, 100);
-}
-
-function renderTablaPedidos(pedidos) {
-  if (pedidos.length === 0) return '<p style="text-align:center; padding:40px;">No hay pedidos</p>';
-  return `
-    <table>
-      <thead><tr><th>ID</th><th>Cliente</th><th>Dirección</th><th>Productos</th><th>Total</th><th>Estado</th><th>Fecha</th></tr></thead>
-      <tbody>
-        ${pedidos.map(p => `
-          <tr>
-            <td>#${p.id?.slice(-6)}</td>
-            <td>${p.cliente || 'N/A'}</td>
-            <td>${p.direccion?.substring(0, 30) || 'N/A'}</td>
-            <td>${p.productos?.substring(0, 30)}${p.productos?.length > 30 ? '...' : ''}</td>
-            <td>$${p.total || 0}</td>
-            <td>
-              <select onchange="actualizarEstado('${p.id}', this.value)" class="estado-select" style="padding:5px;">
-                <option value="Pendiente" ${(p.estado || 'Pendiente') === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
-                <option value="En preparación" ${p.estado === 'En preparación' ? 'selected' : ''}>En preparación</option>
-                <option value="En camino" ${p.estado === 'En camino' ? 'selected' : ''}>En camino</option>
-                <option value="Entregado" ${p.estado === 'Entregado' ? 'selected' : ''}>Entregado</option>
-              </select>
-            </td>
-            <td>${p.fecha?.split(',')[0] || 'N/A'}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  `;
-}
-
-// ========== SECCIÓN PRODUCTOS ==========
-function mostrarProductos() {
-  // Calcular ventas por producto
-  const ventasPorProducto = {};
-  pedidosData.forEach(p => {
-    if (p.productos) {
-      const productosList = p.productos.split(',').map(prod => prod.trim().toLowerCase());
-      productosList.forEach(prod => {
-        ventasPorProducto[prod] = (ventasPorProducto[prod] || 0) + 1;
-      });
-    }
-  });
-  
-  // Categorías más vendidas
-  const ventasPorCategoria = {};
-  productosData.forEach(prod => {
-    ventasPorCategoria[prod.categoria || 'Otros'] = (ventasPorCategoria[prod.categoria || 'Otros'] || 0) + (prod.vendidos || 0);
-  });
-  
-  const productosAgotados = productosData.filter(p => (p.stock || 0) === 0);
-  const stockBajo = productosData.filter(p => (p.stock || 0) > 0 && (p.stock || 0) < 20);
-  
-  const topProductosList = Object.entries(ventasPorProducto)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5);
-  
-  const html = `
-    <div class="top-bar">
-      <h1 class="page-title">📦 Productos</h1>
-      <button class="btn btn-primary" onclick="agregarProducto()"><i class="fas fa-plus"></i> Agregar Producto</button>
-    </div>
-    
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-info"><h3>Total Productos</h3><div class="number">${productosData.length}</div></div>
-        <div class="stat-icon" style="background:#e5f5e5;"><i class="fas fa-boxes"></i></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-info"><h3>Productos Agotados</h3><div class="number">${productosAgotados.length}</div></div>
-        <div class="stat-icon" style="background:#ffe5e5;"><i class="fas fa-exclamation-triangle" style="color:#dc3545;"></i></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-info"><h3>Stock Bajo</h3><div class="number">${stockBajo.length}</div></div>
-        <div class="stat-icon" style="background:#fff3cd;"><i class="fas fa-hourglass-half"></i></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-info"><h3>Total Vendidos</h3><div class="number">${productosData.reduce((sum, p) => sum + (p.vendidos || 0), 0)}</div></div>
-        <div class="stat-icon" style="background:#e5e5ff;"><i class="fas fa-chart-simple"></i></div>
-      </div>
-    </div>
-    
-    <div class="charts-row">
-      <div class="chart-container">
-        <h4>🏆 Top 5 productos más vendidos</h4>
-        ${topProductosList.map(([prod, count], idx) => `
-          <div class="rank-item">
-            <div class="rank-number">${idx + 1}</div>
-            <div class="rank-name">${prod.charAt(0).toUpperCase() + prod.slice(1)}</div>
-            <div class="rank-value">${count} ventas</div>
-          </div>
-        `).join('')}
-      </div>
-      <div class="chart-container">
-        <h4>📊 Categorías más vendidas</h4>
-        <canvas id="categoriasChart"></canvas>
-      </div>
-    </div>
-    
-    <div class="section-card">
-      <div class="section-header">
-        <h3>📦 Inventario completo</h3>
-      </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
-        ${productosData.map(p => `
-          <div style="background: var(--gris-claro); padding: 15px; border-radius: 8px;">
-            <h4>${p.nombre}</h4>
-            <p>💰 Precio: $${p.precio}</p>
-            <p>📦 Stock: ${p.stock || 0} unidades</p>
-            <p>📈 Vendidos: ${p.vendidos || 0}</p>
-            <p>🏷️ Categoría: ${p.categoria || 'Sin categoría'}</p>
-            <button class="btn" style="background:#fd7e14; margin-top:10px;" onclick="editarProducto('${p.id}')">Editar</button>
-            <button class="btn" style="background:#dc3545;" onclick="eliminarProducto('${p.id}')">Eliminar</button>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  `;
-  
-  document.getElementById("appContent").innerHTML = html;
-  
-  setTimeout(() => {
-    const ctxCat = document.getElementById('categoriasChart')?.getContext('2d');
-    if (ctxCat) {
-      if (charts.categorias) charts.categorias.destroy();
-      charts.categorias = new Chart(ctxCat, {
-        type: 'pie',
-        data: {
-          labels: Object.keys(ventasPorCategoria),
-          datasets: [{ data: Object.values(ventasPorCategoria), backgroundColor: ['#fb0101', '#fd7e14', '#ffc107', '#28a745', '#17a2b8'] }]
-        },
-        options: { responsive: true, maintainAspectRatio: true }
-      });
-    }
-  }, 100);
-}
-
-// ========== SECCIÓN CLIENTES ==========
-function mostrarClientes() {
-  const clientesArray = [...clientesMap.values()].sort((a, b) => b.totalGastado - a.totalGastado);
-  const clientesFrecuentes = clientesArray.slice(0, 5);
-  const nuevosRegistros = clientesArray.filter(c => {
-    const ultimo = new Date(c.ultimoPedido);
-    const hoy = new Date();
-    const diffDays = (hoy - ultimo) / (1000 * 60 * 60 * 24);
-    return diffDays <= 7;
-  });
-  const clientesActivos = clientesArray.filter(c => {
-    const ultimo = new Date(c.ultimoPedido);
-    const hoy = new Date();
-    const diffDays = (hoy - ultimo) / (1000 * 60 * 60 * 24);
-    return diffDays <= 30;
-  });
-  
-  const html = `
-    <div class="top-bar">
-      <h1 class="page-title">👥 Clientes y Usuarios</h1>
-    </div>
-    
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-info"><h3>Total Clientes</h3><div class="number">${clientesArray.length}</div></div>
-        <div class="stat-icon" style="background:#e5f5e5;"><i class="fas fa-users"></i></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-info"><h3>Nuevos (7 días)</h3><div class="number">${nuevosRegistros.length}</div></div>
-        <div class="stat-icon" style="background:#ffe5e5;"><i class="fas fa-user-plus"></i></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-info"><h3>Clientes Activos</h3><div class="number">${clientesActivos.length}</div></div>
-        <div class="stat-icon" style="background:#e5e5ff;"><i class="fas fa-user-check"></i></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-info"><h3>Ticket Promedio</h3><div class="number">$${Math.round(clientesArray.reduce((sum, c) => sum + c.totalGastado, 0) / (clientesArray.length || 1))}</div></div>
-        <div class="stat-icon" style="background:#fff3cd;"><i class="fas fa-receipt"></i></div>
-      </div>
-    </div>
-    
-    <div class="charts-row">
-      <div class="chart-container">
-        <h4>🏆 Clientes frecuentes (Top 5)</h4>
-        ${clientesFrecuentes.map((c, idx) => `
-          <div class="rank-item">
-            <div class="rank-number">${idx + 1}</div>
-            <div class="rank-name">${c.email.split('@')[0]}</div>
-            <div class="rank-value">$${c.totalGastado}</div>
-          </div>
-        `).join('')}
-      </div>
-      <div class="chart-container">
-        <h4>📊 Historial de compras</h4>
-        <canvas id="historialChart"></canvas>
-      </div>
-    </div>
-    
-    <div class="section-card">
-      <div class="section-header">
-        <h3>📋 Lista completa de clientes</h3>
-      </div>
-      <table>
-        <thead><tr><th>Email</th><th>Total Pedidos</th><th>Total Gastado</th><th>Último Pedido</th></tr></thead>
-        <tbody>
-          ${clientesArray.map(c => `
-            <tr>
-              <td>${c.email}</td>
-              <td>${c.totalPedidos}</td>
-              <td>$${c.totalGastado.toLocaleString()}</td>
-              <td>${c.ultimoPedido?.split(',')[0] || 'N/A'}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
-  
-  document.getElementById("appContent").innerHTML = html;
-  
-  setTimeout(() => {
-    const ctxHist = document.getElementById('historialChart')?.getContext('2d');
-    if (ctxHist) {
-      const ultimos6Meses = [];
-      const ventasMensuales = [];
-      for (let i = 5; i >= 0; i--) {
-        const fecha = new Date();
-        fecha.setMonth(fecha.getMonth() - i);
-        const mes = fecha.toLocaleString('es', { month: 'short' });
-        ultimos6Meses.push(mes);
-        ventasMensuales.push(Math.floor(Math.random() * 10000) + 2000);
-      }
-      
-      if (charts.historial) charts.historial.destroy();
-      charts.historial = new Chart(ctxHist, {
-        type: 'bar',
-        data: {
-          labels: ultimos6Meses,
-          datasets: [{ label: 'Ventas ($)', data: ventasMensuales, backgroundColor: '#fb0101', borderRadius: 8 }]
-        },
-        options: { responsive: true, maintainAspectRatio: true }
-      });
-    }
-  }, 100);
-}
-
-// ========== SECCIÓN REPORTES ==========
-function mostrarReportes() {
-  // Horas pico
-  const pedidosPorHora = Array(24).fill(0);
-  pedidosData.forEach(p => {
-    if (p.fecha) {
-      const hora = parseInt(p.fecha.split(' ')[1]?.split(':')[0] || 0);
-      if (!isNaN(hora)) pedidosPorHora[hora]++;
-    }
-  });
-  
-  const horaPico = pedidosPorHora.indexOf(Math.max(...pedidosPorHora));
-  
-  // Tiempos de entrega (simulados)
-  const entregados = pedidosData.filter(p => p.estado === 'Entregado');
-  const pendientes = pedidosData.filter(p => p.estado === 'Pendiente' || !p.estado);
-  const enPreparacion = pedidosData.filter(p => p.estado === 'En preparación');
-  const enCamino = pedidosData.filter(p => p.estado === 'En camino');
-  
-  // Ventas por día de semana
-  const ventasPorDiaSemana = [0, 0, 0, 0, 0, 0, 0];
-  const diasNombres = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-  pedidosData.forEach(p => {
-    if (p.fecha) {
-      const dia = new Date(p.fecha).getDay();
-      ventasPorDiaSemana[dia] += p.total || 0;
-    }
-  });
-  
-  const html = `
-    <div class="top-bar">
-      <h1 class="page-title">📊 Reportes de Reparto y Horarios</h1>
-      <button class="btn btn-primary" onclick="exportarReporteCompleto()"><i class="fas fa-download"></i> Exportar Reporte</button>
-    </div>
-    
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-info"><h3>Hora Pico</h3><div class="number">${horaPico}:00 - ${horaPico + 1}:00</div></div>
-        <div class="stat-icon" style="background:#ffe5e5;"><i class="fas fa-clock"></i></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-info"><h3>Pedidos Entregados</h3><div class="number">${entregados.length}</div></div>
-        <div class="stat-icon" style="background:#e5f5e5;"><i class="fas fa-check-circle" style="color:var(--verde-exito);"></i></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-info"><h3>Pedidos Pendientes</h3><div class="number">${pendientes.length}</div></div>
-        <div class="stat-icon" style="background:#fff3cd;"><i class="fas fa-hourglass-half"></i></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-info"><h3>Tasa de Entregas</h3><div class="number">${Math.round((entregados.length / (pedidosData.length || 1)) * 100)}%</div></div>
-        <div class="stat-icon" style="background:#e5e5ff;"><i class="fas fa-chart-pie"></i></div>
-      </div>
-    </div>
-    
-    <div class="charts-row">
-      <div class="chart-container">
-        <h4>⏰ Pedidos por hora (Horario pico)</h4>
-        <canvas id="horasPicoChart"></canvas>
-      </div>
-      <div class="chart-container">
-        <h4>📊 Ventas por día de la semana</h4>
-        <canvas id="diaSemanaChart"></canvas>
-      </div>
-    </div>
-    
-    <div class="charts-row">
-      <div class="chart-container">
-        <h4>🚚 Estado de pedidos</h4>
-        <canvas id="estadosGeneralChart"></canvas>
-      </div>
-      <div class="chart-container">
-        <h4>📈 Resumen ejecutivo</h4>
-        <div style="padding: 20px;">
-          <div class="rank-item"><strong>Total de pedidos:</strong> <span>${pedidosData.length}</span></div>
-          <div class="rank-item"><strong>Ingresos totales:</strong> <span>$${pedidosData.reduce((sum, p) => sum + (p.total || 0), 0).toLocaleString()}</span></div>
-          <div class="rank-item"><strong>Clientes únicos:</strong> <span>${clientesMap.size}</span></div>
-          <div class="rank-item"><strong>Ticket promedio:</strong> <span>$${Math.round(pedidosData.reduce((sum, p) => sum + (p.total || 0), 0) / (pedidosData.length || 1))}</span></div>
-          <div class="rank-item"><strong>Productos más vendido:</strong> <span>Cerveza Corona</span></div>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  document.getElementById("appContent").innerHTML = html;
-  
-  setTimeout(() => {
-    const ctxHoras = document.getElementById('horasPicoChart')?.getContext('2d');
-    if (ctxHoras) {
-      if (charts.horasPico) charts.horasPico.destroy();
-      charts.horasPico = new Chart(ctxHoras, {
-        type: 'bar',
-        data: {
-          labels: Array.from({length: 24}, (_, i) => `${i}:00`),
-          datasets: [{ label: 'Pedidos', data: pedidosPorHora, backgroundColor: '#fb0101', borderRadius: 8 }]
-        },
-        options: { responsive: true, maintainAspectRatio: true }
-      });
-    }
-    
-    const ctxDia = document.getElementById('diaSemanaChart')?.getContext('2d');
-    if (ctxDia) {
-      if (charts.diaSemana) charts.diaSemana.destroy();
-      charts.diaSemana = new Chart(ctxDia, {
-        type: 'line',
-        data: {
-          labels: diasNombres,
-          datasets: [{ label: 'Ventas ($)', data: ventasPorDiaSemana, borderColor: '#fd7e14', backgroundColor: 'rgba(253,126,20,0.1)', fill: true, tension: 0.4 }]
-        },
-        options: { responsive: true, maintainAspectRatio: true }
-      });
-    }
-    
-    const ctxEstados = document.getElementById('estadosGeneralChart')?.getContext('2d');
-    if (ctxEstados) {
-      if (charts.estadosGeneral) charts.estadosGeneral.destroy();
-      charts.estadosGeneral = new Chart(ctxEstados, {
-        type: 'doughnut',
-        data: {
-          labels: ['Pendiente', 'En preparación', 'En camino', 'Entregado'],
-          datasets: [{
-            data: [
-              pedidosData.filter(p => p.estado === "Pendiente" || !p.estado).length,
-              pedidosData.filter(p => p.estado === "En preparación").length,
-              pedidosData.filter(p => p.estado === "En camino").length,
-              pedidosData.filter(p => p.estado === "Entregado").length
-            ],
-            backgroundColor: ['#ffc107', '#fd7e14', '#17a2b8', '#28a745']
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: true }
-      });
-    }
-  }, 100);
-}
-
-// ========== FUNCIONES AUXILIARES ==========
-window.filtrarPedidosTabla = function() {
-  const filtro = document.getElementById("filtroEstado").value;
-  const filtrados = filtro === "todos" ? pedidosData : pedidosData.filter(p => (p.estado || "Pendiente") === filtro);
-  document.getElementById("tablaPedidosContainer").innerHTML = renderTablaPedidos(filtrados);
-};
-
-window.actualizarEstado = async function(id, nuevoEstado) {
-  await db.collection("pedidos").doc(id).update({ estado: nuevoEstado });
-  await cargarPedidos();
-  mostrarVentas();
-  alert(`✅ Pedido #${id} actualizado a ${nuevoEstado}`);
-};
-
-window.agregarProducto = async function() {
-  const nombre = prompt("Nombre del producto:");
-  const precio = prompt("Precio:");
-  const stock = prompt("Stock inicial:");
-  const categoria = prompt("Categoría:");
-  if (nombre && precio) {
-    await db.collection("productos").add({
-      nombre, precio: parseFloat(precio), stock: parseInt(stock) || 0, vendidos: 0, categoria: categoria || "Otros"
-    });
-    await cargarProductos();
-    mostrarProductos();
-  }
-};
-
-window.editarProducto = async function(id) {
-  const producto = productosData.find(p => p.id === id);
-  const nuevoNombre = prompt("Nuevo nombre:", producto.nombre);
-  const nuevoPrecio = prompt("Nuevo precio:", producto.precio);
-  const nuevoStock = prompt("Nuevo stock:", producto.stock);
-  if (nuevoNombre && nuevoPrecio) {
-    await db.collection("productos").doc(id).update({
-      nombre: nuevoNombre, precio: parseFloat(nuevoPrecio), stock: parseInt(nuevoStock) || 0
-    });
-    await cargarProductos();
-    mostrarProductos();
-  }
-};
-
-window.eliminarProducto = async function(id) {
-  if (confirm("¿Eliminar este producto?")) {
-    await db.collection("productos").doc(id).delete();
-    await cargarProductos();
-    mostrarProductos();
-  }
-};
-
-window.exportarReporte = function() {
-  const csv = pedidosData.map(p => `${p.id},${p.cliente},${p.direccion},${p.productos},${p.total},${p.estado},${p.fecha}`).join("\n");
-  const blob = new Blob(["ID,Cliente,Direccion,Productos,Total,Estado,Fecha\n" + csv], { type: "text/csv" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = `reporte_pedidos_${new Date().toISOString().slice(0,19)}.csv`;
-  link.click();
-};
-
-window.exportarReporteCompleto = function() {
-  const totalVentas = pedidosData.reduce((sum, p) => sum + (p.total || 0), 0);
-  const entregados = pedidosData.filter(p => p.estado === 'Entregado').length;
-  const reporte = `REPORTE COMPLETO - Tu Six a Domicilio
-Fecha: ${new Date().toLocaleString()}
-----------------------------------------
-📊 ESTADÍSTICAS GENERALES:
-- Total Pedidos: ${pedidosData.length}
-- Total Ventas: $${totalVentas.toLocaleString()}
-- Pedidos Entregados: ${entregados}
-- Tasa de Entrega: ${Math.round((entregados / (pedidosData.length || 1)) * 100)}%
-- Total Clientes: ${clientesMap.size}
-----------------------------------------`;
-  alert(reporte);
-  const blob = new Blob([reporte], { type: "text/plain" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = `reporte_completo_${new Date().toISOString().slice(0,19)}.txt`;
-  link.click();
-};
-
-function cambiarSeccion(section) {
-  document.querySelectorAll('.nav-menu li').forEach(li => li.classList.remove('active'));
-  document.querySelector(`[data-section="${section}"]`).classList.add('active');
-  
+function actualizarVistaActual() {
   const funciones = {
     dashboard: mostrarDashboard,
     ventas: mostrarVentas,
@@ -1300,10 +680,17 @@ function cambiarSeccion(section) {
     clientes: mostrarClientes,
     reportes: mostrarReportes
   };
-  if (funciones[section]) funciones[section]();
+  if (funciones[seccionActual]) funciones[seccionActual]();
 }
 
-// Event listeners
+function cambiarSeccion(section) {
+  seccionActual = section;
+  document.querySelectorAll('.nav-menu li').forEach(li => li.classList.remove('active'));
+  const el = document.querySelector(`[data-section="${section}"]`);
+  if (el) el.classList.add('active');
+  actualizarVistaActual();
+}
+
 document.querySelectorAll('.nav-menu li').forEach(li => {
   li.addEventListener('click', () => {
     const section = li.getAttribute('data-section');
@@ -1311,21 +698,402 @@ document.querySelectorAll('.nav-menu li').forEach(li => {
   });
 });
 
-// Autenticación
-auth.onAuthStateChanged(async (user) => {
-  if (user && ADMIN_EMAILS.includes(user.email)) {
-    document.getElementById("adminEmail").innerText = user.email;
-    document.getElementById("loginContainer").style.display = "none";
-    document.getElementById("appContent").style.display = "block";
-    await cargarDatos();
-    mostrarDashboard();
-  } else if (user) {
-    await auth.signOut();
+// ========== DASHBOARD GENERAL ==========
+function mostrarDashboard() {
+  const hoy = new Date().toLocaleDateString();
+  const pedidosHoy = pedidosData.filter(p => p.fecha?.includes(hoy)).length;
+  const ventasHoy = pedidosData.filter(p => p.fecha?.includes(hoy)).reduce((sum, p) => sum + (p.total || 0), 0);
+  
+  const ventasPorProducto = {};
+  pedidosData.forEach(p => {
+    if (p.productos) {
+      p.productos.split(',').forEach(prod => {
+        const name = prod.trim().toLowerCase();
+        if(name) ventasPorProducto[name] = (ventasPorProducto[name] || 0) + 1;
+      });
+    }
+  });
+  
+  const topProductos = Object.entries(ventasPorProducto).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  
+  let html = `
+    <div class="top-bar">
+      <h1 class="page-title">Dashboard General</h1>
+      <div class="date-time">${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-info"><h3>Ventas de Hoy</h3><div class="number">$${ventasHoy.toLocaleString()}</div></div>
+        <div class="stat-icon" style="background:#e5f5e5;"><i class="fas fa-dollar-sign" style="color:var(--verde-exito);"></i></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info"><h3>Pedidos de Hoy</h3><div class="number">${pedidosHoy}</div></div>
+        <div class="stat-icon" style="background:#ffe5e5;"><i class="fas fa-shopping-cart" style="color:var(--rojo-six);"></i></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info"><h3>Total Clientes</h3><div class="number">${clientesMap.size}</div></div>
+        <div class="stat-icon" style="background:#e5e5ff;"><i class="fas fa-users" style="color:#667eea;"></i></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info"><h3>Total Histórico</h3><div class="number">${pedidosData.length}</div></div>
+        <div class="stat-icon" style="background:#fff3cd;"><i class="fas fa-chart-line" style="color:#fd7e14;"></i></div>
+      </div>
+    </div>
+    
+    <div class="charts-row">
+      <div class="chart-container">
+        <h4>📊 Estados de Pedidos</h4>
+        <canvas id="estadosChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h4>🏆 Top Productos</h4>
+        <div id="topProductosList">
+          ${topProductos.map(([prod, count], idx) => `
+            <div class="rank-item">
+              <div class="rank-number">${idx + 1}</div>
+              <div class="rank-name">${prod.toUpperCase()}</div>
+              <div class="rank-value">${count} u.</div>
+            </div>
+          `).join('')}
+          ${topProductos.length === 0 ? '<p>Sin pedidos registrados</p>' : ''}
+        </div>
+      </div>
+    </div>
+    
+    <div class="section-card">
+      <div class="section-header">
+        <h3>📋 Pedidos Recientes</h3>
+        <button class="btn btn-primary" onclick="cambiarSeccion('ventas')">Ver todos</button>
+      </div>
+      <div class="table-responsive">
+        <table>
+          <thead><tr><th>ID</th><th>Cliente</th><th>Productos</th><th>Total</th><th>Estado</th></tr></thead>
+          <tbody>
+            ${pedidosData.slice(0, 5).map(p => `
+              <tr>
+                <td>#${p.id?.slice(-5)}</td>
+                <td>${p.cliente || p.nombreCliente || 'Anónimo'}</td>
+                <td>${p.productos || 'N/A'}</td>
+                <td>$${p.total || 0}</td>
+                <td><span class="estado-badge estado-${(p.estado || 'Pendiente').toLowerCase().replace(/\s/g, '')}">${p.estado || 'Pendiente'}</span></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById("appContent").innerHTML = html;
+  instanciarGraficaDoughnut();
+}
+
+function instanciarGraficaDoughnut() {
+  setTimeout(() => {
+    const ctx = document.getElementById('estadosChart')?.getContext('2d');
+    if (!ctx) return;
+    if (charts.estados) charts.estados.destroy();
+    charts.estados = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Pendiente', 'En preparación', 'En camino', 'Entregado'],
+        datasets: [{
+          data: [
+            pedidosData.filter(p => (p.estado || 'Pendiente') === "Pendiente").length,
+            pedidosData.filter(p => p.estado === "En preparación").length,
+            pedidosData.filter(p => p.estado === "En camino").length,
+            pedidosData.filter(p => p.estado === "Entregado").length
+          ],
+          backgroundColor: ['#ffc107', '#fd7e14', '#17a2b8', '#28a745']
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }, 50);
+}
+
+// ========== SECCIÓN VENTAS ==========
+function mostrarVentas() {
+  const ingresosTotales = pedidosData.reduce((sum, p) => sum + (p.total || 0), 0);
+  
+  const html = `
+    <div class="top-bar">
+      <h1 class="page-title">📈 Historial de Ventas y Pedidos</h1>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-info"><h3>Ingresos Totales</h3><div class="number">$${ingresosTotales.toLocaleString()}</div></div>
+        <div class="stat-icon" style="background:#e5f5e5;"><i class="fas fa-dollar-sign" style="color:var(--verde-exito);"></i></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info"><h3>Pedidos Recibidos</h3><div class="number">${pedidosData.length}</div></div>
+        <div class="stat-icon" style="background:#ffe5e5;"><i class="fas fa-shopping-basket"></i></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info"><h3>Ticket Promedio</h3><div class="number">$${Math.round(ingresosTotales / (pedidosData.length || 1))}</div></div>
+        <div class="stat-icon" style="background:#fff3cd;"><i class="fas fa-receipt"></i></div>
+      </div>
+    </div>
+    
+    <div class="section-card">
+      <div class="section-header">
+        <h3>📋 Todos los Pedidos en Sistema</h3>
+      </div>
+      <div class="table-responsive">
+        <table>
+          <thead><tr><th>ID</th><th>Cliente</th><th>Dirección</th><th>Productos</th><th>Total</th><th>Método Pago</th><th>Estado</th><th>Fecha</th></tr></thead>
+          <tbody>
+            ${pedidosData.map(p => `
+              <tr>
+                <td>#${p.id?.slice(-5)}</td>
+                <td><strong>${p.cliente || p.nombreCliente || 'Anónimo'}</strong></td>
+                <td>${p.direccion || 'N/A'}</td>
+                <td>${p.productos || 'N/A'}</td>
+                <td>$${p.total || 0}</td>
+                <td><i class="fas ${p.metodoPago === 'Tarjeta' ? 'fa-credit-card' : 'fa-money-bill-wave'}"></i> ${p.metodoPago || 'Efectivo'}</td>
+                <td>
+                  <select onchange="actualizarEstado('${p.id}', this.value)" style="padding: 5px; border-radius:4px; font-weight:bold;">
+                    <option value="Pendiente" ${(p.estado || 'Pendiente') === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                    <option value="En preparación" ${p.estado === 'En preparación' ? 'selected' : ''}>En preparación</option>
+                    <option value="En camino" ${p.estado === 'En camino' ? 'selected' : ''}>En camino</option>
+                    <option value="Entregado" ${p.estado === 'Entregado' ? 'selected' : ''}>Entregado</option>
+                  </select>
+                </td>
+                <td>${p.fecha || 'N/A'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  document.getElementById("appContent").innerHTML = html;
+}
+
+async function actualizarEstado(id, nuevoEstado) {
+  try {
+    await db.collection("pedidos").doc(id).update({ estado: nuevoEstado });
+  } catch(e) {
+    alert("Error al actualizar estado: " + e.message);
   }
-});
+}
+
+// ========== SECCIÓN PRODUCTOS ==========
+function mostrarProductos() {
+  const ventasPorCategoria = {};
+  productosData.forEach(prod => {
+    ventasPorCategoria[prod.categoria || 'Otros'] = (ventasPorCategoria[prod.categoria || 'Otros'] || 0) + (prod.vendidos || 0);
+  });
+
+  const html = `
+    <div class="top-bar">
+      <h1 class="page-title">📦 Inventario de Productos</h1>
+      <button class="btn btn-primary" onclick="abrirModal()"><i class="fas fa-plus"></i> Nuevo Producto</button>
+    </div>
+    
+    <div class="charts-row">
+      <div class="chart-container" style="max-width: 500px; margin: 0 auto 25px auto;">
+        <h4>📊 Unidades Vendidas por Categoría</h4>
+        <canvas id="categoriasChart" style="height:250px;"></canvas>
+      </div>
+    </div>
+    
+    <div class="section-card">
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+        ${productosData.map(p => `
+          <div style="background: white; padding: 20px; border-radius: 12px; box-shadow:0 2px 8px rgba(0,0,0,0.06); display:flex; flex-direction:column; justify-content:space-between; border: 1px solid var(--gris-borde);">
+            <div style="text-align:center; margin-bottom:15px;">
+              ${p.imagen ? `<img src="${p.imagen}" style="max-height:80px; max-width:100%; object-fit:contain; margin-bottom:10px;">` : `<i class="fas fa-box" style="font-size:48px; color:#ccc; margin-bottom:10px;"></i>`}
+              <h3 style="font-family:'PT Sans', sans-serif; font-size:18px;">${p.nombre}</h3>
+              <span class="estado-badge" style="background:#e1f5fe; color:#0288d1; margin-top:5px;">${p.categoria}</span>
+            </div>
+            <div style="font-size:14px; color:#555; margin-bottom:15px;">
+              <p><strong>Precio:</strong> $${p.precio}</p>
+              <p><strong>Stock:</strong> ${p.stock || 0} unidades</p>
+              <p><strong>Vendidos:</strong> ${p.vendidos || 0} unidades</p>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+              <button class="btn btn-warning" onclick="abrirModal('${p.id}')"><i class="fas fa-edit"></i> Editar</button>
+              <button class="btn btn-danger" onclick="eliminarProducto('${p.id}')"><i class="fas fa-trash"></i> Borrar</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  document.getElementById("appContent").innerHTML = html;
+  
+  setTimeout(() => {
+    const ctx = document.getElementById('categoriasChart')?.getContext('2d');
+    if (!ctx) return;
+    if(charts.categorias) charts.categorias.destroy();
+    charts.categorias = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: Object.keys(ventasPorCategoria),
+        datasets: [{ data: Object.values(ventasPorCategoria), backgroundColor: ['#fb0101', '#fd7e14', '#ffc107', '#28a745'] }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }, 50);
+}
+
+function abrirModal(id = '') {
+  const modal = document.getElementById("productoModal");
+  modal.style.display = "flex";
+  if(id) {
+    document.getElementById("modalTitulo").innerText = "Editar Producto";
+    const prod = productosData.find(p => p.id === id);
+    document.getElementById("prodId").value = prod.id;
+    document.getElementById("prodNombre").value = prod.nombre;
+    document.getElementById("prodPrecio").value = prod.precio;
+    document.getElementById("prodStock").value = prod.stock;
+    document.getElementById("prodCategoria").value = prod.categoria || 'Cervezas';
+    document.getElementById("prodImagen").value = prod.imagen || '';
+  } else {
+    document.getElementById("modalTitulo").innerText = "Agregar Producto";
+    document.getElementById("prodId").value = '';
+    document.getElementById("prodNombre").value = '';
+    document.getElementById("prodPrecio").value = '';
+    document.getElementById("prodStock").value = '';
+    document.getElementById("prodCategoria").value = 'Cervezas';
+    document.getElementById("prodImagen").value = '';
+  }
+}
+
+function cerrarModal() {
+  document.getElementById("productoModal").style.display = "none";
+}
+
+async function guardarProducto() {
+  const id = document.getElementById("prodId").value;
+  const nombre = document.getElementById("prodNombre").value.trim();
+  const precio = parseFloat(document.getElementById("prodPrecio").value);
+  const stock = parseInt(document.getElementById("prodStock").value);
+  const categoria = document.getElementById("prodCategoria").value;
+  const imagen = document.getElementById("prodImagen").value.trim();
+  
+  if(!nombre || isNaN(precio) || isNaN(stock)) {
+    alert("Por favor rellena correctamente los campos obligatorios.");
+    return;
+  }
+  
+  const datos = { nombre, precio, stock, categoria, imagen };
+  
+  try {
+    if(id) {
+      await db.collection("productos").doc(id).update(datos);
+    } else {
+      datos.vendidos = 0;
+      await db.collection("productos").add(datos);
+    }
+    cerrarModal();
+    await cargarProductos();
+    mostrarProductos();
+  } catch(e) {
+    alert("Error al guardar producto: " + e.message);
+  }
+}
+
+async function eliminarProducto(id) {
+  if(confirm("¿Estás seguro de eliminar este producto de forma permanente?")) {
+    try {
+      await db.collection("productos").doc(id).delete();
+      await cargarProductos();
+      mostrarProductos();
+    } catch(e) {
+      alert("Error al eliminar: " + e.message);
+    }
+  }
+}
+
+// ========== SECCIÓN CLIENTES ==========
+function mostrarClientes() {
+  const clientesArray = [...clientesMap.values()].sort((a,b) => b.totalGastado - a.totalGastado);
+  
+  const html = `
+    <div class="top-bar">
+      <h1 class="page-title">👥 Directorio de Clientes Frecuentes</h1>
+    </div>
+    
+    <div class="section-card">
+      <div class="table-responsive">
+        <table>
+          <thead><tr><th>Nombre / ID</th><th>Dirección de Entrega</th><th>Total Pedidos</th><th>Total Consumido</th><th>Último Pedido</th></tr></thead>
+          <tbody>
+            ${clientesArray.map(c => `
+              <tr>
+                <td><strong>${c.nombre}</strong></td>
+                <td>${c.direccion}</td>
+                <td>${c.totalPedidos} compras</td>
+                <td style="color:var(--verde-exito); font-weight:bold;">$${c.totalGastado.toLocaleString()}</td>
+                <td>${c.ultimoPedido}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  document.getElementById("appContent").innerHTML = html;
+}
+
+// ========== SECCIÓN REPORTES ==========
+function mostrarReportes() {
+  const html = `
+    <div class="top-bar">
+      <h1 class="page-title">📁 Centro de Reportes Gerenciales</h1>
+    </div>
+    
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
+      <div class="section-card" style="text-align:center; padding:30px;">
+        <i class="fas fa-file-invoice-dollar" style="font-size:50px; color:var(--rojo-six); margin-bottom:15px;"></i>
+        <h3>Reporte Completo de Ventas</h3>
+        <p style="color:#666; font-size:14px; margin: 10px 0 20px 0;">Descarga todo el histórico de pedidos, totales, direcciones de envío y estatus en formato TXT.</p>
+        <button class="btn btn-primary" onclick="descargarReporteTxt()"><i class="fas fa-download"></i> Descargar TXT</button>
+      </div>
+    </div>
+  `;
+  document.getElementById("appContent").innerHTML = html;
+}
+
+function descargarReporteTxt() {
+  if (pedidosData.length === 0) {
+    alert("No hay pedidos registrados para generar un reporte.");
+    return;
+  }
+  
+  let txt = `========================================\n`;
+  txt += `       TU SIX A DOMICILIO - REPORTE\n`;
+  txt += `       Fecha: ${new Date().toLocaleString()}\n`;
+  txt += `========================================\n\n`;
+  
+  pedidosData.forEach((p, i) => {
+    txt += `Pedido #${i+1} [ID: ${p.id}]\n`;
+    txt += `- Cliente: ${p.cliente || p.nombreCliente || 'Anónimo'}\n`;
+    txt += `- Dirección: ${p.direccion || 'N/A'}\n`;
+    txt += `- Productos: ${p.productos || 'N/A'}\n`;
+    txt += `- Total: $${p.total || 0}\n`;
+    txt += `- Método de Pago: ${p.metodoPago || 'Efectivo'}\n`;
+    txt += `- Estado: ${p.estado || 'Pendiente'}\n`;
+    txt += `- Fecha/Hora: ${p.fecha || 'N/A'}\n`;
+    txt += `----------------------------------------\n`;
+  });
+  
+  txt += `\nRESUMEN GENERAL:\n`;
+  txt += `- Total Pedidos: ${pedidosData.length}\n`;
+  txt += `- Ingresos Brutos: $${pedidosData.reduce((sum, p) => sum + (p.total || 0), 0).toLocaleString()}\n`;
+  txt += `- Clientes Únicos Atendidos: ${clientesMap.size}\n`;
+  txt += `========================================\n`;
+
+  const blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `reporte_ventas_${new Date().toISOString().slice(0,10)}.txt`;
+  link.click();
+}
 </script>
 </body>
 </html>
-
-</html>
-
