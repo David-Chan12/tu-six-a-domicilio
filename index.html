@@ -277,7 +277,7 @@
   font-weight: bold;
   color: white;
 ">
-  实时 Cargando clima...
+  Cargando clima...
 </div>
 
 <section id="catalogo">
@@ -372,10 +372,10 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-let productosData = []; // Requerido por la instrucción 3
+let productosData = [];
 
 window.onload = function() {
-  cargarProductos(); // Requerido por la instrucción 4
+  cargarProductos();
   cargarFotosGuardadas();
 };
 
@@ -400,7 +400,7 @@ auth.onAuthStateChanged(user => {
   cargarPedidos();
 });
 
-// FUNCIÓN DE CARGA DE PRODUCTOS DE FIREBASE REESTRUCTURADA Y CORREGIDA
+// FUNCIÓN DE CARGA DE PRODUCTOS CORREGIDA (EVITA CATEGORÍAS INDEFINIDAS)
 async function cargarProductos() {
   const contenedor = document.getElementById("productosContainer");
   if (!contenedor) return;
@@ -410,10 +410,29 @@ async function cargarProductos() {
   contenedor.innerHTML = "";
   
   snapshot.forEach(doc => {
+    const data = doc.data();
+    
+    // Validamos que la categoría exista en el producto, si no, le asignamos una por defecto según su nombre
+    let catValidada = data.categoria || "General";
+    if (catValidada === "undefined" || catValidada === "") {
+      if (data.nombre && data.nombre.toLowerCase().includes("cerveza")) {
+        catValidada = "Cervezas";
+      } else if (data.nombre && data.nombre.toLowerCase().includes("hielo")) {
+        catValidada = "Hielo";
+      } else {
+        catValidada = "General";
+      }
+    }
+
     const producto = {
       id: doc.id,
-      ...doc.data()
+      nombre: data.nombre || "Producto sin nombre",
+      precio: data.precio || 0,
+      categoria: catValidada,
+      stock: data.stock || 0,
+      imagen: data.imagen || ""
     };
+    
     productosData.push(producto);
     
     contenedor.innerHTML += `
@@ -422,8 +441,8 @@ async function cargarProductos() {
         <div class="producto-info">
           <h3>${producto.nombre}</h3>
           <p><strong>$${producto.precio}</strong></p>
-          <p>${producto.categoria}</p>
-          <p>Stock: ${producto.stock || 0}</p>
+          <p>Categoría: ${producto.categoria}</p>
+          <p>Stock: ${producto.stock}</p>
           <div class="producto-footer">
             <input
               type="checkbox"
@@ -455,15 +474,19 @@ function actualizarResumen() {
   document.getElementById('totalPedido').innerText = `$${total}`;
 }
 
-// FUNCIÓN GUARDAR PEDIDO REEMPLAZADA TOTALMENTE SEGÚN INSTRUCCIÓN 7
+// FUNCIÓN GUARDAR PEDIDO TOTALMENTE OPTIMIZADA PARA COMPATIBILIDAD CON EL PANEL ADMIN
 async function guardarPedido() {
-  const nombre = document.getElementById('nombreCliente').value;
-  const direccion = document.getElementById('direccionEntrega').value;
+  const nombre = document.getElementById('nombreCliente').value.trim();
+  const direccion = document.getElementById('direccionEntrega').value.trim();
   const metodoPago = document.getElementById('metodoPago').value;
   const checks = document.querySelectorAll('.producto-check:checked');
   
+  if (!nombre || !direccion) {
+    return alert('Por favor, ingresa tu nombre y dirección de entrega.');
+  }
+
   if (checks.length === 0) {
-    return alert('Selecciona productos');
+    return alert('Selecciona al menos un producto.');
   }
   
   const productos = [];
@@ -474,43 +497,61 @@ async function guardarPedido() {
       id: check.dataset.id,
       nombre: check.dataset.nombre,
       precio: Number(check.dataset.precio),
-      categoria: check.dataset.categoria,
+      categoria: check.dataset.categoria || "General", // Forzamos que se guarde la categoría real en el pedido
       amount: 1,
       subtotal: Number(check.dataset.precio)
     };
     productos.push(producto);
     total += producto.precio;
     
+    // Descontar inventario en Firebase
     const productoRef = db.collection('productos').doc(producto.id);
     const productoSnap = await productoRef.get();
-    const data = productoSnap.data();
-    
-    await productoRef.update({
-      stock: (data.stock || 0) - 1,
-      vendidos: (data.vendidos || 0) + 1
-    });
+    if (productoSnap.exists) {
+      const data = productoSnap.data();
+      await productoRef.update({
+        stock: Math.max(0, (data.stock || 0) - 1),
+        vendidos: (data.vendidos || 0) + 1
+      });
+    }
   }
   
+  // Generar formato estricto de fecha: "27/5/2026, 7:14:02 p.m." para la lectura inmediata de admin.html
+  const ahora = new Date();
+  const fechaString = `${ahora.getDate()}/${ahora.getMonth() + 1}/${ahora.getFullYear()}, ${ahora.getHours() % 12 || 12}:${String(ahora.getMinutes()).padStart(2, '0')}:${String(ahora.getSeconds()).padStart(2, '0')} ${ahora.getHours() >= 12 ? 'p.m.' : 'a.m.'}`;
+
   const pedido = {
     cliente: nombre,
     email: auth.currentUser.email,
     direccion,
-    productos,
+    productos, // Array de objetos estructurado con la categoría corregida
     total,
     cantidadProductos: productos.length,
     metodoPago,
     estado: 'Pendiente',
-    fecha: new Date().toLocaleString(),
+    fecha: fechaString, // Fecha sincronizada en texto plano
     fechaTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    hora: new Date().getHours(),
-    diaSemana: new Date().getDay(),
-    mes: new Date().getMonth() + 1
+    hora: ahora.getHours(),
+    diaSemana: ahora.getDay(),
+    mes: ahora.getMonth() + 1
   };
   
-  await db.collection('pedidos').add(pedido);
-  alert('Pedido realizado correctamente 🍺');
-  cargarProductos();
-  cargarPedidos();
+  try {
+    await db.collection('pedidos').add(pedido);
+    alert('Pedido realizado correctamente 🍺');
+    
+    // Limpiar formulario y refrescar interfaz
+    document.getElementById('nombreCliente').value = "";
+    document.getElementById('direccionEntrega').value = "";
+    checks.forEach(c => c.checked = false);
+    actualizarResumen();
+    
+    cargarProductos();
+    cargarPedidos();
+  } catch (error) {
+    console.error("Error al guardar el pedido:", error);
+    alert("Hubo un error al procesar tu pedido. Inténtalo de nuevo.");
+  }
 }
 
 function cargarPedidos() {
@@ -584,10 +625,10 @@ function logout() {
   });
 }
 
-
 function cerrarSesion() {
   logout();
 }
+
 // SERVICIO DEL CLIMA
 async function cargarClima() {
   const ciudad = "Valladolid";
