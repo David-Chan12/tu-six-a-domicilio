@@ -590,6 +590,31 @@ async function cargarClientes() {
   }
 }
 
+
+// ========== UTILIDADES DE PRODUCTOS ==========
+function obtenerProductosTexto(productos) {
+  if (Array.isArray(productos)) {
+    return productos.map(prod => `${prod.nombre || 'Producto'}${prod.amount ? ` (x${prod.amount})` : ''}`).join(', ');
+  }
+  if (typeof productos === 'string') {
+    return productos;
+  }
+  return 'Sin productos';
+}
+
+function obtenerProductosArray(productos) {
+  if (Array.isArray(productos)) {
+    return productos;
+  }
+  if (typeof productos === 'string') {
+    return productos.split(',').map(prod => ({
+      nombre: prod.trim(),
+      amount: 1
+    }));
+  }
+  return [];
+}
+
 // ========== DASHBOARD GENERAL ==========
 function mostrarDashboard() {
   const hoy = new Date().toLocaleDateString();
@@ -605,9 +630,12 @@ function mostrarDashboard() {
   const ventasPorProducto = {};
   pedidosData.forEach(p => {
     if (p.productos) {
-      const productosList = p.productos.split(',').map(prod => prod.trim().toLowerCase());
+      const productosList = obtenerProductosArray(p.productos);
       productosList.forEach(prod => {
-        ventasPorProducto[prod] = (ventasPorProducto[prod] || 0) + 1;
+        const nombreProducto = (prod.nombre || '').trim().toLowerCase();
+        if (nombreProducto) {
+          ventasPorProducto[nombreProducto] = (ventasPorProducto[nombreProducto] || 0) + (prod.amount || 1);
+        }
       });
     }
   });
@@ -678,7 +706,7 @@ function mostrarDashboard() {
             <tr>
               <td>#${p.id?.slice(-5)}</td>
               <td>${p.cliente || p.email?.split('@')[0]}</td>
-              <td>${p.productos?.substring(0, 30)}${p.productos?.length > 30 ? '...' : ''}</td>
+              <td>${obtenerProductosTexto(p.productos).substring(0, 30)}${obtenerProductosTexto(p.productos).length > 30 ? '...' : ''}</td>
               <td>$${p.total || 0}</td>
               <td><span class="estado-badge estado-${(p.estado || 'Pendiente').toLowerCase().replace(' ', '')}">${p.estado || 'Pendiente'}</span></td>
               <td>${p.fecha?.split(',')[0] || 'N/A'}</td>
@@ -844,7 +872,7 @@ function renderTablaPedidos(pedidos) {
             <td>#${p.id?.slice(-6)}</td>
             <td>${p.cliente || 'N/A'}</td>
             <td>${p.direccion?.substring(0, 30) || 'N/A'}</td>
-            <td>${p.productos?.substring(0, 30)}${p.productos?.length > 30 ? '...' : ''}</td>
+            <td>${obtenerProductosTexto(p.productos).substring(0, 30)}${obtenerProductosTexto(p.productos).length > 30 ? '...' : ''}</td>
             <td>$${p.total || 0}</td>
             <td>
               <select onchange="actualizarEstado('${p.id}', this.value)" class="estado-select" style="padding:5px;">
@@ -868,9 +896,12 @@ function mostrarProductos() {
   const ventasPorProducto = {};
   pedidosData.forEach(p => {
     if (p.productos) {
-      const productosList = p.productos.split(',').map(prod => prod.trim().toLowerCase());
+      const productosList = obtenerProductosArray(p.productos);
       productosList.forEach(prod => {
-        ventasPorProducto[prod] = (ventasPorProducto[prod] || 0) + 1;
+        const nombreProducto = (prod.nombre || '').trim().toLowerCase();
+        if (nombreProducto) {
+          ventasPorProducto[nombreProducto] = (ventasPorProducto[nombreProducto] || 0) + (prod.amount || 1);
+        }
       });
     }
   });

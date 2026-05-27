@@ -575,8 +575,19 @@ function login() {
 function registrar() {
   auth.createUserWithEmailAndPassword(document.getElementById("email").value, document.getElementById("password").value).then(() => alert("Cuenta creada")).catch(e => alert(e.message));
 }
-defineScript = function logout() { auth.signOut(); }
+function logout() {
+  auth.signOut().then(() => {
+    alert('Sesión cerrada correctamente');
+    window.location.reload();
+  }).catch((error) => {
+    console.error('Error al cerrar sesión:', error);
+  });
+}
 
+
+function cerrarSesion() {
+  logout();
+}
 // SERVICIO DEL CLIMA
 async function cargarClima() {
   const ciudad = "Valladolid";
