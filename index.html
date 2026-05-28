@@ -869,41 +869,58 @@ function cargarPedidos() {
 }
 
 // PERSISTENCIA DE LA GALERÍA
+// NUEVA FUNCIÓN: Subir foto a Firebase
 function procesarArchivo() {
   const archivoInput = document.getElementById("inputArchivo");
   const archivo = archivoInput.files[0];
-  if (!archivo) return alert("Selecciona una imagen.");
+  
+  if (!archivo) {
+    return Swal.fire('Falta la imagen', 'Por favor selecciona una imagen.', 'warning');
+  }
+
+  // Mostramos un mensaje de carga
+  Swal.fire({ title: 'Subiendo...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = async function(e) {
     const base64Image = e.target.result;
-    let fotosExistentes = JSON.parse(localStorage.getItem("galeriaSix") || "[]");
-    fotosExistentes.unshift(base64Image);
-    localStorage.setItem("galeriaSix", JSON.stringify(fotosExistentes));
-    mostrarImagenEnGaleria(base64Image);
-    archivoInput.value = "";
+    
+    try {
+      // Guardamos la imagen en Firestore en una colección llamada "galeria"
+      await db.collection("galeria").add({
+        imagen: base64Image,
+        fecha: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      archivoInput.value = "";
+      Swal.fire('¡Foto publicada!', 'La comunidad ya puede ver tu foto.', 'success');
+    } catch (error) {
+      Swal.fire('Error', 'No se pudo subir la foto.', 'error');
+    }
   };
   reader.readAsDataURL(archivo);
 }
 
+// NUEVA FUNCIÓN: Cargar fotos desde Firebase en tiempo real
 function cargarFotosGuardadas() {
   const contenedor = document.getElementById("contenedorFotos");
   if(!contenedor) return;
-  contenedor.innerHTML = "";
-  let fotos = JSON.parse(localStorage.getItem("galeriaSix") || "[]");
-  if (fotos.length === 0) {
-    contenedor.innerHTML = '<p style="padding:20px;">Sé el primero en compartir una foto.</p>';
-  } else {
-    fotos.forEach(src => mostrarImagenEnGaleria(src));
-  }
-}
-
-function mostrarImagenEnGaleria(src) {
-  const img = document.createElement("img");
-  img.src = src;
-  img.className = "foto-usuario";
-  const contenedor = document.getElementById("contenedorFotos");
-  if(contenedor) contenedor.insertBefore(img, contenedor.firstChild);
+  
+  // Usamos onSnapshot para que cuando alguien suba una foto, aparezca en todos los dispositivos al instante
+  db.collection("galeria").orderBy("fecha", "desc").onSnapshot(snapshot => {
+    contenedor.innerHTML = ""; // Limpiamos el contenedor
+    if (snapshot.empty) {
+      contenedor.innerHTML = '<p style="padding:20px;">Sé el primero en compartir una foto.</p>';
+    } else {
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const img = document.createElement("img");
+        img.src = data.imagen;
+        img.className = "foto-usuario";
+        contenedor.appendChild(img);
+      });
+    }
+  });
 }
 // ==========================================
 // FUNCIONES ACTUALIZADAS CON SWEETALERT2
