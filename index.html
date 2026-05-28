@@ -8,11 +8,144 @@
   <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700|Merriweather:400,700&display=swap" rel="stylesheet">
 
   <style>
-    :root {
+ /* CORRECCIÓN: Centrar el texto cuando la galería está vacía */
+    .galeria-usuarios p {
+      grid-column: 1 / -1; /* Esto le dice que ocupe todas las columnas disponibles */
+      text-align: center; /* Centra el texto */
+      font-size: 1.2rem;
+      color: #666;
+      margin: 40px auto;
+    }
+    #auth-section {
+      max-width: 500px; /* Hace que la tarjeta sea más estrecha y elegante */
+      margin: 60px auto;
+      text-align: center;
+      background: linear-gradient(to bottom, #ffffff, #fafafa);
+    }
+
+    #auth-section h2 {
+      border-bottom: none; /* Quitamos la línea roja gruesa para un look más limpio */
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    #auth-section input {
+      max-width: 100%; /* Los inputs usan todo el ancho de la tarjeta */
+      background: #fff;
+    }
+
+    /* Botones de Auth a lo ancho */
+    #auth-section button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 16px;
+      font-size: 1.1rem;
+    }
+
+    /* Estilo especial para el botón de CREAR CUENTA para diferenciarlo */
+    #auth-section button[onclick="registrar()"] {
+      background: transparent !important; /* Sobreescribe el #444 de tu HTML */
+      color: var(--negro-google) !important;
+      border: 2px solid #ccc !important;
+      box-shadow: none;
+    }
+
+    #auth-section button[onclick="registrar()"]:hover {
+      border-color: var(--rojo-six) !important;
+      color: var(--rojo-six) !important;
+      background: #fff !important;
+    }
+
+
+    /* 2. SECCIÓN DE COMUNIDAD Y FOTOS */
+    #galeria {
+      text-align: center;
+    }
+
+    .foto-usuario {
+      border: 6px solid var(--blanco); /* Borde grueso estilo fotografía */
+      border-bottom: 25px solid var(--blanco); /* Efecto Polaroid */
+      border-radius: 4px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Animación con rebote */
+    }
+
+    .foto-usuario:hover {
+      transform: scale(1.08) rotate(3deg); /* Zoom y rotación divertida */
+      box-shadow: var(--sombra-roja);
+      z-index: 10;
+      position: relative;
+    }
+
+    /* Estilo para la caja de subir foto */
+    #subirFotoContainer {
+      background: #fafafa;
+      border: 2px dashed #ccc; /* Borde punteado de zona de carga */
+      box-shadow: none;
+      transition: border-color 0.3s ease;
+    }
+
+    #subirFotoContainer:hover {
+      border-color: var(--rojo-six);
+    }
+
+
+    /* 3. SECCIÓN DE PEDIDOS EN CURSO */
+    #pedidos-realizados {
+      background: var(--blanco);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: var(--sombra-suave);
+      margin-bottom: 60px;
+      border: 1px solid rgba(0,0,0,0.03);
+    }
+
+    .pedido-item {
+      background: #fafafa;
+      border-left: 6px solid var(--rojo-six);
+      padding: 20px 25px;
+      margin-bottom: 15px;
+      border-radius: 0 12px 12px 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pedido-item:hover {
+      transform: translateX(10px); /* Deslizamiento hacia la derecha */
+      background: var(--blanco);
+      box-shadow: var(--sombra-suave);
+      border-left-width: 10px; /* El borde rojo se hace más grueso */
+    }
+
+    .pedido-item strong {
+      font-size: 1.15rem;
+      color: var(--negro-google);
+    }
+
+    .pedido-item small {
+      display: inline-block;
+      margin-top: 12px;
+      color: #666;
+      background: #eee;
+      padding: 4px 10px;
+      border-radius: 20px; /* Fecha estilo "píldora" o etiqueta */
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+   :root {
       --rojo-six: #fb0101;
+      --rojo-gradiente: #d40202;
       --negro-google: #212121;
-      --gris-fondo: #f8f9fa;
+      --gris-fondo: #f4f6f8;
       --blanco: #ffffff;
+      --sombra-suave: 0 8px 24px rgba(0,0,0,0.08);
+      --sombra-roja: 0 10px 25px rgba(251, 1, 1, 0.2);
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
@@ -20,234 +153,338 @@
       margin: 0;
       background-color: var(--gris-fondo);
       color: var(--negro-google);
+      line-height: 1.6;
     }
 
-    /* HEADER ESTILO GOOGLE SITES */
+    /* HEADER ESTILO MODERNO */
     header {
-      background-color: var(--rojo-six);
-      background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://lh3.googleusercontent.com/sitesv/AA5AbUAZRdESUIyFqaYVcQVSZh_pG9SLvQbrmM1WRYsPd4TuZaGMyBwn0mhdPRiRWt-EaabOdCkY6oU-9azTHQTkM8U5CvsUat6g9nX7d7RyhOgP41dXsgqP-KYAHRJUrnlMynP8Ht3AExVb-LfCKXEfxgcNs3KRFsliakNBwf5m7o4KKHpGCLblAZy-y8rdqxw2fj3kVHKimEX-0CGaOjKlSc3P4J6icpKrmUzr=w1280');
+      background: linear-gradient(135deg, rgba(251,1,1,0.85), rgba(212,2,2,0.9)), url('https://lh3.googleusercontent.com/sitesv/AA5AbUAZRdESUIyFqaYVcQVSZh_pG9SLvQbrmM1WRYsPd4TuZaGMyBwn0mhdPRiRWt-EaabOdCkY6oU-9azTHQTkM8U5CvsUat6g9nX7d7RyhOgP41dXsgqP-KYAHRJUrnlMynP8Ht3AExVb-LfCKXEfxgcNs3KRFsliakNBwf5m7o4KKHpGCLblAZy-y8rdqxw2fj3kVHKimEX-0CGaOjKlSc3P4J6icpKrmUzr=w1280');
       background-size: cover;
       background-position: center;
+      background-attachment: fixed; /* Efecto Parallax */
       color: var(--blanco);
-      padding: 80px 20px;
+      padding: 100px 20px;
       text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
     header h1 {
       font-family: 'PT Sans', sans-serif;
-      font-size: 56pt;
+      font-size: 4rem;
       margin: 0;
       text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
     }
 
+    header p {
+      font-size: 1.2rem;
+      font-family: 'PT Sans', sans-serif;
+      opacity: 0.9;
+    }
+
+    /* MENÚ DE NAVEGACIÓN TIPO EFECTO CRISTAL */
     nav {
-      background-color: var(--blanco);
-      padding: 15px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px); /* Desenfoca lo que está detrás */
+      -webkit-backdrop-filter: blur(12px);
+      padding: 15px 30px;
       display: flex;
       justify-content: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      align-items: center;
+      gap: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
       position: sticky;
       top: 0;
       z-index: 1000;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
     }
 
     nav a {
       color: var(--negro-google);
-      margin: 0 20px;
       text-decoration: none;
       font-family: 'PT Sans', sans-serif;
       font-weight: 700;
+      font-size: 0.95rem;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    nav a:not(.btn-admin):hover {
+      color: var(--rojo-six);
+    }
+
+    /* Subrayado animado en el menú */
+    nav a:not(.btn-admin)::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background-color: var(--rojo-six);
+      transition: width 0.3s ease;
+    }
+    nav a:not(.btn-admin):hover::after {
+      width: 100%;
     }
 
     /* BOTÓN ADMIN */
     .btn-admin {
-      background-color: var(--rojo-six);
+      background: linear-gradient(135deg, var(--rojo-six), var(--rojo-gradiente));
       color: white !important;
-      padding: 10px 18px;
-      border-radius: 6px;
-      transition: 0.3s ease;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      padding: 8px 20px;
+      border-radius: 25px; /* Botón en forma de píldora */
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 10px rgba(251,1,1,0.3);
     }
 
     .btn-admin:hover {
-      background-color: #c70000;
       transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(251,1,1,0.4);
     }
 
+    /* ESTRUCTURA GENERAL DE SECCIONES */
     section {
-      max-width: 1000px;
-      margin: 40px auto;
-      padding: 20px;
+      max-width: 1100px;
+      margin: 60px auto;
+      padding: 0 20px;
     }
 
     h2 {
       font-family: 'PT Sans', sans-serif;
-      font-size: 28pt;
-      border-bottom: 2px solid var(--rojo-six);
+      font-size: 2.5rem;
+      color: var(--negro-google);
+      border-bottom: 4px solid var(--rojo-six);
       display: inline-block;
-      margin-bottom: 30px;
+      margin-bottom: 40px;
+      padding-bottom: 5px;
+      border-radius: 2px;
     }
 
-    /* AJUSTE CATÁLOGO */
-    .grid-productos {
+    /* TARJETAS DE PRODUCTOS PROFESIONALES */
+    .grid-productos, .productos-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 30px;
     }
 
-    .card-producto {
-      background: white;
-      border-radius: 8px;
+    .card-producto, .producto-card {
+      background: var(--blanco);
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: var(--sombra-suave);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
       text-align: center;
-      padding-bottom: 15px;
+      position: relative;
+      border: 1px solid rgba(0,0,0,0.03);
     }
 
-    .card-producto img {
+    .card-producto:hover, .producto-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--sombra-roja);
+    }
+
+    .card-producto img, .producto-card img {
       width: 100%;
-      height: 180px;
+      height: 200px;
       object-fit: contain;
       background-color: #fff;
-      padding: 10px;
+      padding: 20px;
       box-sizing: border-box;
+      border-bottom: 1px solid #f0f0f0;
+      transition: transform 0.3s ease;
+    }
+
+    .card-producto:hover img, .producto-card:hover img {
+      transform: scale(1.05); /* Efecto zoom sutil a la imagen */
+    }
+
+    .producto-info {
+      padding: 20px;
+    }
+
+    .producto-info h3 {
+      margin: 0 0 10px 0;
+      font-family: 'PT Sans', sans-serif;
+      font-size: 1.3rem;
+    }
+
+    .producto-info p {
+      margin: 5px 0;
+      color: #666;
+      font-size: 0.95rem;
     }
 
     /* SECCIÓN GALERÍA DE USUARIOS */
     .galeria-usuarios {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      background: #eee;
-      padding: 20px;
-      border-radius: 10px;
-      min-height: 100px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+      background: transparent;
+      padding: 10px 0;
     }
 
     .foto-usuario {
-      width: calc(33.33% - 10px);
-      height: 200px;
-      border: 3px solid white;
-      object-fit: cover;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-
-    /* FORMULARIOS Y BOTONES */
-    #auth-section, #zonaPrivada, #subirFotoContainer {
-      background: white;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      margin-bottom: 30px;
-    }
-
-    input[type="text"], input[type="file"], input[type="email"], input[type="password"], select {
-      padding: 12px;
-      margin: 10px 0;
       width: 100%;
-      max-width: 400px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      box-sizing: border-box;
+      height: 220px;
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: var(--sombra-suave);
+      transition: transform 0.3s ease;
+    }
+    .foto-usuario:hover {
+      transform: scale(1.03);
     }
 
+    /* FORMULARIOS Y CONTENEDORES */
+    #auth-section, #zonaPrivada, #subirFotoContainer {
+      background: var(--blanco);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: var(--sombra-suave);
+      margin-bottom: 40px;
+      border: 1px solid rgba(0,0,0,0.03);
+    }
+
+    /* ESTILIZADO DE INPUTS (CAMPOS DE TEXTO) */
+    input[type="text"], input[type="file"], input[type="email"], input[type="password"], select {
+      padding: 15px;
+      margin: 10px 0 20px 0;
+      width: 100%;
+      max-width: 450px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      box-sizing: border-box;
+      font-family: 'PT Sans', sans-serif;
+      font-size: 1rem;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      background-color: #fafafa;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--rojo-six);
+      box-shadow: 0 0 0 4px rgba(251, 1, 1, 0.1);
+      background-color: var(--blanco);
+    }
+
+    /* BOTONES GLOBALES */
     button {
-      background-color: var(--rojo-six);
+      background: linear-gradient(135deg, var(--rojo-six), var(--rojo-gradiente));
       color: white;
       border: none;
-      padding: 12px 24px;
+      padding: 14px 28px;
       font-family: 'PT Sans', sans-serif;
       font-weight: 700;
-      border-radius: 4px;
+      font-size: 1rem;
+      border-radius: 10px;
       cursor: pointer;
       margin: 5px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(251,1,1,0.2);
     }
 
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(251,1,1,0.35);
+    }
+
+    /* Utilidades */
     .oculto { display: none !important; }
 
-    .pedido-item {
-      background: #fff;
-      border-left: 6px solid var(--rojo-six);
-      padding: 15px;
-      margin-bottom: 10px;
+    /* ESTILOS DEL WIDGET DEL CLIMA */
+    #widget-clima {
+      margin: -40px auto 40px auto; /* Lo sube un poco para montarlo sobre el header */
+      position: relative;
+      z-index: 10;
+      padding: 20px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #d40202, #a00000);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      border: none !important;
     }
 
-    /* INSTRUCCIONES MEJORAS: NUEVO CSS ADICIONAL */
-    .pedido-container {
-      background: white;
-      padding: 25px;
-      border-radius: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,.08);
-    }
-    .productos-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      margin-top: 25px;
-    }
-    .producto-card {
-      background: white;
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,.08);
-      transition: .3s;
-      position: relative;
-    }
-    .producto-card:hover {
-      transform: translateY(-5px);
-    }
-    .producto-card img {
-      width: 100%;
-      height: 180px;
-      object-fit: contain;
-      background: #fff;
-      padding: 10px;
-    }
-    .producto-info {
-      padding: 15px;
-    }
-    .producto-info h3 {
-      margin-bottom: 10px;
-    }
-    .producto-info p {
-      margin: 5px 0;
-    }
-    .producto-check {
-      width: 22px;
-      height: 22px;
-    }
-    .producto-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 10px;
-    }
-    .resumen-pedido {
-      margin-top: 25px;
-      background: #f5f5f5;
+    /* HISTORIAL DE PEDIDOS */
+    .pedido-item {
+      background: var(--blanco);
+      border-left: 6px solid var(--rojo-six);
       padding: 20px;
-      border-radius: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
     }
-    .btn-confirmar {
-      width: 100%;
-      margin-top: 20px;
-      padding: 16px;
-      border-radius: 12px;
-      font-size: 18px;
-      background: #fb0101;
-    }
+
+    /* RESPONSIVE DESIGN (Pantallas pequeñas) */
     @media(max-width:768px){
-      .productos-grid {
-        grid-template-columns: 1fr;
-      }
+      header h1 { font-size: 2.5rem; }
       nav {
         flex-wrap: wrap;
-        gap: 10px;
+        padding: 10px;
       }
-      header h1 {
-        font-size: 32pt;
+      .grid-productos, .productos-grid {
+        grid-template-columns: 1fr;
+      }
+      #auth-section, #zonaPrivada {
+        padding: 20px;
+      }
+      input[type="text"], input[type="email"], input[type="password"], select {
+        max-width: 100%;
       }
     }
+    /* CORRECCIÓN: Evitar que los campos se suban al lado del título */
+    #zonaPrivada h2 {
+      display: block;
+      width: fit-content; /* Mantiene la línea roja del tamaño exacto del texto */
+    }
+
+    #zonaPrivada input, 
+    #zonaPrivada select {
+      display: block; /* Fuerza a que los inputs bajen a su propio renglón */
+    }
+    /* =========================================
+   ESTILO MODERNO PARA EL MÉTODO DE PAGO
+   ========================================= */
+#zonaPrivada select#metodoPago {
+  /* 1. Quitamos el estilo por defecto del navegador */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  
+  /* 2. Diseño base de la caja */
+  background-color: #ffffff;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  width: 100%;
+  font-family: 'PT Sans', sans-serif;
+  font-size: 1.1rem;
+  color: var(--negro-google);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  /* 3. Dibujamos una flecha roja personalizada a la derecha */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fb0101' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 20px center;
+  background-size: 18px;
+}
+
+/* 4. Efecto cuando el usuario pasa el ratón por encima (Hover) */
+#zonaPrivada select#metodoPago:hover {
+  border-color: #cccccc;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* 5. Efecto cuando el cliente hace clic en el campo (Focus) */
+#zonaPrivada select#metodoPago:focus {
+  outline: none;
+  border-color: var(--rojo-six);
+  box-shadow: 0 0 0 4px rgba(251, 1, 1, 0.15);
+}
   </style>
 </head>
 <body>
@@ -354,9 +591,11 @@
   <div id="listaPedidos"></div>
 </section>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>>
 
 <script>
 // Configuración Firebase
@@ -373,150 +612,207 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 let productosData = [];
+// ¡NUEVO! Variables para controlar el carrito y las categorías
+let carrito = {}; 
+let categoriaActual = 'Todas'; 
 
 window.onload = function() {
   cargarProductos();
   cargarFotosGuardadas();
+  iniciarCarruselAutomatico();
 };
 
 auth.onAuthStateChanged(user => {
+  console.log("Estado de autenticación detectado:", user ? user.email : "Invitado");
+  
   const loView = document.getElementById("logged-out-view");
   const liView = document.getElementById("logged-in-view");
   const zp = document.getElementById("zonaPrivada");
   const sf = document.getElementById("subirFotoContainer");
 
   if (user) {
+    // 1. EL USUARIO ESTÁ LOGUEADO: Mostrar interfaz privada inmediatamente
     loView.classList.add("oculto");
     liView.classList.remove("oculto");
     zp.classList.remove("oculto");
     sf.classList.remove("oculto");
     document.getElementById("user-display-email").innerText = user.email;
+    
+    // 2. Solo cargamos datos si el usuario es válido
+    cargarPedidos();
+    // No bloqueamos aquí, cargamos productos siempre
   } else {
+    // 3. EL USUARIO NO ESTÁ LOGUEADO: Forzar vista de login
     loView.classList.remove("oculto");
     liView.classList.add("oculto");
     zp.classList.add("oculto");
     sf.classList.add("oculto");
   }
-  cargarPedidos();
 });
-
-// FUNCIÓN DE CARGA DE PRODUCTOS CORREGIDA (EVITA CATEGORÍAS INDEFINIDAS)
+// 1. CARGAMOS LOS PRODUCTOS DE FIREBASE
 async function cargarProductos() {
   const contenedor = document.getElementById("productosContainer");
   if (!contenedor) return;
   
   const snapshot = await db.collection("productos").get();
   productosData = [];
-  contenedor.innerHTML = "";
   
   snapshot.forEach(doc => {
     const data = doc.data();
-    
-    // Validamos que la categoría exista en el producto, si no, le asignamos una por defecto según su nombre
     let catValidada = data.categoria || "General";
-    if (catValidada === "undefined" || catValidada === "") {
-      if (data.nombre && data.nombre.toLowerCase().includes("cerveza")) {
-        catValidada = "Cervezas";
-      } else if (data.nombre && data.nombre.toLowerCase().includes("hielo")) {
-        catValidada = "Hielo";
-      } else {
-        catValidada = "General";
-      }
-    }
+    if (catValidada === "undefined" || catValidada === "") catValidada = "General";
 
-    const producto = {
+    productosData.push({
       id: doc.id,
       nombre: data.nombre || "Producto sin nombre",
       precio: data.precio || 0,
       categoria: catValidada,
       stock: data.stock || 0,
-      imagen: data.imagen || ""
-    };
-    
-    productosData.push(producto);
-    
-    contenedor.innerHTML += `
+      imagen: data.imagen || "https://cdn-icons-png.flaticon.com/512/1046/1046784.png"
+    });
+  });
+  
+  renderizarVistaProductos(); // Llamamos a la nueva función que dibuja todo
+}
+
+// 2. FUNCIÓN PARA DIBUJAR CATEGORÍAS Y CANTIDADES
+function renderizarVistaProductos() {
+  const contenedor = document.getElementById("productosContainer");
+  contenedor.innerHTML = "";
+
+  // A. Obtener categorías únicas para hacer el menú
+  const categoriasUnicas = ["Todas", ...new Set(productosData.map(p => p.categoria))];
+
+  // B. Crear la barra de botones de categoría
+  let botonesHTML = `<div style="display:flex; gap:10px; overflow-x:auto; margin-bottom:20px; padding-bottom:10px; grid-column: 1 / -1;">`;
+  categoriasUnicas.forEach(cat => {
+    const colorFondo = cat === categoriaActual ? 'var(--rojo-six)' : '#f0f0f0';
+    const colorTexto = cat === categoriaActual ? 'white' : 'var(--negro-google)';
+    botonesHTML += `<button style="background:${colorFondo}; color:${colorTexto}; padding:10px 20px; border-radius:25px; border:none; cursor:pointer; font-weight:bold; white-space: nowrap; box-shadow:0 2px 5px rgba(0,0,0,0.1);" onclick="filtrarCategoria('${cat}')">${cat}</button>`;
+  });
+  botonesHTML += `</div>`;
+
+  // C. Filtrar los productos según la categoría seleccionada
+  const productosFiltrados = categoriaActual === 'Todas' 
+    ? productosData 
+    : productosData.filter(p => p.categoria === categoriaActual);
+
+  // D. Dibujar las tarjetas con botones de + y -
+  let tarjetasHTML = ``;
+  productosFiltrados.forEach(producto => {
+    const cantidadActual = carrito[producto.id] || 0;
+    tarjetasHTML += `
       <div class="producto-card">
-        <img src="${producto.imagen || 'https://cdn-icons-png.flaticon.com/512/1046/1046784.png'}">
+        <img src="${producto.imagen}">
         <div class="producto-info">
           <h3>${producto.nombre}</h3>
-          <p><strong>$${producto.precio}</strong></p>
-          <p>Categoría: ${producto.categoria}</p>
-          <p>Stock: ${producto.stock}</p>
-          <div class="producto-footer">
-            <input
-              type="checkbox"
-              class="producto-check"
-              data-id="${producto.id}"
-              data-nombre="${producto.nombre}"
-              data-precio="${producto.precio}"
-              data-categoria="${producto.categoria}"
-            >
-            <span>Agregar</span>
+          <p style="color:var(--rojo-six); font-size:1.2rem;"><strong>$${producto.precio}</strong></p>
+          <p style="font-size:0.85rem; color:#888;">Stock: ${producto.stock}</p>
+          
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; background:#f8f9fa; border-radius:10px; padding:5px;">
+            <button style="margin:0; padding:8px 15px; background:#e0e0e0; color:black; border-radius:8px;" onclick="cambiarCantidad('${producto.id}', -1)">-</button>
+            <span style="font-weight:bold; font-size:1.2rem; width:30px; text-align:center;">${cantidadActual}</span>
+            <button style="margin:0; padding:8px 15px; background:var(--rojo-six); color:white; border-radius:8px;" onclick="cambiarCantidad('${producto.id}', 1)">+</button>
           </div>
         </div>
       </div>
     `;
   });
 
-  document.querySelectorAll('.producto-check').forEach(check => {
-    check.addEventListener('change', actualizarResumen);
-  });
+  contenedor.innerHTML = botonesHTML + tarjetasHTML;
+  actualizarResumen();
+}
+
+// 3. CONTROLADORES DE INTERFAZ
+function filtrarCategoria(cat) {
+  categoriaActual = cat;
+  renderizarVistaProductos(); // Vuelve a dibujar con el filtro aplicado
+}
+
+function cambiarCantidad(id, cambio) {
+  const producto = productosData.find(p => p.id === id);
+  if(!producto) return;
+  
+  const cantidadActual = carrito[id] || 0;
+  let nuevaCantidad = cantidadActual + cambio;
+  
+  if(nuevaCantidad < 0) nuevaCantidad = 0;
+  
+  if(nuevaCantidad > producto.stock) {
+    Swal.fire('Stock máximo', 'No nos quedan más unidades de este producto.', 'info');
+    nuevaCantidad = producto.stock;
+  }
+  
+  carrito[id] = nuevaCantidad;
+  renderizarVistaProductos();
 }
 
 function actualizarResumen() {
-  const checks = document.querySelectorAll('.producto-check:checked');
   let total = 0;
-  checks.forEach(check => {
-    total += Number(check.dataset.precio);
-  });
-  document.getElementById('cantidadProductos').innerText = checks.length;
+  let cantidadObjetos = 0;
+  
+  for (const [id, cant] of Object.entries(carrito)) {
+    if (cant > 0) {
+      const prod = productosData.find(p => p.id === id);
+      if (prod) {
+        total += (prod.precio * cant);
+        cantidadObjetos += cant; // Sumamos la cantidad real de artículos
+      }
+    }
+  }
+  
+  document.getElementById('cantidadProductos').innerText = cantidadObjetos;
   document.getElementById('totalPedido').innerText = `$${total}`;
 }
 
-// FUNCIÓN GUARDAR PEDIDO TOTALMENTE OPTIMIZADA PARA COMPATIBILIDAD CON EL PANEL ADMIN
+// 4. GUARDAR EL PEDIDO CON LAS CANTIDADES REALES
 async function guardarPedido() {
   const nombre = document.getElementById('nombreCliente').value.trim();
   const direccion = document.getElementById('direccionEntrega').value.trim();
   const metodoPago = document.getElementById('metodoPago').value;
-  const checks = document.querySelectorAll('.producto-check:checked');
   
   if (!nombre || !direccion) {
-    return alert('Por favor, ingresa tu nombre y dirección de entrega.');
+    return Swal.fire('Faltan datos', 'Por favor, ingresa tu nombre y dirección de entrega.', 'warning');
   }
 
-  if (checks.length === 0) {
-    return alert('Selecciona al menos un producto.');
-  }
-  
-  const productos = [];
+  const productosPedido = [];
   let total = 0;
+  let cantidadTotalProductos = 0;
   
-  for (const check of checks) {
-    const producto = {
-      id: check.dataset.id,
-      nombre: check.dataset.nombre,
-      precio: Number(check.dataset.precio),
-      categoria: check.dataset.categoria || "General", // Forzamos que se guarde la categoría real en el pedido
-      amount: 1,
-      subtotal: Number(check.dataset.precio)
-    };
-    productos.push(producto);
-    total += producto.precio;
-    
-    // Descontar inventario en Firebase
-    const productoRef = db.collection('productos').doc(producto.id);
-    const productoSnap = await productoRef.get();
-    if (productoSnap.exists) {
-      const data = productoSnap.data();
-      await productoRef.update({
-        stock: Math.max(0, (data.stock || 0) - 1),
-        vendidos: (data.vendidos || 0) + 1
-      });
+  // Revisamos qué hay en el carrito
+  for (const [id, cant] of Object.entries(carrito)) {
+    if (cant > 0) {
+      const prod = productosData.find(p => p.id === id);
+      if(prod) {
+        productosPedido.push({
+          id: prod.id,
+          nombre: prod.nombre,
+          precio: prod.precio,
+          categoria: prod.categoria || "General",
+          amount: cant,
+          subtotal: prod.precio * cant
+        });
+        total += (prod.precio * cant);
+        cantidadTotalProductos += cant;
+        
+        // Descontar inventario multiplicado por la cantidad en Firebase
+        const productoRef = db.collection('productos').doc(prod.id);
+        const productoSnap = await productoRef.get();
+        if (productoSnap.exists) {
+          const data = productoSnap.data();
+          await productoRef.update({
+            stock: Math.max(0, (data.stock || 0) - cant),
+            vendidos: (data.vendidos || 0) + cant
+          });
+        }
+      }
     }
   }
+
+  if (productosPedido.length === 0) {
+    return Swal.fire('Carrito vacío', 'Selecciona la cantidad de al menos un producto usando el botón +.', 'warning');
+  }
   
-  // Generar formato estricto de fecha: "27/5/2026, 7:14:02 p.m." para la lectura inmediata de admin.html
   const ahora = new Date();
   const fechaString = `${ahora.getDate()}/${ahora.getMonth() + 1}/${ahora.getFullYear()}, ${ahora.getHours() % 12 || 12}:${String(ahora.getMinutes()).padStart(2, '0')}:${String(ahora.getSeconds()).padStart(2, '0')} ${ahora.getHours() >= 12 ? 'p.m.' : 'a.m.'}`;
 
@@ -524,12 +820,12 @@ async function guardarPedido() {
     cliente: nombre,
     email: auth.currentUser.email,
     direccion,
-    productos, // Array de objetos estructurado con la categoría corregida
+    productos: productosPedido, 
     total,
-    cantidadProductos: productos.length,
+    cantidadProductos: cantidadTotalProductos,
     metodoPago,
     estado: 'Pendiente',
-    fecha: fechaString, // Fecha sincronizada en texto plano
+    fecha: fechaString,
     fechaTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
     hora: ahora.getHours(),
     diaSemana: ahora.getDay(),
@@ -538,19 +834,19 @@ async function guardarPedido() {
   
   try {
     await db.collection('pedidos').add(pedido);
-    alert('Pedido realizado correctamente 🍺');
+    Swal.fire('¡Pedido Confirmado!', 'Nosotros te llevamos lo que necesitas 🍺', 'success');
     
-    // Limpiar formulario y refrescar interfaz
+    // Limpiar formulario, vaciar carrito y refrescar interfaz
     document.getElementById('nombreCliente').value = "";
     document.getElementById('direccionEntrega').value = "";
-    checks.forEach(c => c.checked = false);
-    actualizarResumen();
+    carrito = {}; // Vaciamos el carrito
+    categoriaActual = 'Todas'; // Regresamos la vista general
     
     cargarProductos();
     cargarPedidos();
   } catch (error) {
     console.error("Error al guardar el pedido:", error);
-    alert("Hubo un error al procesar tu pedido. Inténtalo de nuevo.");
+    Swal.fire('Error', 'Hubo un error al procesar tu pedido. Inténtalo de nuevo.', 'error');
   }
 }
 
@@ -609,24 +905,92 @@ function mostrarImagenEnGaleria(src) {
   const contenedor = document.getElementById("contenedorFotos");
   if(contenedor) contenedor.insertBefore(img, contenedor.firstChild);
 }
+// ==========================================
+// FUNCIONES ACTUALIZADAS CON SWEETALERT2
+// ==========================================
 
 function login() {
-  auth.signInWithEmailAndPassword(document.getElementById("email").value, document.getElementById("password").value).catch(e => alert(e.message));
+  auth.signInWithEmailAndPassword(document.getElementById("email").value, document.getElementById("password").value)
+    .catch(e => {
+      Swal.fire({
+        title: 'Error de acceso',
+        text: 'El correo o la contraseña son incorrectos.',
+        icon: 'error',
+        confirmButtonColor: '#fb0101'
+      });
+    });
 }
+
 function registrar() {
-  auth.createUserWithEmailAndPassword(document.getElementById("email").value, document.getElementById("password").value).then(() => alert("Cuenta creada")).catch(e => alert(e.message));
+  auth.createUserWithEmailAndPassword(document.getElementById("email").value, document.getElementById("password").value)
+    .then(() => {
+      Swal.fire({
+        title: '¡Bienvenido!',
+        text: 'Tu cuenta ha sido creada exitosamente.',
+        icon: 'success',
+        confirmButtonColor: '#fb0101'
+      });
+    })
+    .catch(e => {
+      Swal.fire({
+        title: 'No se pudo crear la cuenta',
+        text: e.message,
+        icon: 'error',
+        confirmButtonColor: '#fb0101'
+      });
+    });
 }
+
 function logout() {
   auth.signOut().then(() => {
-    alert('Sesión cerrada correctamente');
-    window.location.reload();
+    // Aquí esperamos a que el usuario presione "OK" para recargar la página
+    Swal.fire({
+      title: '¡Hasta pronto!',
+      text: 'Sesión cerrada correctamente',
+      icon: 'success',
+      confirmButtonColor: '#fb0101'
+    }).then(() => {
+      window.location.reload();
+    });
   }).catch((error) => {
     console.error('Error al cerrar sesión:', error);
   });
 }
 
-function cerrarSesion() {
-  logout();
+function procesarArchivo() {
+  const archivoInput = document.getElementById("inputArchivo");
+  const archivo = archivoInput.files[0];
+  
+  if (!archivo) {
+    return Swal.fire({
+      title: 'Falta la imagen',
+      text: 'Por favor selecciona una imagen desde tu dispositivo.',
+      icon: 'warning',
+      confirmButtonColor: '#fb0101'
+    });
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const base64Image = e.target.result;
+    let fotosExistentes = JSON.parse(localStorage.getItem("galeriaSix") || "[]");
+    fotosExistentes.unshift(base64Image);
+    localStorage.setItem("galeriaSix", JSON.stringify(fotosExistentes));
+    mostrarImagenEnGaleria(base64Image);
+    archivoInput.value = "";
+    
+    // Alerta de éxito al subir foto
+    Swal.fire({
+      title: '¡Foto publicada!',
+      text: 'Gracias por compartir con la comunidad Six.',
+      icon: 'success',
+      confirmButtonColor: '#fb0101',
+      timer: 2000, // Se cierra sola a los 2 segundos
+      showConfirmButton: false
+    });
+  };
+  reader.readAsDataURL(archivo);
+
 }
 
 // SERVICIO DEL CLIMA
@@ -668,6 +1032,36 @@ async function cargarClima() {
 document.addEventListener("DOMContentLoaded", () => {
   cargarClima();
 });
+// ==========================================
+// CARRUSEL AUTOMÁTICO DE LA GALERÍA
+// ==========================================
+let autoScrollInterval;
+
+function iniciarCarruselAutomatico() {
+  const contenedor = document.getElementById("contenedorFotos");
+  if (!contenedor) return;
+
+  // Limpiamos cualquier temporizador previo por seguridad
+  if(autoScrollInterval) clearInterval(autoScrollInterval);
+
+  // Configuramos el temporizador para que se ejecute cada 3 segundos (3000 milisegundos)
+  autoScrollInterval = setInterval(() => {
+    // Si el usuario tiene el ratón encima de la galería, pausamos el movimiento
+    if (contenedor.matches(':hover')) return;
+
+    // Calculamos si ya llegamos al final del barrido
+    // (le restamos 5 píxeles como margen de error por los bordes)
+    const llegoAlFinal = contenedor.scrollLeft + contenedor.clientWidth >= contenedor.scrollWidth - 5;
+
+    if (llegoAlFinal) {
+      // Si llegó al final, regresa suavemente a la posición 0 (al principio)
+      contenedor.scrollTo({ left: 0, behavior: 'smooth' });
+    } else {
+      // Si no ha llegado al final, avanza unos 300 píxeles (el tamaño aproximado de una foto)
+      contenedor.scrollBy({ left: 300, behavior: 'smooth' });
+    }
+  }, 3000); 
+}
 </script>
 </body>
 </html>

@@ -10,7 +10,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
-    * {
+* {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -18,26 +18,26 @@
 
     :root {
       --rojo-six: #fb0101;
-      --rojo-oscuro: #cc0000;
-      --verde-exito: #28a745;
-      --amarillo-pendiente: #ffc107;
-      --naranja-preparacion: #fd7e14;
-      --azul-camino: #17a2b8;
-      --gris-claro: #f8f9fa;
-      --gris-borde: #dee2e6;
-      --texto-oscuro: #212121;
+      --rojo-gradiente: #d40202;
+      --fondo-admin: #f4f7fe; /* Fondo moderno azul claro */
+      --blanco: #ffffff;
+      --texto-principal: #2b3674;
+      --texto-secundario: #a3aed1;
+      --sombra-suave: 0px 18px 40px rgba(112, 144, 176, 0.12);
+      --radio-borde: 20px;
     }
 
     body {
-      font-family: 'Merriweather', serif;
-      background: #f0f2f5;
+      font-family: 'PT Sans', sans-serif;
+      background: var(--fondo-admin);
+      color: var(--texto-principal);
       display: flex;
     }
 
-    /* SIDEBAR */
+    /* SIDEBAR MODERNO */
     .sidebar {
       width: 280px;
-      background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
+      background: linear-gradient(180deg, #111c44 0%, #0b1437 100%);
       color: white;
       min-height: 100vh;
       position: fixed;
@@ -45,367 +45,321 @@
       top: 0;
       transition: all 0.3s;
       z-index: 100;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.1);
     }
 
     .sidebar-header {
-      padding: 25px 20px;
+      padding: 30px 20px;
       text-align: center;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
     }
 
     .sidebar-header h2 {
-      font-family: 'PT Sans', sans-serif;
-      font-size: 28px;
+      font-size: 32px;
       color: var(--rojo-six);
-    }
-
-    .sidebar-header p {
-      font-size: 12px;
-      opacity: 0.7;
-      margin-top: 5px;
+      letter-spacing: 1px;
     }
 
     .admin-info {
-      padding: 15px 20px;
-      background: rgba(255,255,255,0.05);
-      margin: 15px;
-      border-radius: 8px;
+      padding: 20px;
+      background: rgba(255,255,255,0.03);
+      margin: 20px 15px;
+      border-radius: 16px;
       text-align: center;
+      border: 1px solid rgba(255,255,255,0.05);
     }
 
     .admin-info i {
       font-size: 40px;
       margin-bottom: 10px;
+      color: var(--rojo-six);
     }
 
-    .admin-info h4 {
-      font-size: 14px;
-      margin-bottom: 5px;
-    }
-
-    .admin-info p {
-      font-size: 11px;
-      opacity: 0.6;
-      word-break: break-all;
-    }
-
-    .nav-menu {
-      list-style: none;
-      margin-top: 20px;
-    }
+    .nav-menu { list-style: none; margin-top: 10px; }
 
     .nav-menu li {
-      padding: 12px 25px;
+      padding: 15px 25px;
       cursor: pointer;
       transition: all 0.3s;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 15px;
+      font-weight: bold;
+      color: var(--texto-secundario);
+      border-right: 4px solid transparent;
     }
 
     .nav-menu li:hover {
-      background: rgba(255,255,255,0.1);
+      color: white;
+      background: rgba(255,255,255,0.05);
     }
 
     .nav-menu li.active {
-      background: var(--rojo-six);
-      border-left: 4px solid white;
-    }
-
-    .nav-menu li i {
-      width: 24px;
-      font-size: 18px;
+      color: white;
+      border-right: 4px solid var(--rojo-six);
+      background: linear-gradient(90deg, rgba(251,1,1,0) 0%, rgba(251,1,1,0.1) 100%);
     }
 
     .logout-btn {
       position: absolute;
-      bottom: 20px;
+      bottom: 30px;
       width: calc(100% - 40px);
       margin: 0 20px;
-      background: rgba(255,255,255,0.1);
-      border: none;
-      color: white;
-      padding: 12px;
-      border-radius: 8px;
+      background: rgba(251,1,1,0.1);
+      border: 1px solid rgba(251,1,1,0.2);
+      color: var(--rojo-six);
+      padding: 14px;
+      border-radius: 12px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
+      font-weight: bold;
       transition: all 0.3s;
     }
 
     .logout-btn:hover {
       background: var(--rojo-six);
+      color: white;
     }
 
-    /* MAIN CONTENT */
+    /* MAIN CONTENT Y TARJETAS */
     .main-content {
       margin-left: 280px;
       flex: 1;
-      padding: 20px;
+      padding: 30px 40px;
     }
 
     .top-bar {
-      background: white;
-      padding: 15px 25px;
-      border-radius: 12px;
-      margin-bottom: 25px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 15px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    .page-title {
-      font-family: 'PT Sans', sans-serif;
-      font-size: 24px;
-    }
-
-    .date-time {
-      color: #666;
-      font-size: 14px;
-    }
-
-    /* STATS CARDS */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
       margin-bottom: 30px;
     }
 
-    .stat-card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: transform 0.3s;
+    .page-title {
+      font-size: 34px;
+      font-weight: bold;
+    }
+
+    .stat-card, .chart-container, .section-card, .login-card {
+      background: var(--blanco);
+      border-radius: var(--radio-borde);
+      box-shadow: var(--sombra-suave);
+      padding: 25px;
+      transition: transform 0.3s ease;
     }
 
     .stat-card:hover {
-      transform: translateY(-3px);
+      transform: translateY(-5px);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 25px;
+      margin-bottom: 35px;
     }
 
     .stat-info h3 {
-      font-size: 12px;
-      color: #666;
-      margin-bottom: 8px;
+      font-size: 14px;
+      color: var(--texto-secundario);
+      margin-bottom: 5px;
     }
 
-    .stat-info .number {
-      font-size: 28px;
-      font-weight: bold;
-      color: var(--texto-oscuro);
-    }
+    .stat-info .number { font-size: 32px; font-weight: bold; }
 
     .stat-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 12px;
+      width: 56px; height: 56px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 24px;
     }
 
-    /* SECTION CARDS */
-    .section-card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 25px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 15px;
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid var(--gris-borde);
-    }
-
-    .section-header h3 {
-      font-family: 'PT Sans', sans-serif;
-      font-size: 18px;
-    }
-
-    /* CHARTS */
-    .charts-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 20px;
-      margin-bottom: 25px;
-    }
-
-    .chart-container {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    .chart-container h4 {
-      margin-bottom: 15px;
-      font-family: 'PT Sans', sans-serif;
-    }
-
-    canvas {
-      max-height: 300px;
-      width: 100%;
-    }
-
-    /* TABLES */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th, td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid var(--gris-borde);
-    }
-
+    /* TABLAS MODERNAS */
+    .section-card { margin-bottom: 30px; }
+    
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    
     th {
-      background: var(--gris-claro);
-      font-family: 'PT Sans', sans-serif;
-      font-weight: 700;
+      color: var(--texto-secundario);
+      font-size: 14px;
+      padding: 15px 10px;
+      text-transform: uppercase;
+      border-bottom: 1px solid #e9edf7;
+    }
+    
+    td {
+      padding: 18px 10px;
+      font-weight: bold;
+      border-bottom: 1px solid #e9edf7;
     }
 
+    tr:hover td { background-color: #f8fafc; }
+
+    /* BOTONES */
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--rojo-six), var(--rojo-gradiente));
+      color: white;
+      box-shadow: 0 4px 10px rgba(251,1,1,0.2);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(251,1,1,0.3); }
+
+    /* ESTILOS DE SELECT (Como el index) */
+    select {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-weight: bold;
+      color: var(--texto-principal);
+      outline: none;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { width: 80px; }
+      .sidebar-header h2, .sidebar-header p, .admin-info h4, .admin-info p, .nav-menu li span { display: none; }
+      .main-content { margin-left: 80px; padding: 20px; }
+    }
+    /* =========================================
+       RESTAURACIÓN DE GRÁFICAS, ETIQUETAS Y RANKINGS
+       ========================================= */
+
+    /* 1. Límite estricto para que las gráficas no se vuelvan gigantes */
+    canvas {
+      max-height: 300px !important;
+      width: 100% !important;
+      margin-top: 20px;
+    }
+
+    /* 2. Estilos para las etiquetas de estado en la tabla */
     .estado-badge {
-      padding: 4px 10px;
+      padding: 6px 14px;
       border-radius: 20px;
       font-size: 12px;
       font-weight: bold;
       display: inline-block;
+      text-align: center;
     }
-
     .estado-pendiente { background: #fff3cd; color: #856404; }
     .estado-preparacion { background: #ffe5d0; color: #fd7e14; }
     .estado-camino { background: #d1ecf1; color: #0c5460; }
     .estado-entregado { background: #d4edda; color: #155724; }
 
+    /* 3. Estilos para que el Top 5 se vea ordenado y en fila */
     .rank-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--gris-borde);
+      padding: 12px 0;
+      border-bottom: 1px solid #e9edf7;
     }
-
+    .rank-item:last-child {
+      border-bottom: none; /* Quita la línea del último elemento */
+    }
     .rank-number {
-      width: 30px;
-      height: 30px;
-      background: var(--rojo-six);
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--rojo-six), var(--rojo-gradiente));
       color: white;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
+      font-size: 14px;
+      box-shadow: 0 2px 5px rgba(251,1,1,0.3);
     }
-
     .rank-name {
       flex: 1;
       margin-left: 15px;
+      font-weight: bold;
+      color: var(--texto-principal);
     }
-
     .rank-value {
       font-weight: bold;
       color: var(--rojo-six);
+      font-size: 14px;
+    }
+    /* =========================================
+       CORRECCIÓN: ESPACIADOS Y DISEÑO DE LOGIN
+       ========================================= */
+
+    /* 1. Separación de los Dashboards (Para que respiren) */
+    .charts-row {
+      gap: 35px !important; /* Más espacio entre gráficas que están lado a lado */
+      margin-bottom: 40px !important; /* Más espacio hacia la fila de abajo */
+    }
+    
+    .section-card, .chart-container {
+      margin-bottom: 40px !important; /* Evita que las tablas y gráficas colisionen verticalmente */
     }
 
-    .btn {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-family: 'PT Sans', sans-serif;
-      font-weight: 700;
-      transition: all 0.3s;
-    }
-
-    .btn-primary {
-      background: var(--rojo-six);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: var(--rojo-oscuro);
-    }
-
+    /* 2. Rediseño Premium del Inicio de Sesión */
     .login-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 80vh;
+      min-height: 100vh; /* Centra la tarjeta perfectamente en la pantalla */
+      background: var(--fondo-admin); 
+      margin: -20px; /* Ajuste para quitar márgenes extra */
     }
 
     .login-card {
-      background: white;
-      border-radius: 12px;
-      padding: 30px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      padding: 50px 40px !important;
+      border-radius: 24px !important;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.08) !important;
+      text-align: center;
+      border: 1px solid rgba(0,0,0,0.03);
     }
 
     .login-card h2 {
-      text-align: center;
-      color: var(--rojo-six);
-      margin-bottom: 20px;
+      font-size: 30px;
+      color: var(--texto-principal);
+      margin-bottom: 5px;
+      font-family: 'PT Sans', sans-serif;
+    }
+
+    .login-card p {
+      color: var(--texto-secundario) !important;
+      margin-bottom: 30px !important;
+      font-size: 16px;
     }
 
     .login-card input {
       width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: 1px solid #ddd;
-      border-radius: 6px;
+      padding: 16px 20px !important;
+      margin-bottom: 20px !important;
+      border: 2px solid #e9edf7 !important;
+      border-radius: 12px !important;
+      font-family: 'PT Sans', sans-serif;
+      font-size: 16px;
+      color: var(--texto-principal);
+      background-color: #f8fafc;
+      transition: all 0.3s ease;
+      box-sizing: border-box; /* Evita que el input se salga de la tarjeta */
     }
 
-    .alert {
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
+    .login-card input:focus {
+      outline: none;
+      border-color: var(--rojo-six) !important;
+      box-shadow: 0 0 0 4px rgba(251, 1, 1, 0.1) !important;
+      background-color: var(--blanco);
     }
 
-    .alert-danger {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
-
-    @media (max-width: 768px) {
-      .sidebar {
-        width: 80px;
-      }
-      .sidebar-header h2, .sidebar-header p, .admin-info h4, .admin-info p, .nav-menu li span {
-        display: none;
-      }
-      .main-content {
-        margin-left: 80px;
-      }
-      .nav-menu li {
-        justify-content: center;
-      }
-      .charts-row {
-        grid-template-columns: 1fr;
-      }
-      th, td {
-        font-size: 11px;
-        padding: 6px;
-      }
+    .login-card hr {
+      border: 0;
+      height: 1px;
+      background: #e9edf7;
+      margin: 30px 0 !important;
     }
   </style>
 </head>
@@ -458,22 +412,24 @@
       <h2>Panel Administrativo</h2>
       <p style="text-align: center; margin-bottom: 20px;">Inicia sesión para continuar</p>
       <div id="loginError" class="alert alert-danger" style="display: none;"></div>
-      <input type="email" id="loginEmail" placeholder="admin@six.com">
+      <input type="email" id="loginEmail" placeholder="correo admin">
       <input type="password" id="loginPassword" placeholder="Contraseña">
       <button onclick="loginAdmin()" class="btn btn-primary" style="width: 100%;">Ingresar</button>
       <hr style="margin: 20px 0;">
       <p style="text-align: center; font-size: 12px; color: #666;">
-        <i class="fas fa-info-circle"></i> Credenciales: admin@six.com / admin123
+        <i class="fas fa-info-circle"></i> Credenciales: admin/admin
       </p>
     </div>
   </div>
   <div id="appContent" style="display: none;"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
 <script>
 // Firebase Config
 const firebaseConfig = {
@@ -498,42 +454,185 @@ let clientesMap = new Map();
 let charts = {};
 
 // ========== FUNCIONES DE AUTENTICACIÓN ==========
+// ========== FUNCIONES CON SWEETALERT2 ==========
+
 async function loginAdmin() {
   const email = document.getElementById("loginEmail").value.trim();
   const password = document.getElementById("loginPassword").value;
-  const errorDiv = document.getElementById("loginError");
-  
-  errorDiv.style.display = "none";
   
   if (!email || !password) {
-    errorDiv.innerText = "❌ Ingresa email y contraseña";
-    errorDiv.style.display = "block";
-    return;
+    return Swal.fire('Faltan datos', 'Ingresa email y contraseña', 'warning');
   }
   
   try {
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     if (!ADMIN_EMAILS.includes(userCredential.user.email)) {
       await auth.signOut();
-      errorDiv.innerText = "❌ Acceso denegado. No tienes permisos de administrador.";
-      errorDiv.style.display = "block";
-      return;
+      return Swal.fire('Acceso denegado', 'No tienes permisos de administrador.', 'error');
     }
+    
     document.getElementById("adminEmail").innerText = userCredential.user.email;
     document.getElementById("loginContainer").style.display = "none";
     document.getElementById("appContent").style.display = "block";
     await cargarDatos();
     mostrarDashboard();
+    
+    Swal.fire({
+      title: '¡Bienvenido Administrador!',
+      text: 'Panel cargado correctamente',
+      icon: 'success',
+      timer: 1500,
+      showConfirmButton: false
+    });
+    
   } catch (error) {
-    errorDiv.innerText = "❌ Error: " + error.message;
-    errorDiv.style.display = "block";
+    Swal.fire('Error', 'Credenciales incorrectas', 'error');
   }
 }
 
+window.actualizarEstado = async function(id, nuevoEstado) {
+  await db.collection("pedidos").doc(id).update({ estado: nuevoEstado });
+  await cargarPedidos();
+  mostrarVentas();
+  
+  Swal.fire({
+    toast: true,
+    position: 'top-end',
+    icon: 'success',
+    title: `Pedido #${id.slice(-5)} actualizado a ${nuevoEstado}`,
+    showConfirmButton: false,
+    timer: 3000
+  });
+};
+
+window.agregarProducto = async function() {
+  const { value: formValues } = await Swal.fire({
+    title: 'Agregar Nuevo Producto',
+    html:
+      '<input id="swal-nombre" class="swal2-input" placeholder="Nombre del producto">' +
+      '<input id="swal-precio" type="number" class="swal2-input" placeholder="Precio ($)">' +
+      '<input id="swal-stock" type="number" class="swal2-input" placeholder="Stock inicial">' +
+      '<input id="swal-categoria" class="swal2-input" placeholder="Categoría (ej. Cervezas, Botanas)">',
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: 'Guardar Producto',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#fb0101',
+    preConfirm: () => {
+      const nombre = document.getElementById('swal-nombre').value;
+      const precio = document.getElementById('swal-precio').value;
+      if (!nombre || !precio) {
+        Swal.showValidationMessage('El nombre y el precio son obligatorios');
+      }
+      return {
+        nombre: nombre,
+        precio: parseFloat(precio),
+        stock: parseInt(document.getElementById('swal-stock').value) || 0,
+        categoria: document.getElementById('swal-categoria').value || 'Otros'
+      }
+    }
+  });
+
+  if (formValues) {
+    await db.collection("productos").add({ ...formValues, vendidos: 0 });
+    await cargarProductos();
+    mostrarProductos();
+    Swal.fire('¡Agregado!', 'El producto ya está en el catálogo.', 'success');
+  }
+};
+
+window.editarProducto = async function(id) {
+  // Buscamos los datos actuales del producto para rellenar las cajitas
+  const producto = productosData.find(p => p.id === id);
+  
+  const { value: formValues } = await Swal.fire({
+    title: 'Editar Producto',
+    html:
+      `<label style="text-align: left; display: block; font-size: 14px; margin-top: 10px;">Nombre:</label>` +
+      `<input id="swal-edit-nombre" class="swal2-input" placeholder="Nombre" value="${producto.nombre}">` +
+      `<label style="text-align: left; display: block; font-size: 14px; margin-top: 10px;">Precio ($):</label>` +
+      `<input id="swal-edit-precio" type="number" class="swal2-input" placeholder="Precio" value="${producto.precio}">` +
+      `<label style="text-align: left; display: block; font-size: 14px; margin-top: 10px;">Stock:</label>` +
+      `<input id="swal-edit-stock" type="number" class="swal2-input" placeholder="Stock" value="${producto.stock || 0}">` +
+      `<label style="text-align: left; display: block; font-size: 14px; margin-top: 10px;">Categoría:</label>` +
+      `<input id="swal-edit-categoria" class="swal2-input" placeholder="Categoría" value="${producto.categoria || ''}">`,
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: 'Actualizar',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#fb0101',
+    preConfirm: () => {
+      const nombre = document.getElementById('swal-edit-nombre').value;
+      const precio = document.getElementById('swal-edit-precio').value;
+      if (!nombre || !precio) Swal.showValidationMessage('El nombre y el precio son obligatorios');
+      return {
+        nombre: nombre,
+        precio: parseFloat(precio),
+        stock: parseInt(document.getElementById('swal-edit-stock').value) || 0,
+        categoria: document.getElementById('swal-edit-categoria').value || 'Otros'
+      }
+    }
+  });
+
+  if (formValues) {
+    await db.collection("productos").doc(id).update(formValues);
+    await cargarProductos();
+    mostrarProductos();
+    Swal.fire('¡Actualizado!', 'El producto ha sido modificado exitosamente.', 'success');
+  }
+};
+
+window.eliminarProducto = async function(id) {
+  const confirmacion = await Swal.fire({
+    title: '¿Estás seguro?',
+    text: "El producto será eliminado permanentemente del catálogo.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#fb0101',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  });
+
+  if (confirmacion.isConfirmed) {
+    await db.collection("productos").doc(id).delete();
+    await cargarProductos();
+    mostrarProductos();
+    Swal.fire('Eliminado', 'El producto ha sido borrado.', 'success');
+  }
+};
+  // Función para cerrar sesión en el Admin
 function logout() {
-  auth.signOut();
-  document.getElementById("loginContainer").style.display = "flex";
-  document.getElementById("appContent").style.display = "none";
+  Swal.fire({
+    title: '¿Cerrar sesión?',
+    text: "Saldrás del panel de administración.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#fb0101',
+    confirmButtonText: 'Sí, salir'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      auth.signOut().then(() => {
+        // --- AQUÍ ESTÁ LA MAGIA DE LIMPIEZA ---
+        document.getElementById("loginEmail").value = "";     // Borra el correo
+        document.getElementById("loginPassword").value = "";  // Borra la contraseña
+        document.getElementById("adminEmail").innerText = ""; // Limpia el nombre
+        
+        document.getElementById("loginContainer").style.display = "flex";
+        document.getElementById("appContent").style.display = "none";
+        
+        Swal.fire({
+          title: 'Sesión cerrada',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        });
+        
+      }).catch((error) => {
+        Swal.fire('Error', 'No se pudo cerrar sesión: ' + error.message, 'error');
+      });
+    }
+  });
 }
 
 // ========== CARGA DE DATOS ==========
@@ -983,15 +1082,26 @@ function mostrarProductos() {
   
   document.getElementById("appContent").innerHTML = html;
   
-  setTimeout(() => {
+setTimeout(() => {
     const ctxCat = document.getElementById('categoriasChart')?.getContext('2d');
     if (ctxCat) {
       if (charts.categorias) charts.categorias.destroy();
+      
+      // ¡NUEVO! Generador automático de colores
+      const categoriasArray = Object.keys(ventasPorCategoria);
+      const paletaColores = ['#fb0101', '#fd7e14', '#ffc107', '#28a745', '#17a2b8', '#6f42c1', '#e83e8c', '#20c997', '#0dcaf0', '#6c757d', '#343a40'];
+      const coloresDinamicos = categoriasArray.map((_, i) => paletaColores[i % paletaColores.length]);
+
       charts.categorias = new Chart(ctxCat, {
         type: 'pie',
         data: {
-          labels: Object.keys(ventasPorCategoria),
-          datasets: [{ data: Object.values(ventasPorCategoria), backgroundColor: ['#fb0101', '#fd7e14', '#ffc107', '#28a745', '#17a2b8'] }]
+          labels: categoriasArray,
+          datasets: [{ 
+            data: Object.values(ventasPorCategoria), 
+            backgroundColor: coloresDinamicos,
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
         },
         options: { responsive: true, maintainAspectRatio: true }
       });
@@ -1251,42 +1361,195 @@ window.actualizarEstado = async function(id, nuevoEstado) {
   await db.collection("pedidos").doc(id).update({ estado: nuevoEstado });
   await cargarPedidos();
   mostrarVentas();
-  alert(`✅ Pedido #${id} actualizado a ${nuevoEstado}`);
+  Swal.fire({
+    toast: true,
+    position: 'top-end',
+    icon: 'success',
+    title: `Pedido #${id.slice(-5)} actualizado a ${nuevoEstado}`,
+    showConfirmButton: false,
+    timer: 3000
+  });
 };
 
 window.agregarProducto = async function() {
-  const nombre = prompt("Nombre del producto:");
-  const precio = prompt("Precio:");
-  const stock = prompt("Stock inicial:");
-  const categoria = prompt("Categoría:");
-  if (nombre && precio) {
-    await db.collection("productos").add({
-      nombre, precio: parseFloat(precio), stock: parseInt(stock) || 0, vendidos: 0, categoria: categoria || "Otros"
-    });
+  // 1. Extraemos las categorías que ya existen para hacer el menú
+  const categorias = [...new Set(productosData.map(p => p.categoria || 'General'))];
+  let opcionesCategorias = categorias.map(c => `<option value="${c}">${c}</option>`).join('');
+  opcionesCategorias += `<option value="NUEVA" style="font-weight:bold; color:var(--rojo-six);">+ Crear nueva categoría...</option>`;
+
+  const { value: formValues } = await Swal.fire({
+    title: 'Agregar Nuevo Producto',
+    html: `
+      <input id="swal-nombre" class="swal2-input" placeholder="Nombre del producto">
+      <input id="swal-precio" type="number" class="swal2-input" placeholder="Precio ($)">
+      <input id="swal-stock" type="number" class="swal2-input" placeholder="Stock inicial">
+      
+      <label style="text-align: left; display: block; font-size: 14px; margin-top: 15px;">Selecciona o crea categoría:</label>
+      <select id="swal-categoria" class="swal2-input" onchange="if(this.value==='NUEVA'){document.getElementById('swal-nueva-cat').style.display='block'}else{document.getElementById('swal-nueva-cat').style.display='none'}">
+        <option value="" disabled selected>Elige una categoría...</option>
+        ${opcionesCategorias}
+      </select>
+      <input id="swal-nueva-cat" class="swal2-input" placeholder="Escribe la nueva categoría" style="display:none; margin-top:10px;">
+      
+      <label style="display:block; text-align:left; margin-top:15px; font-size:14px;">Sube la imagen real del producto:</label>
+      <input id="swal-imagen" type="file" class="swal2-file" accept="image/*" style="width: 100%; margin-top: 5px;">
+    `,
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: 'Guardar Producto',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#fb0101',
+    preConfirm: () => {
+      // Usamos una Promesa porque leer la imagen de la computadora toma unos milisegundos
+      return new Promise((resolve) => {
+        const nombre = document.getElementById('swal-nombre').value;
+        const precio = document.getElementById('swal-precio').value;
+        const stock = document.getElementById('swal-stock').value;
+        let categoria = document.getElementById('swal-categoria').value;
+        
+        if (categoria === 'NUEVA') categoria = document.getElementById('swal-nueva-cat').value;
+        
+        if (!nombre || !precio || !categoria) {
+          Swal.showValidationMessage('Nombre, precio y categoría son obligatorios');
+          resolve(false);
+          return;
+        }
+
+        const archivoInput = document.getElementById('swal-imagen');
+        let imagenBase64 = "https://cdn-icons-png.flaticon.com/512/1046/1046784.png"; // Imagen por defecto (hamburguesa)
+
+        // Si el usuario subió una foto, la convertimos a código para guardarla
+        if (archivoInput.files.length > 0) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            resolve({
+              nombre, 
+              precio: parseFloat(precio), 
+              stock: parseInt(stock) || 0, 
+              categoria,
+              imagen: e.target.result // Foto real
+            });
+          };
+          reader.readAsDataURL(archivoInput.files[0]);
+        } else {
+          // Si no subió foto, guardamos con la de defecto
+          resolve({
+            nombre, 
+            precio: parseFloat(precio), 
+            stock: parseInt(stock) || 0, 
+            categoria,
+            imagen: imagenBase64
+          });
+        }
+      });
+    }
+  });
+
+  if (formValues) {
+    await db.collection("productos").add({ ...formValues, vendidos: 0 });
     await cargarProductos();
     mostrarProductos();
+    Swal.fire('¡Agregado!', 'El producto ya está en el catálogo con su imagen.', 'success');
   }
 };
 
 window.editarProducto = async function(id) {
   const producto = productosData.find(p => p.id === id);
-  const nuevoNombre = prompt("Nuevo nombre:", producto.nombre);
-  const nuevoPrecio = prompt("Nuevo precio:", producto.precio);
-  const nuevoStock = prompt("Nuevo stock:", producto.stock);
-  if (nuevoNombre && nuevoPrecio) {
-    await db.collection("productos").doc(id).update({
-      nombre: nuevoNombre, precio: parseFloat(nuevoPrecio), stock: parseInt(nuevoStock) || 0
-    });
+  const categorias = [...new Set(productosData.map(p => p.categoria || 'General'))];
+  
+  let opcionesCategorias = categorias.map(c => `<option value="${c}" ${c === producto.categoria ? 'selected' : ''}>${c}</option>`).join('');
+  opcionesCategorias += `<option value="NUEVA" style="font-weight:bold; color:var(--rojo-six);">+ Crear nueva categoría...</option>`;
+
+  const { value: formValues } = await Swal.fire({
+    title: 'Editar Producto',
+    html: `
+      <label style="text-align: left; display: block; font-size: 14px; margin-top: 10px;">Nombre:</label>
+      <input id="swal-edit-nombre" class="swal2-input" placeholder="Nombre" value="${producto.nombre}">
+      
+      <label style="text-align: left; display: block; font-size: 14px; margin-top: 10px;">Precio ($):</label>
+      <input id="swal-edit-precio" type="number" class="swal2-input" placeholder="Precio" value="${producto.precio}">
+      
+      <label style="text-align: left; display: block; font-size: 14px; margin-top: 10px;">Stock:</label>
+      <input id="swal-edit-stock" type="number" class="swal2-input" placeholder="Stock" value="${producto.stock || 0}">
+      
+      <label style="text-align: left; display: block; font-size: 14px; margin-top: 10px;">Categoría:</label>
+      <select id="swal-edit-categoria" class="swal2-input" onchange="if(this.value==='NUEVA'){document.getElementById('swal-edit-nueva-cat').style.display='block'}else{document.getElementById('swal-edit-nueva-cat').style.display='none'}">
+        ${opcionesCategorias}
+      </select>
+      <input id="swal-edit-nueva-cat" class="swal2-input" placeholder="Escribe la nueva categoría" style="display:none; margin-top:10px;">
+      
+      <label style="display:block; text-align:left; margin-top:15px; font-size:14px;">Cambiar Imagen (Opcional):</label>
+      <input id="swal-edit-imagen" type="file" class="swal2-file" accept="image/*" style="width: 100%; margin-top: 5px;">
+    `,
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: 'Actualizar',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#fb0101',
+    preConfirm: () => {
+      return new Promise((resolve) => {
+        const nombre = document.getElementById('swal-edit-nombre').value;
+        const precio = document.getElementById('swal-edit-precio').value;
+        const stock = document.getElementById('swal-edit-stock').value;
+        let categoria = document.getElementById('swal-edit-categoria').value;
+        
+        if(categoria === 'NUEVA') categoria = document.getElementById('swal-edit-nueva-cat').value;
+
+        if (!nombre || !precio || !categoria) {
+          Swal.showValidationMessage('El nombre, precio y categoría son obligatorios');
+          resolve(false);
+          return;
+        }
+
+        const archivoInput = document.getElementById('swal-edit-imagen');
+        let datosActualizados = {
+          nombre,
+          precio: parseFloat(precio),
+          stock: parseInt(stock) || 0,
+          categoria
+        };
+
+        // Si el usuario eligió una foto nueva, la actualizamos
+        if (archivoInput.files.length > 0) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            datosActualizados.imagen = e.target.result;
+            resolve(datosActualizados);
+          };
+          reader.readAsDataURL(archivoInput.files[0]);
+        } else {
+          // Si no, dejamos la imagen que ya tenía
+          resolve(datosActualizados);
+        }
+      });
+    }
+  });
+
+  if (formValues) {
+    await db.collection("productos").doc(id).update(formValues);
     await cargarProductos();
     mostrarProductos();
+    Swal.fire('¡Actualizado!', 'El producto ha sido modificado exitosamente.', 'success');
   }
 };
 
 window.eliminarProducto = async function(id) {
-  if (confirm("¿Eliminar este producto?")) {
+  const confirmacion = await Swal.fire({
+    title: '¿Estás seguro?',
+    text: "El producto será eliminado permanentemente del catálogo.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#fb0101',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  });
+
+  if (confirmacion.isConfirmed) {
     await db.collection("productos").doc(id).delete();
     await cargarProductos();
     mostrarProductos();
+    Swal.fire('Eliminado', 'El producto ha sido borrado.', 'success');
   }
 };
 
@@ -1302,17 +1565,15 @@ window.exportarReporte = function() {
 window.exportarReporteCompleto = function() {
   const totalVentas = pedidosData.reduce((sum, p) => sum + (p.total || 0), 0);
   const entregados = pedidosData.filter(p => p.estado === 'Entregado').length;
-  const reporte = `REPORTE COMPLETO - Tu Six a Domicilio
-Fecha: ${new Date().toLocaleString()}
-----------------------------------------
-📊 ESTADÍSTICAS GENERALES:
-- Total Pedidos: ${pedidosData.length}
-- Total Ventas: $${totalVentas.toLocaleString()}
-- Pedidos Entregados: ${entregados}
-- Tasa de Entrega: ${Math.round((entregados / (pedidosData.length || 1)) * 100)}%
-- Total Clientes: ${clientesMap.size}
-----------------------------------------`;
-  alert(reporte);
+  const reporte = `REPORTE COMPLETO - Tu Six a Domicilio\nFecha: ${new Date().toLocaleString()}\n----------------------------------------\n📊 ESTADÍSTICAS GENERALES:\n- Total Pedidos: ${pedidosData.length}\n- Total Ventas: $${totalVentas.toLocaleString()}\n- Pedidos Entregados: ${entregados}\n- Tasa de Entrega: ${Math.round((entregados / (pedidosData.length || 1)) * 100)}%\n- Total Clientes: ${clientesMap.size}\n----------------------------------------`;
+  
+  Swal.fire({
+    title: 'Reporte Generado',
+    text: 'Tu reporte se ha descargado correctamente.',
+    icon: 'success',
+    confirmButtonColor: '#fb0101'
+  });
+
   const blob = new Blob([reporte], { type: "text/plain" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
@@ -1354,6 +1615,7 @@ auth.onAuthStateChanged(async (user) => {
     await auth.signOut();
   }
 });
+</script>
 </script>
 </body>
 </html>
