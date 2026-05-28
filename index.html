@@ -922,6 +922,14 @@ function cargarFotosGuardadas() {
     }
   });
 }
+
+function mostrarImagenEnGaleria(src) {
+  const img = document.createElement("img");
+  img.src = src;
+  img.className = "foto-usuario";
+  const contenedor = document.getElementById("contenedorFotos");
+  if(contenedor) contenedor.insertBefore(img, contenedor.firstChild);
+}
 // ==========================================
 // FUNCIONES ACTUALIZADAS CON SWEETALERT2
 // ==========================================
@@ -972,41 +980,6 @@ function logout() {
   }).catch((error) => {
     console.error('Error al cerrar sesión:', error);
   });
-}
-
-function procesarArchivo() {
-  const archivoInput = document.getElementById("inputArchivo");
-  const archivo = archivoInput.files[0];
-  
-  if (!archivo) {
-    return Swal.fire({
-      title: 'Falta la imagen',
-      text: 'Por favor selecciona una imagen desde tu dispositivo.',
-      icon: 'warning',
-      confirmButtonColor: '#fb0101'
-    });
-  }
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const base64Image = e.target.result;
-    let fotosExistentes = JSON.parse(localStorage.getItem("galeriaSix") || "[]");
-    fotosExistentes.unshift(base64Image);
-    localStorage.setItem("galeriaSix", JSON.stringify(fotosExistentes));
-    mostrarImagenEnGaleria(base64Image);
-    archivoInput.value = "";
-    
-    // Alerta de éxito al subir foto
-    Swal.fire({
-      title: '¡Foto publicada!',
-      text: 'Gracias por compartir con la comunidad Six.',
-      icon: 'success',
-      confirmButtonColor: '#fb0101',
-      timer: 2000, // Se cierra sola a los 2 segundos
-      showConfirmButton: false
-    });
-  };
-  reader.readAsDataURL(archivo);
 
 }
 
