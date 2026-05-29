@@ -1193,14 +1193,39 @@ function mostrarClientes() {
     const ctxHist = document.getElementById('historialChart')?.getContext('2d');
     if (ctxHist) {
       const ultimos6Meses = [];
-      const ventasMensuales = [];
+      const ventasMensuales = [0, 0, 0, 0, 0, 0];
+      const fechaActual = new Date();
+      
+      // 1. Crear las etiquetas de los últimos 6 meses reales
       for (let i = 5; i >= 0; i--) {
-        const fecha = new Date();
-        fecha.setMonth(fecha.getMonth() - i);
-        const mes = fecha.toLocaleString('es', { month: 'short' });
-        ultimos6Meses.push(mes);
-        ventasMensuales.push(Math.floor(Math.random() * 10000) + 2000);
+        const d = new Date();
+        d.setMonth(fechaActual.getMonth() - i);
+        ultimos6Meses.push(d.toLocaleString('es', { month: 'short' }));
       }
+
+      // 2. Sumar las ventas reales de Firebase
+      pedidosData.forEach(p => {
+        if (p.fecha) {
+          // Extraemos el mes y el año del texto de la fecha (ej. "28/5/2026")
+          const fechaString = p.fecha.split(',')[0]; 
+          const partes = fechaString.split('/');
+          
+          if (partes.length === 3) {
+            const mesPedido = parseInt(partes[1]) - 1; // Enero es 0 en JS
+            const añoPedido = parseInt(partes[2]);
+
+            // Comprobamos a cuál de los últimos 6 meses pertenece la venta y sumamos el total
+            for (let i = 0; i < 6; i++) {
+              const d = new Date();
+              d.setMonth(fechaActual.getMonth() - (5 - i));
+              
+              if (d.getMonth() === mesPedido && d.getFullYear() === añoPedido) {
+                ventasMensuales[i] += (p.total || 0);
+              }
+            }
+          }
+        }
+      });
       
       if (charts.historial) charts.historial.destroy();
       charts.historial = new Chart(ctxHist, {
@@ -1235,13 +1260,16 @@ function mostrarReportes() {
   const enCamino = pedidosData.filter(p => p.estado === 'En camino');
   
   // Ventas por día de semana
+  // Ventas por día de semana
   const ventasPorDiaSemana = [0, 0, 0, 0, 0, 0, 0];
   const diasNombres = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
   pedidosData.forEach(p => {
-    if (p.fecha) {
-      const dia = new Date(p.fecha).getDay();
-      ventasPorDiaSemana[dia] += p.total || 0;
+    // En lugar de intentar adivinar la fecha del texto, leemos la variable diaSemana 
+    // que ya enviaste limpia y lista desde tu archivo principal
+    if (p.diaSemana !== undefined && p.diaSemana >= 0 && p.diaSemana <= 6) {
+      ventasPorDiaSemana[p.diaSemana] += p.total || 0;
     }
+  
   });
   
   const html = `
@@ -1554,31 +1582,73 @@ window.eliminarProducto = async function(id) {
 };
 
 window.exportarReporte = function() {
-  const csv = pedidosData.map(p => `${p.id},${p.cliente},${p.direccion},${p.productos},${p.total},${p.estado},${p.fecha}`).join("\n");
-  const blob = new Blob(["ID,Cliente,Direccion,Productos,Total,Estado,Fecha\n" + csv], { type: "text/csv" });
+  // 1. Recorremos los pedidos para darles formato seguro
+  const csv = pedidosData.map(p => {
+    
+    // Convertimos la lista de objetos de productos a texto usando tu función
+    const textoProductos = obtenerProductosTexto(p.productos);
+    
+    // Función de seguridad: Envuelve textos en comillas para proteger las comas
+    const protegerTexto = (texto) => `"${(texto || '').toString().replace(/"/g, '""')}"`;
+    
+    // Retornamos la fila armada, protegiendo cliente, dirección, productos y fecha
+    return `${p.id},${protegerTexto(p.cliente)},${protegerTexto(p.direccion)},${protegerTexto(textoProductos)},${p.total},${protegerTexto(p.estado)},${protegerTexto(p.fecha)}`;
+  }).join("\n");
+  
+  // 2. Cabeceras del Excel
+  const cabeceras = "ID,Cliente,Direccion,Productos,Total,Estado,Fecha\n";
+  
+  // 3. Agregamos el BOM (\uFEFF) para que Excel lea el UTF-8 (acentos y ñ) correctamente
+  const blob = new Blob(["\uFEFF" + cabeceras + csv], { type: "text/csv;charset=utf-8;" });
+  
+  // 4. Descargamos el archivo
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
   link.download = `reporte_pedidos_${new Date().toISOString().slice(0,19)}.csv`;
   link.click();
+
 };
 
 window.exportarReporteCompleto = function() {
-  const totalVentas = pedidosData.reduce((sum, p) => sum + (p.total || 0), 0);
-  const entregados = pedidosData.filter(p => p.estado === 'Entregado').length;
-  const reporte = `REPORTE COMPLETO - Tu Six a Domicilio\nFecha: ${new Date().toLocaleString()}\n----------------------------------------\n📊 ESTADÍSTICAS GENERALES:\n- Total Pedidos: ${pedidosData.length}\n- Total Ventas: $${totalVentas.toLocaleString()}\n- Pedidos Entregados: ${entregados}\n- Tasa de Entrega: ${Math.round((entregados / (pedidosData.length || 1)) * 100)}%\n- Total Clientes: ${clientesMap.size}\n----------------------------------------`;
-  
+  // 1. Cabeceras con toda la información analítica separada
+  const cabeceras = "ID_Pedido,Nombre_Cliente,Direccion_Entrega,Detalle_Productos,Total_Ingreso,Estado_Pedido,Fecha_Completa,Mes,Dia_Semana,Hora_Compra,Cantidad_Articulos,Ticket_Promedio\n";
+
+  // 2. Función para proteger textos que tengan comas por dentro
+  const protegerTexto = (texto) => `"${(texto || '').toString().replace(/"/g, '""')}"`;
+
+  // 3. Procesamos todos los pedidos
+  const csv = pedidosData.map(p => {
+    // Convertimos los productos a texto legible
+    const textoProductos = obtenerProductosTexto(p.productos);
+
+    // Extraemos los datos analíticos (si existen en la base de datos)
+    const mes = p.mes || "N/A";
+    const dia = p.diaSemana || "N/A";
+    const hora = p.hora !== undefined ? p.hora + ":00" : "N/A";
+    const cantidadArticulos = p.cantidadProductos || 1;
+    const ticketPromedio = Math.round((p.total || 0) / cantidadArticulos);
+
+    // Retornamos la fila completa con las 12 columnas
+    return `${p.id},${protegerTexto(p.cliente)},${protegerTexto(p.direccion)},${protegerTexto(textoProductos)},${p.total},${protegerTexto(p.estado)},${protegerTexto(p.fecha)},${mes},${dia},${protegerTexto(hora)},${cantidadArticulos},${ticketPromedio}`;
+  }).join("\n");
+
+  // 4. Mostramos una alerta bonita
   Swal.fire({
-    title: 'Reporte Generado',
-    text: 'Tu reporte se ha descargado correctamente.',
+    title: 'Reporte Completo Generado',
+    text: 'Tu Excel con todas las métricas analíticas se ha descargado.',
     icon: 'success',
     confirmButtonColor: '#fb0101'
   });
 
-  const blob = new Blob([reporte], { type: "text/plain" });
+  // 5. Armamos el Excel usando \uFEFF para que los acentos salgan perfectos
+  const blob = new Blob(["\uFEFF" + cabeceras + csv], { type: "text/csv;charset=utf-8;" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = `reporte_completo_${new Date().toISOString().slice(0,19)}.txt`;
+  
+  // Le ponemos un nombre profesional al archivo
+  link.download = `Six_Reporte_Analitico_${new Date().toISOString().slice(0,10)}.csv`;
   link.click();
+S
 };
 
 function cambiarSeccion(section) {
