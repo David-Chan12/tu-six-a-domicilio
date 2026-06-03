@@ -543,14 +543,31 @@
   border-color: var(--rojo-six);
   box-shadow: 0 0 0 4px rgba(251, 1, 1, 0.15);
 }
+/* =========================================
+       DISEÑO DEL TICKET DE COMPRA
+       ========================================= */
+    .resumen-pedido {
+      background: #fffdf5; /* Color amarillento tipo papel de ticket */
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      margin: 25px 0;
+      border: 1px solid #e0e0e0;
+      font-family: 'Courier New', Courier, monospace; /* Fuente de máquina registradora */
+      color: #333;
+    }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>Tu Six a Domicilio :D</h1>
+  <!-- Aquí mandamos a llamar a tu imagen en lugar del texto h1 -->
+  <img src="logo-six.png" alt="Tu Six a Domicilio" style="max-width: 320px; height: auto; margin-bottom: 15px; filter: drop-shadow(2px 2px 8px rgba(0,0,0,0.3));">
   <p>¿Se acabó la fiesta? Nosotros te llevamos lo que necesitas.</p>
 </header>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Librería para convertir el ticket a PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <nav>
   <a href="#">INICIO</a>
@@ -617,17 +634,30 @@
     <input type="text" id="nombreCliente" placeholder="Tu nombre">
     <input type="text" id="direccionEntrega" placeholder="Dirección de entrega">
     <div id="productosContainer" class="productos-grid"></div>
-    <div class="resumen-pedido">
-      <h3>Resumen del Pedido</h3>
-      <p>Productos: <span id="cantidadProductos">0</span></p>
-      <p>Total: <span id="totalPedido">$0</span></p>
+    <!-- Nuevo diseño de Ticket -->
+    <div class="resumen-pedido" id="ticket-imprimible">
+      <h3 style="text-align: center; border-bottom: 2px dashed #aaa; padding-bottom: 10px; margin-top:0;">🧾 TICKET DE COMPRA</h3>
+      
+      <!-- Aquí se inyectarán los productos línea por línea -->
+      <ul id="listaTicket" style="list-style: none; padding: 0; margin: 15px 0;">
+        <li style="text-align: center; color: #888; font-family: 'PT Sans', sans-serif;">El carrito está vacío</li>
+      </ul>
+      
+      <div style="border-top: 2px dashed #aaa; padding-top: 10px; margin-top: 10px; text-align: right; font-size: 1.2rem;">
+        <strong>Total a pagar: <span id="totalPedido">$0</span></strong>
+      </div>
     </div>
+
+    <!-- Botón para descargar el PDF -->
+    <button class="btn-confirmar" onclick="descargarTicketPDF()" style="background: #333; margin-bottom: 20px; width: 100%;">
+      📄 Descargar Ticket en PDF
+    </button>
+
     <select id="metodoPago">
       <option value="Efectivo">Efectivo</option>
       <option value="Tarjeta">Tarjeta</option>
     </select>
     <button class="btn-confirmar" onclick="guardarPedido()">Confirmar Pedido</button>
-  </div>
 </section>
 
 <section id="pedidos-realizados">
@@ -796,20 +826,71 @@ function cambiarCantidad(id, cambio) {
 
 function actualizarResumen() {
   let total = 0;
-  let cantidadObjetos = 0;
+  let htmlTicket = '';
+  let hayProductos = false;
   
+  // Recorremos el carrito para armar el ticket
   for (const [id, cant] of Object.entries(carrito)) {
     if (cant > 0) {
       const prod = productosData.find(p => p.id === id);
       if (prod) {
-        total += (prod.precio * cant);
-        cantidadObjetos += cant; // Sumamos la cantidad real de artículos
+        hayProductos = true;
+        const subtotal = prod.precio * cant;
+        total += subtotal;
+        
+        // Creamos una línea del ticket por cada producto
+        htmlTicket += `
+          <li style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 1rem;">
+            <span>${cant}x ${prod.nombre}</span>
+            <span>$${subtotal}</span>
+          </li>
+        `;
       }
     }
   }
   
-  document.getElementById('cantidadProductos').innerText = cantidadObjetos;
+  const listaTicket = document.getElementById('listaTicket');
+  // Si hay productos, mostramos la lista. Si no, mostramos el mensaje de vacío.
+  if (hayProductos) {
+     listaTicket.innerHTML = htmlTicket;
+  } else {
+     listaTicket.innerHTML = '<li style="text-align: center; color: #888; font-family:\'PT Sans\', sans-serif;">El carrito está vacío</li>';
+  }
+  
   document.getElementById('totalPedido').innerText = `$${total}`;
+}
+// Función para generar y descargar el ticket en PDF
+// Función para generar y descargar el ticket en PDF
+function descargarTicketPDF() {
+  // 1. Verificamos que el carrito no esté vacío
+  let totalCarrito = 0;
+  for (const cant of Object.values(carrito)) {
+    totalCarrito += cant;
+  }
+  
+  if (totalCarrito === 0) {
+    return Swal.fire('Carrito vacío', 'Agrega productos a tu pedido antes de descargar el ticket.', 'info');
+  }
+
+  // 2. Tomamos el elemento HTML del ticket que queremos convertir
+  const elementoTicket = document.getElementById('ticket-imprimible');
+  
+  // 3. Configuramos cómo queremos que se vea el PDF (¡Con corrección anti-blanco!)
+  const opciones = {
+    margin:       10, 
+    filename:     `Ticket_TuSix_${new Date().getTime()}.pdf`, 
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { 
+      scale: 2, 
+      scrollY: 0, // Ignora si el usuario bajó la pantalla
+      useCORS: true, // Permite cargar recursos externos sin fallar
+      backgroundColor: '#fffdf5' // Fuerza el color del papel del ticket
+    }, 
+    jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' } 
+  };
+
+  // 4. Ejecutamos la librería
+  html2pdf().set(opciones).from(elementoTicket).save();
 }
 
 // 4. GUARDAR EL PEDIDO CON LAS CANTIDADES REALES
