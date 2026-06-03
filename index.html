@@ -5,32 +5,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tu Six a Domicilio :D - Oficial</title>
   
+  <!-- ICONO DE LA PÁGINA (FAVICON) -->
+  <link rel="icon" href="six-logo-png_seeklogo-250549.png" type="image/png">
+  
   <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700|Merriweather:400,700&display=swap" rel="stylesheet">
 
   <style>
- /* CORRECCIÓN: Centrar el texto cuando la galería está vacía */
+    /* ESTILO PARA EL LOGO Y EL BANNER PRINCIPAL (Ajustado según image_d72767.jpg) */
+    header {
+      background: #fb0101; /* Rojo sólido de la marca */
+      padding: 100px 20px; /* Más espacio para dar el efecto imponente de tu captura */
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .logo-principal {
+      max-width: 550px;
+      width: 85%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    /* CORRECCIÓN: Centrar el texto cuando la galería está vacía */
     .galeria-usuarios p {
-      grid-column: 1 / -1; /* Esto le dice que ocupe todas las columnas disponibles */
-      text-align: center; /* Centra el texto */
+      grid-column: 1 / -1; 
+      text-align: center; 
       font-size: 1.2rem;
       color: #666;
       margin: 40px auto;
     }
+
     #auth-section {
-      max-width: 500px; /* Hace que la tarjeta sea más estrecha y elegante */
+      max-width: 500px; 
       margin: 60px auto;
       text-align: center;
       background: linear-gradient(to bottom, #ffffff, #fafafa);
     }
 
     #auth-section h2 {
-      border-bottom: none; /* Quitamos la línea roja gruesa para un look más limpio */
+      border-bottom: none; 
       font-size: 2rem;
       margin-bottom: 10px;
     }
 
     #auth-section input {
-      max-width: 100%; /* Los inputs usan todo el ancho de la tarjeta */
+      max-width: 100%; 
       background: #fff;
     }
 
@@ -44,7 +64,7 @@
 
     /* Estilo especial para el botón de CREAR CUENTA para diferenciarlo */
     #auth-section button[onclick="registrar()"] {
-      background: transparent !important; /* Sobreescribe el #444 de tu HTML */
+      background: transparent !important;
       color: var(--negro-google) !important;
       border: 2px solid #ccc !important;
       box-shadow: none;
@@ -56,22 +76,21 @@
       background: #fff !important;
     }
 
-
     /* 2. SECCIÓN DE COMUNIDAD Y FOTOS */
     #galeria {
       text-align: center;
     }
 
     .foto-usuario {
-      border: 6px solid var(--blanco); /* Borde grueso estilo fotografía */
-      border-bottom: 25px solid var(--blanco); /* Efecto Polaroid */
+      border: 6px solid var(--blanco); 
+      border-bottom: 25px solid var(--blanco); 
       border-radius: 4px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Animación con rebote */
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
     }
 
     .foto-usuario:hover {
-      transform: scale(1.08) rotate(3deg); /* Zoom y rotación divertida */
+      transform: scale(1.08) rotate(3deg); 
       box-shadow: var(--sombra-roja);
       z-index: 10;
       position: relative;
@@ -80,7 +99,7 @@
     /* Estilo para la caja de subir foto */
     #subirFotoContainer {
       background: #fafafa;
-      border: 2px dashed #ccc; /* Borde punteado de zona de carga */
+      border: 2px dashed #ccc; 
       box-shadow: none;
       transition: border-color 0.3s ease;
     }
@@ -88,7 +107,6 @@
     #subirFotoContainer:hover {
       border-color: var(--rojo-six);
     }
-
 
     /* 3. SECCIÓN DE PEDIDOS EN CURSO */
     #pedidos-realizados {
@@ -113,10 +131,10 @@
     }
 
     .pedido-item:hover {
-      transform: translateX(10px); /* Deslizamiento hacia la derecha */
+      transform: translateX(10px); 
       background: var(--blanco);
       box-shadow: var(--sombra-suave);
-      border-left-width: 10px; /* El borde rojo se hace más grueso */
+      border-left-width: 10px; 
     }
 
     .pedido-item strong {
@@ -130,11 +148,12 @@
       color: #666;
       background: #eee;
       padding: 4px 10px;
-      border-radius: 20px; /* Fecha estilo "píldora" o etiqueta */
+      border-radius: 20px; 
       font-size: 0.85rem;
       font-weight: bold;
     }
-   :root {
+
+    :root {
       --rojo-six: #fb0101;
       --rojo-gradiente: #d40202;
       --negro-google: #212121;
@@ -156,37 +175,10 @@
       line-height: 1.6;
     }
 
-    /* HEADER ESTILO MODERNO */
-    header {
-      background: linear-gradient(135deg, rgba(251,1,1,0.85), rgba(212,2,2,0.9)), url('https://lh3.googleusercontent.com/sitesv/AA5AbUAZRdESUIyFqaYVcQVSZh_pG9SLvQbrmM1WRYsPd4TuZaGMyBwn0mhdPRiRWt-EaabOdCkY6oU-9azTHQTkM8U5CvsUat6g9nX7d7RyhOgP41dXsgqP-KYAHRJUrnlMynP8Ht3AExVb-LfCKXEfxgcNs3KRFsliakNBwf5m7o4KKHpGCLblAZy-y8rdqxw2fj3kVHKimEX-0CGaOjKlSc3P4J6icpKrmUzr=w1280');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed; /* Efecto Parallax */
-      color: var(--blanco);
-      padding: 100px 20px;
-      text-align: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-
-    header h1 {
-      font-family: 'PT Sans', sans-serif;
-      font-size: 4rem;
-      margin: 0;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
-    }
-
-    header p {
-      font-size: 1.2rem;
-      font-family: 'PT Sans', sans-serif;
-      opacity: 0.9;
-    }
-
     /* MENÚ DE NAVEGACIÓN TIPO EFECTO CRISTAL */
     nav {
       background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(12px); /* Desenfoca lo que está detrás */
+      backdrop-filter: blur(12px); 
       -webkit-backdrop-filter: blur(12px);
       padding: 15px 30px;
       display: flex;
@@ -214,7 +206,6 @@
       color: var(--rojo-six);
     }
 
-    /* Subrayado animado en el menú */
     nav a:not(.btn-admin)::after {
       content: '';
       position: absolute;
@@ -234,7 +225,7 @@
       background: linear-gradient(135deg, var(--rojo-six), var(--rojo-gradiente));
       color: white !important;
       padding: 8px 20px;
-      border-radius: 25px; /* Botón en forma de píldora */
+      border-radius: 25px; 
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       box-shadow: 0 4px 10px rgba(251,1,1,0.3);
     }
@@ -262,7 +253,7 @@
       border-radius: 2px;
     }
 
-    /* TARJETAS DE PRODUCTOS PROFESIONALES */
+    /* TARJETAS DE PRODUCTOS */
     .grid-productos, .productos-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -297,7 +288,7 @@
     }
 
     .card-producto:hover img, .producto-card:hover img {
-      transform: scale(1.05); /* Efecto zoom sutil a la imagen */
+      transform: scale(1.05); 
     }
 
     .producto-info {
@@ -315,30 +306,29 @@
       color: #666;
       font-size: 0.95rem;
     }
-    /* =========================================
-       VITRINA PÚBLICA (CARRUSEL AUTOMÁTICO)
-       ========================================= */
+
+    /* VITRINA PÚBLICA (CARRUSEL AUTOMÁTICO) */
     .carrusel-vitrina {
       position: relative;
       width: 100%;
-      max-width: 320px; /* Tamaño de la tarjeta */
+      max-width: 320px; 
       height: 280px;
       margin: 0 auto;
       background: var(--blanco);
       border-radius: 16px;
       box-shadow: var(--sombra-suave);
       border: 1px solid rgba(0,0,0,0.03);
-      overflow: hidden; /* Oculta lo que se salga de la caja */
+      overflow: hidden; 
     }
 
     .vitrina-item {
-      position: absolute; /* Apila las tarjetas una sobre otra */
+      position: absolute; 
       top: 0; 
       left: 0;
       width: 100%; 
       height: 100%;
-      opacity: 0; /* Las oculta por defecto */
-      transition: opacity 1s ease-in-out; /* Animación suave de 1 segundo */
+      opacity: 0; 
+      transition: opacity 1s ease-in-out; 
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -348,7 +338,6 @@
       z-index: 1;
     }
 
-    /* Solo el elemento con la clase .activo se hará visible */
     .vitrina-item.activo {
       opacity: 1;
       z-index: 2;
@@ -371,24 +360,22 @@
     }
 
     /* SECCIÓN GALERÍA DE USUARIOS */
-    /* SECCIÓN GALERÍA DE USUARIOS (CARRUSEL HORIZONTAL) */
     .galeria-usuarios {
-      display: flex; /* Cambiamos grid por flex para hacer una fila */
-      overflow-x: auto; /* Permitimos desplazamiento horizontal */
+      display: flex; 
+      overflow-x: auto; 
       gap: 20px;
       padding: 20px 5px;
-      scroll-snap-type: x mandatory; /* Hace que se detenga justo en cada foto */
+      scroll-snap-type: x mandatory; 
     }
 
-    /* Ocultamos la barra de desplazamiento fea para que se vea limpio */
     .galeria-usuarios::-webkit-scrollbar {
       display: none; 
     }
 
     .foto-usuario {
-      flex: 0 0 250px; /* Forzamos a que cada foto mida 250px de ancho */
+      flex: 0 0 250px; 
       height: 250px;
-      scroll-snap-align: center; /* Centra la foto al hacer scroll */
+      scroll-snap-align: center; 
       border-radius: 12px;
       object-fit: cover;
       box-shadow: var(--sombra-suave);
@@ -405,7 +392,6 @@
       border: 1px solid rgba(0,0,0,0.03);
     }
 
-    /* ESTILIZADO DE INPUTS (CAMPOS DE TEXTO) */
     input[type="text"], input[type="file"], input[type="email"], input[type="password"], select {
       padding: 15px;
       margin: 10px 0 20px 0;
@@ -427,7 +413,6 @@
       background-color: var(--blanco);
     }
 
-    /* BOTONES GLOBALES */
     button {
       background: linear-gradient(135deg, var(--rojo-six), var(--rojo-gradiente));
       color: white;
@@ -448,12 +433,11 @@
       box-shadow: 0 6px 15px rgba(251,1,1,0.35);
     }
 
-    /* Utilidades */
     .oculto { display: none !important; }
 
     /* ESTILOS DEL WIDGET DEL CLIMA */
     #widget-clima {
-      margin: -40px auto 40px auto; /* Lo sube un poco para montarlo sobre el header */
+      margin: -40px auto 40px auto; 
       position: relative;
       z-index: 10;
       padding: 20px;
@@ -476,9 +460,8 @@
       gap: 5px;
     }
 
-    /* RESPONSIVE DESIGN (Pantallas pequeñas) */
+    /* RESPONSIVE DESIGN */
     @media(max-width:768px){
-      header h1 { font-size: 2.5rem; }
       nav {
         flex-wrap: wrap;
         padding: 10px;
@@ -493,63 +476,54 @@
         max-width: 100%;
       }
     }
-    /* CORRECCIÓN: Evitar que los campos se suban al lado del título */
+
     #zonaPrivada h2 {
       display: block;
-      width: fit-content; /* Mantiene la línea roja del tamaño exacto del texto */
+      width: fit-content; 
     }
 
     #zonaPrivada input, 
     #zonaPrivada select {
-      display: block; /* Fuerza a que los inputs bajen a su propio renglón */
+      display: block; 
     }
-    /* =========================================
-   ESTILO MODERNO PARA EL MÉTODO DE PAGO
-   ========================================= */
-#zonaPrivada select#metodoPago {
-  /* 1. Quitamos el estilo por defecto del navegador */
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  
-  /* 2. Diseño base de la caja */
-  background-color: #ffffff;
-  border: 2px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 16px 20px;
-  width: 100%;
-  font-family: 'PT Sans', sans-serif;
-  font-size: 1.1rem;
-  color: var(--negro-google);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  
-  /* 3. Dibujamos una flecha roja personalizada a la derecha */
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fb0101' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 20px center;
-  background-size: 18px;
-}
 
-/* 4. Efecto cuando el usuario pasa el ratón por encima (Hover) */
-#zonaPrivada select#metodoPago:hover {
-  border-color: #cccccc;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
+    /* MÉTODO DE PAGO PERSONALIZADO */
+    #zonaPrivada select#metodoPago {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-color: #ffffff;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 16px 20px;
+      width: 100%;
+      font-family: 'PT Sans', sans-serif;
+      font-size: 1.1rem;
+      color: var(--negro-google);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fb0101' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 20px center;
+      background-size: 18px;
+    }
 
-/* 5. Efecto cuando el cliente hace clic en el campo (Focus) */
-#zonaPrivada select#metodoPago:focus {
-  outline: none;
-  border-color: var(--rojo-six);
-  box-shadow: 0 0 0 4px rgba(251, 1, 1, 0.15);
-}
+    #zonaPrivada select#metodoPago:hover {
+      border-color: #cccccc;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    #zonaPrivada select#metodoPago:focus {
+      outline: none;
+      border-color: var(--rojo-six);
+      box-shadow: 0 0 0 4px rgba(251, 1, 1, 0.15);
+    }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>Tu Six a Domicilio :D</h1>
-  <p>¿Se acabó la fiesta? Nosotros te llevamos lo que necesitas.</p>
+  <img src="C:\Users\djcch\OneDrive\Documentos\Paguina web actualizada\logo-six.png" alt="Six a Domicilio" class="logo-principal">
 </header>
 
 <nav>
@@ -577,9 +551,7 @@
 
 <section id="catalogo">
   <h2>Nuestros Productos</h2>
-  <div id="carrusel-publico" class="carrusel-vitrina">
-    <!-- Aquí JavaScript inyectará los productos automáticamente -->
-  </div>
+  <div id="carrusel-publico" class="carrusel-vitrina"></div>
 </section>
 
 <section id="galeria">
@@ -601,7 +573,7 @@
     <input type="email" id="email" placeholder="Correo electrónico"><br>
     <input type="password" id="password" placeholder="Contraseña"><br>
     <button onclick="login()">ENTRAR</button>
-    <button onclick="registrar()" style="background:#444">CREAR CUENTA</button>
+    <button onclick="registrar()">CREAR CUENTA</button>
   </div>
 
   <div id="logged-in-view" class="oculto">
@@ -613,7 +585,7 @@
 
 <section id="zonaPrivada" class="oculto">
   <div class="pedido-container">
-    <h2>¿Qué vas a pedir hoy?  🍺 </h2>
+    <h2>¿Qué vas a pedir hoy? 🍺</h2>
     <input type="text" id="nombreCliente" placeholder="Tu nombre">
     <input type="text" id="direccionEntrega" placeholder="Dirección de entrega">
     <div id="productosContainer" class="productos-grid"></div>
@@ -636,10 +608,9 @@
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
 <script>
 // Configuración Firebase
@@ -656,7 +627,6 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 let productosData = [];
-// ¡NUEVO! Variables para controlar el carrito y las categorías
 let carrito = {}; 
 let categoriaActual = 'Todas'; 
 
@@ -667,33 +637,26 @@ window.onload = function() {
 };
 
 auth.onAuthStateChanged(user => {
-  console.log("Estado de autenticación detectado:", user ? user.email : "Invitado");
-  
   const loView = document.getElementById("logged-out-view");
   const liView = document.getElementById("logged-in-view");
   const zp = document.getElementById("zonaPrivada");
   const sf = document.getElementById("subirFotoContainer");
 
   if (user) {
-    // 1. EL USUARIO ESTÁ LOGUEADO: Mostrar interfaz privada inmediatamente
     loView.classList.add("oculto");
     liView.classList.remove("oculto");
     zp.classList.remove("oculto");
     sf.classList.remove("oculto");
     document.getElementById("user-display-email").innerText = user.email;
-    
-    // 2. Solo cargamos datos si el usuario es válido
     cargarPedidos();
-    // No bloqueamos aquí, cargamos productos siempre
   } else {
-    // 3. EL USUARIO NO ESTÁ LOGUEADO: Forzar vista de login
     loView.classList.remove("oculto");
     liView.classList.add("oculto");
     zp.classList.add("oculto");
     sf.classList.add("oculto");
   }
 });
-// 1. CARGAMOS LOS PRODUCTOS DE FIREBASE
+
 async function cargarProductos() {
   const contenedor = document.getElementById("productosContainer");
   if (!contenedor) return;
@@ -716,21 +679,17 @@ async function cargarProductos() {
     });
   });
   
-  renderizarVistaProductos(); 
-  // (Final de tu función cargarProductos)
-  renderizarVistaProductos(); // Llamamos a la nueva función que dibuja todo
-  renderizarCatalogoPublico(); // <-- ¡AGREGA ESTA LÍNEA AQUÍ!
-}// Llamamos a la nueva función que dibuja todo
+  renderVistaProductos(); 
+  renderCatalogoPublico(); 
+}
 
-// 2. FUNCIÓN PARA DIBUJAR CATEGORÍAS Y CANTIDADES
-function renderizarVistaProductos() {
+function renderVistaProductos() {
   const contenedor = document.getElementById("productosContainer");
+  if (!contenedor) return;
   contenedor.innerHTML = "";
 
-  // A. Obtener categorías únicas para hacer el menú
   const categoriasUnicas = ["Todas", ...new Set(productosData.map(p => p.categoria))];
 
-  // B. Crear la barra de botones de categoría
   let botonesHTML = `<div style="display:flex; gap:10px; overflow-x:auto; margin-bottom:20px; padding-bottom:10px; grid-column: 1 / -1;">`;
   categoriasUnicas.forEach(cat => {
     const colorFondo = cat === categoriaActual ? 'var(--rojo-six)' : '#f0f0f0';
@@ -739,12 +698,10 @@ function renderizarVistaProductos() {
   });
   botonesHTML += `</div>`;
 
-  // C. Filtrar los productos según la categoría seleccionada
   const productosFiltrados = categoriaActual === 'Todas' 
     ? productosData 
     : productosData.filter(p => p.categoria === categoriaActual);
 
-  // D. Dibujar las tarjetas con botones de + y -
   let tarjetasHTML = ``;
   productosFiltrados.forEach(producto => {
     const cantidadActual = carrito[producto.id] || 0;
@@ -758,7 +715,7 @@ function renderizarVistaProductos() {
           
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; background:#f8f9fa; border-radius:10px; padding:5px;">
             <button style="margin:0; padding:8px 15px; background:#e0e0e0; color:black; border-radius:8px;" onclick="cambiarCantidad('${producto.id}', -1)">-</button>
-            <span style="font-weight:bold; font-size:1.2rem; width:30px; text-align:center;">${cantidadActual}</span>
+            <span style="font-weight:bold; font-size:1.2rem; width:30px; text-align:center;">${amountActual = cantidadActual}</span>
             <button style="margin:0; padding:8px 15px; background:var(--rojo-six); color:white; border-radius:8px;" onclick="cambiarCantidad('${producto.id}', 1)">+</button>
           </div>
         </div>
@@ -770,10 +727,9 @@ function renderizarVistaProductos() {
   actualizarResumen();
 }
 
-// 3. CONTROLADORES DE INTERFAZ
 function filtrarCategoria(cat) {
   categoriaActual = cat;
-  renderizarVistaProductos(); // Vuelve a dibujar con el filtro aplicado
+  renderVistaProductos();
 }
 
 function cambiarCantidad(id, cambio) {
@@ -784,35 +740,31 @@ function cambiarCantidad(id, cambio) {
   let nuevaCantidad = cantidadActual + cambio;
   
   if(nuevaCantidad < 0) nuevaCantidad = 0;
-  
   if(nuevaCantidad > producto.stock) {
     Swal.fire('Stock máximo', 'No nos quedan más unidades de este producto.', 'info');
     nuevaCantidad = producto.stock;
   }
   
   carrito[id] = nuevaCantidad;
-  renderizarVistaProductos();
+  renderVistaProductos();
 }
 
 function actualizarResumen() {
   let total = 0;
   let cantidadObjetos = 0;
-  
   for (const [id, cant] of Object.entries(carrito)) {
     if (cant > 0) {
       const prod = productosData.find(p => p.id === id);
       if (prod) {
         total += (prod.precio * cant);
-        cantidadObjetos += cant; // Sumamos la cantidad real de artículos
+        cantidadObjetos += cant;
       }
     }
   }
-  
   document.getElementById('cantidadProductos').innerText = cantidadObjetos;
   document.getElementById('totalPedido').innerText = `$${total}`;
 }
 
-// 4. GUARDAR EL PEDIDO CON LAS CANTIDADES REALES
 async function guardarPedido() {
   const nombre = document.getElementById('nombreCliente').value.trim();
   const direccion = document.getElementById('direccionEntrega').value.trim();
@@ -826,7 +778,6 @@ async function guardarPedido() {
   let total = 0;
   let cantidadTotalProductos = 0;
   
-  // Revisamos qué hay en el carrito
   for (const [id, cant] of Object.entries(carrito)) {
     if (cant > 0) {
       const prod = productosData.find(p => p.id === id);
@@ -842,7 +793,6 @@ async function guardarPedido() {
         total += (prod.precio * cant);
         cantidadTotalProductos += cant;
         
-        // Descontar inventario multiplicado por la cantidad en Firebase
         const productoRef = db.collection('productos').doc(prod.id);
         const productoSnap = await productoRef.get();
         if (productoSnap.exists) {
@@ -861,7 +811,7 @@ async function guardarPedido() {
   }
   
   const ahora = new Date();
-  const fechaString = `${ahora.getDate()}/${ahora.getMonth() + 1}/${ahora.getFullYear()}, ${ahora.getHours() % 12 || 12}:${String(ahora.getMinutes()).padStart(2, '0')}:${String(ahora.getSeconds()).padStart(2, '0')} ${ahora.getHours() >= 12 ? 'p.m.' : 'a.m.'}`;
+  const fechaString = `${ahora.getDate()}/${ahora.getMonth() + 1}/${ahora.getFullYear()}, ${ahora.getHours() % 12 || 12}:${String(ahora.getMinutes()).padStart(2, '0')} ${ahora.getHours() >= 12 ? 'p.m.' : 'a.m.'}`;
 
   const pedido = {
     cliente: nombre,
@@ -873,27 +823,20 @@ async function guardarPedido() {
     metodoPago,
     estado: 'Pendiente',
     fecha: fechaString,
-    fechaTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    hora: ahora.getHours(),
-    diaSemana: ahora.getDay(),
-    mes: ahora.getMonth() + 1
+    fechaTimestamp: firebase.firestore.FieldValue.serverTimestamp()
   };
   
   try {
     await db.collection('pedidos').add(pedido);
     Swal.fire('¡Pedido Confirmado!', 'Nosotros te llevamos lo que necesitas 🍺', 'success');
-    
-    // Limpiar formulario, vaciar carrito y refrescar interfaz
     document.getElementById('nombreCliente').value = "";
     document.getElementById('direccionEntrega').value = "";
-    carrito = {}; // Vaciamos el carrito
-    categoriaActual = 'Todas'; // Regresamos la vista general
-    
+    carrito = {}; 
+    categoriaActual = 'Todas'; 
     cargarProductos();
     cargarPedidos();
   } catch (error) {
-    console.error("Error al guardar el pedido:", error);
-    Swal.fire('Error', 'Hubo un error al procesar tu pedido. Inténtalo de nuevo.', 'error');
+    Swal.fire('Error', 'Hubo un error al procesar tu pedido.', 'error');
   }
 }
 
@@ -904,41 +847,26 @@ function cargarPedidos() {
     cont.innerHTML = "";
     snap.forEach(doc => {
       const d = doc.data();
-      let totalProdString = "";
-      if(Array.isArray(d.productos)){
-         totalProdString = d.productos.map(p => p.nombre).join(', ');
-      } else {
-         totalProdString = d.productos;
-      }
+      let totalProdString = Array.isArray(d.productos) ? d.productos.map(p => p.nombre).join(', ') : d.productos;
       cont.innerHTML += `<div class="pedido-item"><strong>${d.cliente || 'Anónimo'}</strong>: ${totalProdString} <br><small>${d.fecha}</small></div>`;
     });
-  }).catch(err => console.log("Error cargando historial: ", err));
+  });
 }
 
-// PERSISTENCIA DE LA GALERÍA
-// NUEVA FUNCIÓN: Subir foto a Firebase
 function procesarArchivo() {
   const archivoInput = document.getElementById("inputArchivo");
   const archivo = archivoInput.files[0];
-  
-  if (!archivo) {
-    return Swal.fire('Falta la imagen', 'Por favor selecciona una imagen.', 'warning');
-  }
+  if (!archivo) return Swal.fire('Falta la imagen', 'Por favor selecciona una imagen.', 'warning');
 
-  // Mostramos un mensaje de carga
   Swal.fire({ title: 'Subiendo...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
   const reader = new FileReader();
   reader.onload = async function(e) {
-    const base64Image = e.target.result;
-    
     try {
-      // Guardamos la imagen en Firestore en una colección llamada "galeria"
       await db.collection("galeria").add({
-        imagen: base64Image,
+        imagen: e.target.result,
         fecha: firebase.firestore.FieldValue.serverTimestamp()
       });
-      
       archivoInput.value = "";
       Swal.fire('¡Foto publicada!', 'La comunidad ya puede ver tu foto.', 'success');
     } catch (error) {
@@ -948,14 +876,12 @@ function procesarArchivo() {
   reader.readAsDataURL(archivo);
 }
 
-// NUEVA FUNCIÓN: Cargar fotos desde Firebase en tiempo real
 function cargarFotosGuardadas() {
   const contenedor = document.getElementById("contenedorFotos");
   if(!contenedor) return;
   
-  // Usamos onSnapshot para que cuando alguien suba una foto, aparezca en todos los dispositivos al instante
   db.collection("galeria").orderBy("fecha", "desc").onSnapshot(snapshot => {
-    contenedor.innerHTML = ""; // Limpiamos el contenedor
+    contenedor.innerHTML = ""; 
     if (snapshot.empty) {
       contenedor.innerHTML = '<p style="padding:20px;">Sé el primero en compartir una foto.</p>';
     } else {
@@ -970,179 +896,68 @@ function cargarFotosGuardadas() {
   });
 }
 
-function mostrarImagenEnGaleria(src) {
-  const img = document.createElement("img");
-  img.src = src;
-  img.className = "foto-usuario";
-  const contenedor = document.getElementById("contenedorFotos");
-  if(contenedor) contenedor.insertBefore(img, contenedor.firstChild);
-}
-// ==========================================
-// FUNCIONES ACTUALIZADAS CON SWEETALERT2
-// ==========================================
-
 function login() {
   auth.signInWithEmailAndPassword(document.getElementById("email").value, document.getElementById("password").value)
-    .catch(e => {
-      Swal.fire({
-        title: 'Error de acceso',
-        text: 'El correo o la contraseña son incorrectos.',
-        icon: 'error',
-        confirmButtonColor: '#fb0101'
-      });
-    });
+    .catch(() => Swal.fire('Error de acceso', 'Correo o contraseña incorrectos.', 'error'));
 }
 
 function registrar() {
   auth.createUserWithEmailAndPassword(document.getElementById("email").value, document.getElementById("password").value)
-    .then(() => {
-      Swal.fire({
-        title: '¡Bienvenido!',
-        text: 'Tu cuenta ha sido creada exitosamente.',
-        icon: 'success',
-        confirmButtonColor: '#fb0101'
-      });
-    })
-    .catch(e => {
-      Swal.fire({
-        title: 'No se pudo crear la cuenta',
-        text: e.message,
-        icon: 'error',
-        confirmButtonColor: '#fb0101'
-      });
-    });
+    .then(() => Swal.fire('¡Bienvenido!', 'Tu cuenta ha sido creada.', 'success'))
+    .catch(e => Swal.fire('No se pudo crear', e.message, 'error'));
 }
 
 function logout() {
-  auth.signOut().then(() => {
-    // Aquí esperamos a que el usuario presione "OK" para recargar la página
-    Swal.fire({
-      title: '¡Hasta pronto!',
-      text: 'Sesión cerrada correctamente',
-      icon: 'success',
-      confirmButtonColor: '#fb0101'
-    }).then(() => {
-      window.location.reload();
-    });
-  }).catch((error) => {
-    console.error('Error al cerrar sesión:', error);
-  });
-
+  auth.signOut().then(() => window.location.reload());
 }
 
-// SERVICIO DEL CLIMA
 async function cargarClima() {
-  const ciudad = "Valladolid";
-  const apiKey = "78d8b8e9819bf1c82f10d86068d21f1a";
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${ciudad}&appid=${apiKey}&units=metric&lang=es`;
-
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=Valladolid&appid=78d8b8e9819bf1c82f10d86068d21f1a&units=metric&lang=es`;
   try {
     const respuesta = await fetch(url);
-    if (!respuesta.ok) throw new Error("No se pudo obtener el clima");
     const datos = await respuesta.json();
     const temperatura = Math.round(datos.main.temp);
-    const descripcion = datos.weather[0].description;
-    const climaTexto = `🌡️ ${temperatura}°C, ${descripcion}`;
-    let recomendacion = "";
-
-    if (temperatura > 25) {
-      recomendacion = "☀️ ¿Día caluroso? Perfecto para unas cervezas bien muertas 🍺😎";
-    } else if (temperatura < 15) {
-      recomendacion = "❄️ Los días fríos evitan que se caliente tu cheva ☝️🤓";
-    } else {
-      recomendacion = "🌤️ El clima perfecto para un 12 de Tecate 🤙";
-    }
-
-    const contenedor = document.getElementById("widget-clima");
-    if (contenedor) {
-      contenedor.innerHTML = `<strong>Clima hoy en ${ciudad}:</strong><br>${climaTexto}<br><br><em>${recomendacion}</em>`;
-    }
+    let rec = temperatura > 25 ? "☀️ ¿Día caluroso? Perfecto para unas cervezas bien muertas 🍺😎" : "🌤️ El clima perfecto para un 12 de Tecate 🤙";
+    document.getElementById("widget-clima").innerHTML = `<strong>Clima hoy:</strong><br>🌡️ ${temperatura}°C, ${datos.weather[0].description}<br><br><em>${rec}</em>`;
   } catch (error) {
-    console.error("Error al cargar clima:", error);
-    const contenedor = document.getElementById("widget-clima");
-    if (contenedor) {
-      contenedor.innerHTML = "⚠️ Sistema en mantenimiento, por favor siga con su pedido 😉";
-    }
+    document.getElementById("widget-clima").innerHTML = "⚠️ Sistema listo para tomar tu pedido.";
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  cargarClima();
-});
-// ==========================================
-// CARRUSEL AUTOMÁTICO DE LA GALERÍA
-// ==========================================
-let autoScrollInterval;
+document.addEventListener("DOMContentLoaded", cargarClima);
 
+let autoScrollInterval;
 function iniciarCarruselAutomatico() {
   const contenedor = document.getElementById("contenedorFotos");
   if (!contenedor) return;
-
-  // Limpiamos cualquier temporizador previo por seguridad
-  if(autoScrollInterval) clearInterval(autoScrollInterval);
-
-  // Configuramos el temporizador para que se ejecute cada 3 segundos (3000 milisegundos)
   autoScrollInterval = setInterval(() => {
-    // Si el usuario tiene el ratón encima de la galería, pausamos el movimiento
     if (contenedor.matches(':hover')) return;
-
-    // Calculamos si ya llegamos al final del barrido
-    // (le restamos 5 píxeles como margen de error por los bordes)
-    const llegoAlFinal = contenedor.scrollLeft + contenedor.clientWidth >= contenedor.scrollWidth - 5;
-
-    if (llegoAlFinal) {
-      // Si llegó al final, regresa suavemente a la posición 0 (al principio)
+    if (contenedor.scrollLeft + contenedor.clientWidth >= contenedor.scrollWidth - 5) {
       contenedor.scrollTo({ left: 0, behavior: 'smooth' });
     } else {
-      // Si no ha llegado al final, avanza unos 300 píxeles (el tamaño aproximado de una foto)
       contenedor.scrollBy({ left: 300, behavior: 'smooth' });
     }
   }, 3000); 
 }
-// ==========================================
-// VITRINA PÚBLICA (CATÁLOGO DINÁMICO)
-// ==========================================
+
 let indiceVitrina = 0;
 let vitrinaInterval;
-
-function renderizarCatalogoPublico() {
+function renderCatalogoPublico() {
   const contenedor = document.getElementById("carrusel-publico");
   if (!contenedor || productosData.length === 0) return;
 
   let htmlVitrina = '';
-  
-  // Recorremos los productos y creamos una tarjeta para cada uno
   productosData.forEach((producto, index) => {
-    // Al primer producto (index 0) le ponemos la clase 'activo' para que se vea
-    const claseActivo = index === 0 ? 'activo' : '';
-    htmlVitrina += `
-      <div class="vitrina-item ${claseActivo}">
-        <img src="${producto.imagen}" alt="${producto.nombre}">
-        <h3>${producto.nombre}</h3>
-      </div>
-    `;
+    htmlVitrina += `<div class="vitrina-item ${index === 0 ? 'activo' : ''}"><img src="${producto.imagen}"><h3>${producto.nombre}</h3></div>`;
   });
-
   contenedor.innerHTML = htmlVitrina;
-  iniciarAnimacionVitrina();
-}
-
-function iniciarAnimacionVitrina() {
+  
   const items = document.querySelectorAll(".vitrina-item");
-  if (items.length <= 1) return; // Si hay 1 o 0 productos, no hay nada que animar
-
-  // Limpiamos intervalos anteriores por seguridad
+  if (items.length <= 1) return;
   if (vitrinaInterval) clearInterval(vitrinaInterval);
-
-  // Cambiamos de tarjeta cada 3 segundos
   vitrinaInterval = setInterval(() => {
-    // Le quitamos la clase activo al producto actual
     items[indiceVitrina].classList.remove("activo");
-    
-    // Calculamos el siguiente índice (si llega al final, regresa al 0)
     indiceVitrina = (indiceVitrina + 1) % items.length;
-    
-    // Le ponemos la clase activo al nuevo producto
     items[indiceVitrina].classList.add("activo");
   }, 3000);
 }
