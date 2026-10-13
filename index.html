@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sistema de Inventario de Equipos de Cómputo | Jurisdicción Sanitaria No. 2</title>
   
-  <!-- Tipografía Moderna (Inter) -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Íconos FontAwesome -->
+  <!-- Fuentes Institucionales -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- Íconos de FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- SweetAlert2 -->
@@ -234,27 +234,19 @@
 </head>
 <body>
 
-  <!-- NAVEGACIÓN SUPERIOR -->
-  <nav>
-    <div class="brand-badge">Jurisdicción Sanitaria No. 2</div>
-    <div class="nav-actions">
-      <span style="font-size: 0.9rem; font-weight: 500; color: var(--texto-mutado); margin-right: 8px;">Técnico de Informática</span>
-      <button class="btn-pill-primary" onclick="cerrarSesion()">Cerrar sesión</button>
-    </div>
-  </nav>
-
-  <main>
-    <!-- ENCABEZADO ESTILO JITTER -->
+  <div>
+    <!-- ENCABEZADO INSTITUCIONAL -->
     <header>
-      <h1>Plataforma de gestión de inventario</h1>
-      <p>Administra los equipos de cómputo, resguardos y mantenimientos de forma centralizada y mediante códigos QR.</p>
+      <div class="header-subtítulo">Servicios de Salud de Yucatán | Jurisdicción Sanitaria No. 2</div>
+      <h1>Plataforma de Inventarios y Control de Equipos</h1>
+      <p>Selecciona el módulo al que deseas acceder</p>
     </header>
 
-    <!-- TARJETAS DE MÓDULOS -->
-    <section class="portal-container">
+    <!-- DASHBOARD DE BOTONES / MENÚ PRINCIPAL -->
+    <main class="portal-container">
       <div class="grid-portal">
 
-        <!-- Opción 1: Escanear QR -->
+        <!-- Opción 1: Escanear QR / Ficha Técnica -->
         <div class="opcion-wrapper">
           <a href="#escaneo" class="tarjeta-opcion" onclick="abrirModulo('Escaneo de Código QR')">
             <i class="fa-solid fa-qrcode"></i>
@@ -274,7 +266,7 @@
 
         <div class="separador-vertical"></div>
 
-        <!-- Opción 3: Registro de Equipos -->
+        <!-- Opción 3: Alta de Equipos -->
         <div class="opcion-wrapper">
           <a href="#alta" class="tarjeta-opcion" onclick="abrirModulo('Alta de Equipos')">
             <i class="fa-solid fa-folder-plus"></i>
@@ -303,12 +295,16 @@
         </div>
 
       </div>
-    </section>
-  </main>
+    </main>
+  </div>
 
-  <!-- PIE DE PÁGINA -->
-  <footer>
-    Servicios de Salud de Yucatán &copy; 2026 | Sistema de Control Patrimonial
+  <!-- BARRA DE ESTADO Y SESIÓN DE USUARIO -->
+  <footer class="user-bar">
+    <div class="user-info">
+      <i class="fa-solid fa-circle-user" style="font-size: 1.2rem; color: #c5a059;"></i>
+      <span id="txt-usuario">Usuario: <strong>Técnico de Informática</strong></span>
+    </div>
+    <button class="btn-sesion" onclick="cerrarSesion()">Cerrar Sesión</button>
   </footer>
 
   <script>
@@ -325,11 +321,11 @@
     function cerrarSesion() {
       Swal.fire({
         title: '¿Cerrar Sesión?',
-        text: 'Saldrás de la plataforma de inventarios.',
+        text: 'Saldrás del sistema de inventarios de la Jurisdicción Sanitaria No. 2.',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#18181b',
-        cancelButtonColor: '#71717a',
+        confirmButtonColor: '#800020',
+        cancelButtonColor: '#6e7881',
         confirmButtonText: 'Sí, salir',
         cancelButtonText: 'Cancelar'
       }).then((result) => {
