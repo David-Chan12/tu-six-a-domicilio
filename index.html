@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sistema de Inventario de Equipos de Cómputo | Jurisdicción Sanitaria No. 2</title>
   
-  <!-- Fuentes Institucionales -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <!-- Íconos de FontAwesome -->
+  <!-- Tipografía Moderna (Inter) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Íconos FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- SweetAlert2 -->
@@ -15,14 +15,17 @@
 
   <style>
     :root {
-      --bg-principal: #333333;       /* Fondo oscuro institucional */
-      --tarjeta-bg: #f8f5ed;          /* Fondo crema claro tipo SAT */
-      --tarjeta-hover: #ffffff;       /* Fondo al pasar el cursor */
-      --texto-oscuro: #2b2b2b;       /* Texto primario en tarjetas */
-      --texto-claro: #ffffff;        /* Texto en fondo oscuro */
-      --linea-separadora: #b89855;   /* Línea separadora dorada */
-      --borde-tarjeta: #e5dfd3;      /* Borde suave */
-      --rojo-institucional: #800020;  /* Rojo vino institucional */
+      --bg-principal: #ffffff;         /* Fondo blanco puro */
+      --bg-secundario: #f4f4f6;       /* Gris claro tipo pill/input */
+      --tarjeta-bg: #f9f9fb;          /* Fondo de tarjetas gris ultra suave */
+      --tarjeta-hover: #f0f0f4;       /* Hover de tarjetas */
+      --texto-titulos: #0f0f11;       /* Negro intenso para títulos */
+      --texto-cuerpo: #4a4a52;        /* Gris oscuro para textos */
+      --texto-mutado: #71717a;        /* Gris medio para subtítulos */
+      --borde-suave: #e4e4e7;         /* Borde delicado */
+      --linea-separadora: #d4d4d8;    /* Separador vertical */
+      --accent-black: #18181b;        /* Negro botón principal */
+      --accent-hover: #27272a;        /* Hover botón negro */
     }
 
     * {
@@ -32,46 +35,106 @@
     }
 
     body {
-      font-family: 'Montserrat', 'Roboto', sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
       background-color: var(--bg-principal);
-      color: var(--texto-claro);
+      color: var(--texto-cuerpo);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* ENCABEZADO INSTITUCIONAL */
+    /* BARRA SUPERIOR DE NAVEGACIÓN Y SESIÓN */
+    nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 24px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-badge {
+      background-color: var(--bg-secundario);
+      color: var(--texto-titulos);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-pill-secondary {
+      background-color: var(--bg-secundario);
+      color: var(--texto-titulos);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-pill-secondary:hover {
+      background-color: #e8e8ed;
+    }
+
+    .btn-pill-primary {
+      background-color: var(--accent-black);
+      color: #ffffff;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-pill-primary:hover {
+      background-color: var(--accent-hover);
+    }
+
+    /* ENCABEZADO TIPO JITTER (MINIMALISTA) */
     header {
       text-align: center;
-      padding: 50px 20px 30px 20px;
-    }
-
-    .header-subtítulo {
-      color: #c5c5c5;
-      font-size: 0.95rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 8px;
+      max-width: 900px;
+      margin: 40px auto 30px auto;
+      padding: 0 20px;
     }
 
     header h1 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      margin-bottom: 10px;
+      color: var(--texto-titulos);
+      font-size: 3.2rem;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 20px;
     }
 
     header p {
-      color: #d1d1d1;
-      font-size: 1.05rem;
-      font-weight: 300;
+      color: var(--texto-mutado);
+      font-size: 1.25rem;
+      font-weight: 400;
+      letter-spacing: -0.3px;
+      max-width: 650px;
+      margin: 0 auto;
     }
 
-    /* PORTAL DE OPCIONES / DASHBOARD PRINCIPAL */
+    /* DASHBOARD / CONTENEDOR DE TARJETAS */
     .portal-container {
-      max-width: 1200px;
-      margin: 20px auto 60px auto;
+      max-width: 1100px;
+      margin: 40px auto 80px auto;
       padding: 0 20px;
       width: 100%;
     }
@@ -81,7 +144,7 @@
       justify-content: center;
       align-items: center;
       flex-wrap: wrap;
-      gap: 0; /* Controlamos el espacio con bordes / separadores */
+      gap: 0;
     }
 
     .opcion-wrapper {
@@ -91,122 +154,107 @@
 
     .tarjeta-opcion {
       background-color: var(--tarjeta-bg);
-      color: var(--texto-oscuro);
-      width: 170px;
-      height: 170px;
-      border-radius: 12px;
-      padding: 20px 15px;
+      color: var(--texto-titulos);
+      width: 180px;
+      height: 180px;
+      border-radius: 24px;
+      padding: 24px 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
       text-decoration: none;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-      transition: all 0.3s ease;
+      border: 1px solid var(--borde-suave);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       cursor: pointer;
-      border: 1px solid var(--borde-tarjeta);
     }
 
     .tarjeta-opcion:hover {
-      background-color: var(--tarjeta-hover);
-      transform: translateY(-6px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+      background-color: var(--bg-principal);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+      border-color: #d1d1d6;
     }
 
     .tarjeta-opcion i {
-      font-size: 2.8rem;
-      color: #3d3d3d;
-      margin-bottom: 14px;
-      transition: color 0.3s ease;
+      font-size: 2.4rem;
+      color: var(--texto-titulos);
+      margin-bottom: 16px;
+      transition: transform 0.2s ease;
     }
 
     .tarjeta-opcion:hover i {
-      color: var(--rojo-institucional);
+      transform: scale(1.1);
     }
 
     .tarjeta-opcion span {
-      font-size: 0.92rem;
+      font-size: 0.95rem;
       font-weight: 600;
-      line-height: 1.25;
-      color: #333333;
+      line-height: 1.3;
+      letter-spacing: -0.3px;
     }
 
-    /* LÍNEA SEPARADORA VERTICAL */
+    /* SEPARADOR VERTICAL SLIM */
     .separador-vertical {
-      width: 2px;
-      height: 90px;
+      width: 1px;
+      height: 100px;
       background-color: var(--linea-separadora);
-      margin: 0 25px;
-      opacity: 0.8;
+      margin: 0 20px;
+      opacity: 0.6;
     }
 
-    /* SECCIÓN DE ESTADO DE SESIÓN Y USUARIO */
-    .user-bar {
-      background-color: rgba(0, 0, 0, 0.2);
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 15px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.9rem;
+    /* PIE DE PÁGINA DISCRETO */
+    footer {
+      border-top: 1px solid var(--borde-suave);
+      padding: 20px 30px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--texto-mutado);
     }
 
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .btn-sesion {
-      background-color: transparent;
-      border: 1px solid var(--linea-separadora);
-      color: var(--texto-claro);
-      padding: 8px 18px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-
-    .btn-sesion:hover {
-      background-color: var(--linea-separadora);
-      color: var(--texto-oscuro);
-    }
-
-    /* MEDIA QUERIES PARA ADAPTABILIDAD EN MÓVILES */
+    /* ADAPTABILIDAD EN MÓVILES */
     @media (max-width: 900px) {
+      header h1 {
+        font-size: 2.2rem;
+      }
       .grid-portal {
-        gap: 20px;
+        gap: 16px;
       }
       .separador-vertical {
-        display: none; /* En pantallas pequeñas se ocultan los separadores verticales */
+        display: none;
       }
       .tarjeta-opcion {
         width: 150px;
         height: 150px;
-      }
-      header h1 {
-        font-size: 1.7rem;
+        border-radius: 18px;
       }
     }
   </style>
 </head>
 <body>
 
-  <div>
-    <!-- ENCABEZADO INSTITUCIONAL -->
+  <!-- NAVEGACIÓN SUPERIOR -->
+  <nav>
+    <div class="brand-badge">Jurisdicción Sanitaria No. 2</div>
+    <div class="nav-actions">
+      <span style="font-size: 0.9rem; font-weight: 500; color: var(--texto-mutado); margin-right: 8px;">Técnico de Informática</span>
+      <button class="btn-pill-primary" onclick="cerrarSesion()">Cerrar sesión</button>
+    </div>
+  </nav>
+
+  <main>
+    <!-- ENCABEZADO ESTILO JITTER -->
     <header>
-      <div class="header-subtítulo">Servicios de Salud de Yucatán | Jurisdicción Sanitaria No. 2</div>
-      <h1>Plataforma de Inventarios y Control de Equipos</h1>
-      <p>Selecciona el módulo al que deseas acceder</p>
+      <h1>Plataforma de gestión de inventario</h1>
+      <p>Administra los equipos de cómputo, resguardos y mantenimientos de forma centralizada y mediante códigos QR.</p>
     </header>
 
-    <!-- DASHBOARD DE BOTONES / MENÚ PRINCIPAL -->
-    <main class="portal-container">
+    <!-- TARJETAS DE MÓDULOS -->
+    <section class="portal-container">
       <div class="grid-portal">
 
-        <!-- Opción 1: Escanear QR / Ficha Técnica -->
+        <!-- Opción 1: Escanear QR -->
         <div class="opcion-wrapper">
           <a href="#escaneo" class="tarjeta-opcion" onclick="abrirModulo('Escaneo de Código QR')">
             <i class="fa-solid fa-qrcode"></i>
@@ -226,7 +274,7 @@
 
         <div class="separador-vertical"></div>
 
-        <!-- Opción 3: Alta de Equipos -->
+        <!-- Opción 3: Registro de Equipos -->
         <div class="opcion-wrapper">
           <a href="#alta" class="tarjeta-opcion" onclick="abrirModulo('Alta de Equipos')">
             <i class="fa-solid fa-folder-plus"></i>
@@ -255,16 +303,12 @@
         </div>
 
       </div>
-    </main>
-  </div>
+    </section>
+  </main>
 
-  <!-- BARRA DE ESTADO Y SESIÓN DE USUARIO -->
-  <footer class="user-bar">
-    <div class="user-info">
-      <i class="fa-solid fa-circle-user" style="font-size: 1.2rem; color: #c5a059;"></i>
-      <span id="txt-usuario">Usuario: <strong>Técnico de Informática</strong></span>
-    </div>
-    <button class="btn-sesion" onclick="cerrarSesion()">Cerrar Sesión</button>
+  <!-- PIE DE PÁGINA -->
+  <footer>
+    Servicios de Salud de Yucatán &copy; 2026 | Sistema de Control Patrimonial
   </footer>
 
   <script>
@@ -281,11 +325,11 @@
     function cerrarSesion() {
       Swal.fire({
         title: '¿Cerrar Sesión?',
-        text: 'Saldrás del sistema de inventarios de la Jurisdicción Sanitaria No. 2.',
+        text: 'Saldrás de la plataforma de inventarios.',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#800020',
-        cancelButtonColor: '#6e7881',
+        confirmButtonColor: '#18181b',
+        cancelButtonColor: '#71717a',
         confirmButtonText: 'Sí, salir',
         cancelButtonText: 'Cancelar'
       }).then((result) => {
