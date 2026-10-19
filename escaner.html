@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Escáner QR | Jurisdicción Sanitaria No. 2</title>
+  
+  <!-- Tipografía Moderna (Inter) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Íconos FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- SweetAlert2 para alertas -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Librería Html5Qrcode para el manejo de la cámara -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+  <style>
+    :root {
+      --bg-principal: #ffffff;
+      --bg-secundario: #f4f4f6;
+      --tarjeta-bg: #f9f9fb;
+      --texto-titulos: #0f0f11;
+      --texto-cuerpo: #4a4a52;
+      --texto-mutado: #71717a;
+      --borde-suave: #e4e4e7;
+      --accent-black: #18181b;
+      --accent-hover: #27272a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-principal);
+      color: var(--texto-cuerpo);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 24px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-badge {
+      background-color: var(--bg-secundario);
+      color: var(--texto-titulos);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .scanner-container {
+      max-width: 600px;
+      margin: 20px auto 60px auto;
+      padding: 30px;
+      background-color: var(--tarjeta-bg);
+      border: 1px solid var(--borde-suave);
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+      width: 100%;
+      text-align: center;
+    }
+
+    .scanner-container h2 {
+      color: var(--texto-titulos);
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .scanner-container p.sub {
+      color: var(--texto-mutado);
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+    }
+
+    /* Contenedor donde se proyectará la cámara */
+    #reader {
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 2px solid var(--borde-suave);
+      background: #000;
+      margin-bottom: 20px;
+    }
+
+    .btn-control {
+      background-color: var(--accent-black);
+      color: #ffffff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      margin: 5px;
+    }
+
+    .btn-control:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .btn-danger {
+      background-color: #ef4444;
+    }
+    .btn-danger:hover {
+      background-color: #dc2626;
+    }
+
+    /* Caja de resultados del equipo escaneado */
+    #resultado-equipo {
+      margin-top: 20px;
+      padding: 20px;
+      background: #ffffff;
+      border: 1px solid var(--borde-suave);
+      border-radius: 16px;
+      text-align: left;
+      display: none;
+    }
+
+    #resultado-equipo h3 {
+      color: var(--texto-titulos);
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      border-bottom: 1px solid var(--borde-suave);
+      padding-bottom: 5px;
+    }
+
+    footer {
+      border-top: 1px solid var(--borde-suave);
+      padding: 20px 30px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--texto-mutado);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVEGACIÓN SUPERIOR -->
+  <nav>
+    <a href="index.html" class="brand-badge"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</a>
+    <span style="font-size: 0.85rem; color: var(--texto-mutado);">Módulo AIDC / Escáner QR</span>
+  </nav>
+
+  <!-- CONTENEDOR PRINCIPAL DEL ESCÁNER -->
+  <main class="scanner-container">
+    <h2>Escáner de Equipos QR</h2>
+    <p class="sub">Apunta con la cámara de tu dispositivo hacia el código QR de la etiqueta del equipo.</p>
+
+    <!-- Ventana de video de la cámara -->
+    <div id="reader"></div>
+
+    <div>
+      <button id="btnIniciar" class="btn-control" onclick="iniciarEscaner()">Encender Cámara</button>
+      <button id="btnDetener" class="btn-control btn-danger" onclick="detenerEscaner()" style="display:none;">Apagar Cámara</button>
+    </div>
+
+    <!-- Ficha técnica que aparecerá al detectar el código -->
+    <div id="resultado-equipo">
+      <h3><i class="fa-solid fa-circle-check" style="color: #10b981;"></i> Equipo Identificado</h3>
+      <p id="info-detalle"></p>
+    </div>
+  </main>
+
+  <!-- PIE DE PÁGINA -->
+  <footer>
+    Servicios de Salud de Yucatán &copy; 2026 | Jurisdicción Sanitaria No. 2
+  </footer>
+
+  <!-- SCRIPT DE LÓGICA DE ESCANEO Y FIREBASE -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
+      authDomain: "control-de-equipos-762c4.firebaseapp.com",
+      projectId: "control-de-equipos-762c4",
+      storageBucket: "control-de-equipos-762c4.firebasestorage.app",
+      messagingSenderId: "711982599026",
+      appId: "1:711982599026:web:ba92c737011b38f882abeb",
+      measurementId: "G-X1M2R00M55"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let html5QrCode;
+
+    window.iniciarEscaner = function() {
+      const btnIniciar = document.getElementById("btnIniciar");
+      const btnDetener = document.getElementById("btnDetener");
+
+      html5QrCode = new Html5Qrcode("reader");
+      
+      const configConfiguracion = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+      html5QrCode.start(
+        { facingMode: "environment" }, // Usa la cámara trasera en celulares o la webcam en PC
+        configConfiguracion,
+        async (decodedText) => {
+          // AL DETECTAR EL CÓDIGO QR EXITOSAMENTE:
+          console.log(`Código detectado: ${decodedText}`);
+          
+          // Detenemos la cámara temporalmente para procesar
+          await detenerEscaner();
+          
+          // Buscamos el código en la base de datos de Firestore (colección "equipos")
+          buscarEquipoEnBaseDatos(decodedText);
+        },
+        (errorMessage) => {
+          // Errores de escaneo continuo por fotograma (se ignoran para no saturar)
+        }
+      ).then(() => {
+        btnIniciar.style.display = "none";
+        btnDetener.style.display = "inline-block";
+      }).catch(err => {
+        console.error("No se pudo iniciar la cámara:", err);
+        Swal.fire("Error de Cámara", "No se pudo acceder a la cámara. Asegúrate de dar permisos de video en tu navegador.", "error");
+      });
+    };
+
+    window.detenerEscaner = async function() {
+      if (html5QrCode && html5QrCode.isScanning) {
+        await html5QrCode.stop();
+        html5QrCode.clear();
+      }
+      document.getElementById("btnIniciar").style.display = "inline-block";
+      document.getElementById("btnDetener").style.display = "none";
+    };
+
+    async function buscarEquipoEnBaseDatos(codigoQrLeido) {
+      Swal.fire({ title: 'Buscando equipo...', text: 'Consultando inventario', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+      try {
+        // Buscamos en la colección "equipos" donde el campo "codigoQr" o "codigoInterno" coincida
+        const q = query(collection(db, "equipos"), where("codigoQr", "==", codigoQrLeido));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            Swal.close();
+            
+            // Mostramos la ficha técnica encontrada
+            const contenedorResultado = document.getElementById("resultado-equipo");
+            const infoDetalle = document.getElementById("info-detalle");
+            
+            contenedorResultado.style.display = "block";
+            infoDetalle.innerHTML = `
+              <strong>Tipo:</strong> ${data.tipoEquipo || 'N/A'}<br>
+              <strong>Marca / Modelo:</strong> ${data.marca} ${data.modelo}<br>
+              <strong>Nº de Serie:</strong> ${data.numeroSerie}<br>
+              <strong>Estado Actual:</strong> <span style="color: #2563eb; font-weight: bold;">${data.estado}</span><br>
+              <strong>Código Interno:</strong> ${data.codigoInterno}
+            `;
+            
+            Swal.fire('¡Equipo Encontrado!', `Se cargó la información del equipo ${data.codigoInterno}`, 'success');
+          });
+        } else {
+          Swal.fire('No encontrado', `El código QR "${codigoQrLeido}" no está registrado en el inventario institucional.`, 'warning');
+        }
+      } catch (error) {
+        console.error("Error al consultar Firestore:", error);
+        Swal.fire('Error', 'Ocurrió un error al consultar la base de datos.', 'error');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -15,7 +15,7 @@
 
   <style>
     :root {
-      --bg-principal: #ffffff;         /* Fondo blanco puro */
+      --bg-principal: #ffffff;        /* Fondo blanco puro */
       --bg-secundario: #f4f4f6;       /* Gris claro */
       --tarjeta-bg: #f9f9fb;          /* Fondo de tarjetas gris ultra suave */
       --tarjeta-hover: #ffffff;       /* Fondo al pasar el cursor */
@@ -239,10 +239,10 @@
 
         <!-- Opción 1: Escanear QR -->
         <div class="opcion-wrapper">
-          <a href="#escaneo" class="tarjeta-opcion" onclick="abrirModulo('Escaneo de Código QR')">
-            <i class="fa-solid fa-qrcode"></i>
-            <span>Escanear Código QR</span>
-          </a>
+          <a href="escaner.html" class="tarjeta-opcion">
+  <i class="fa-solid fa-qrcode"></i>
+  <span>Escanear Código QR</span>
+</a>
         </div>
 
         <div class="separador-vertical"></div>
@@ -294,8 +294,25 @@
     Beta de proyecto | Sistema de Control prototipo
   </footer>
 
-  <script>
-    function abrirModulo(nombreModulo) {
+  <!-- SCRIPT DE FIREBASE Y FUNCIONES DE NAVEGACIÓN -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
+      authDomain: "control-de-equipos-762c4.firebaseapp.com",
+      projectId: "control-de-equipos-762c4",
+      storageBucket: "control-de-equipos-762c4.firebasestorage.app",
+      messagingSenderId: "711982599026",
+      appId: "1:711982599026:web:ba92c737011b38f882abeb",
+      measurementId: "G-X1M2R00M55"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.abrirModulo = function(nombreModulo) {
       Swal.fire({
         title: nombreModulo,
         text: `Accediendo al módulo de ${nombreModulo}...`,
@@ -303,24 +320,16 @@
         timer: 1500,
         showConfirmButton: false
       });
-    }
+    };
 
-    function cerrarSesion() {
-      Swal.fire({
-        title: '¿Cerrar Sesión?',
-        text: 'Saldrás de la plataforma de inventarios.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#18181b',
-        cancelButtonColor: '#71717a',
-        confirmButtonText: 'Sí, salir',
-        cancelButtonText: 'Cancelar'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire('Sesión finalizada', 'Has salido correctamente.', 'success');
-        }
-      });
-    }
+    window.cerrarSesion = function() {
+          signOut(auth).then(() => {
+            window.location.href = "login.html"; // Redirige al login correctamente
+          }).catch((error) => {
+            console.error("Error al cerrar sesión:", error);
+            window.location.href = "login.html"; // Redirige de todos modos por seguridad
+          });
+        };
   </script>
 </body>
 </html>
