@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registro de Equipos | Jurisdicción Sanitaria No. 2</title>
+  
+  <!-- Tipografía Moderna (Inter) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Íconos FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- SweetAlert2 y QRCode Generator -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    :root {
+      --bg-principal: #ffffff;
+      --bg-secundario: #f4f4f6;
+      --tarjeta-bg: #f9f9fb;
+      --texto-titulos: #0f0f11;
+      --texto-cuerpo: #4a4a52;
+      --texto-mutado: #71717a;
+      --borde-suave: #e4e4e7;
+      --accent-black: #18181b;
+      --accent-hover: #27272a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-principal);
+      color: var(--texto-cuerpo);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 24px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-badge {
+      background-color: var(--bg-secundario);
+      color: var(--texto-titulos);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .main-container {
+      max-width: 800px;
+      margin: 20px auto 60px auto;
+      padding: 40px;
+      background-color: var(--tarjeta-bg);
+      border: 1px solid var(--borde-suave);
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+      width: 100%;
+    }
+
+    .main-container h2 {
+      color: var(--texto-titulos);
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .main-container p.sub {
+      color: var(--texto-mutado);
+      font-size: 0.95rem;
+      margin-bottom: 30px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 16px;
+    }
+
+    .form-group.full-width {
+      grid-column: span 2;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--texto-titulos);
+      margin-bottom: 6px;
+    }
+
+    input, select, textarea {
+      padding: 12px 16px;
+      background-color: #ffffff;
+      border: 1px solid var(--borde-suave);
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      color: var(--texto-titulos);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent-black);
+      box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.08);
+    }
+
+    textarea {
+      resize: vertical;
+      height: 90px;
+    }
+
+    .seccion-titulo {
+      grid-column: span 2;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--texto-titulos);
+      border-bottom: 1px solid var(--borde-suave);
+      padding-bottom: 8px;
+      margin-top: 10px;
+      margin-bottom: 5px;
+    }
+
+    .btn-submit {
+      grid-column: span 2;
+      background-color: var(--accent-black);
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin-top: 15px;
+    }
+
+    .btn-submit:hover {
+      background-color: var(--accent-hover);
+    }
+
+    footer {
+      border-top: 1px solid var(--borde-suave);
+      padding: 20px 30px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--texto-mutado);
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .form-group.full-width {
+        grid-column: span 1;
+      }
+      .btn-submit, .seccion-titulo {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVEGACIÓN SUPERIOR -->
+  <nav>
+    <a href="index.html" class="brand-badge"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</a>
+    <span style="font-size: 0.85rem; color: var(--texto-mutado);">Módulo de Registro de Equipos</span>
+  </nav>
+
+  <!-- CONTENEDOR DEL FORMULARIO -->
+  <main class="main-container">
+    <h2>Alta de Nuevo Equipo</h2>
+    <p class="sub">Complete los campos institucionales para registrar el activo y generar su código QR automático.</p>
+
+    <form id="formAltaEquipo" class="form-grid" onsubmit="registrarEquipo(event)">
+      
+      <!-- Información General -->
+      <div class="seccion-titulo">Información General</div>
+      
+      <div class="form-group">
+        <label for="codigoInterno">Código Interno</label>
+        <input type="text" id="codigoInterno" placeholder="Ej. EQ-2026-002" required>
+      </div>
+
+      <div class="form-group">
+        <label for="tipoEquipo">Tipo de Equipo</label>
+        <select id="tipoEquipo" required>
+          <option value="Laptop">Laptop</option>
+          <option value="Computadora de Escritorio">Computadora de Escritorio</option>
+          <option value="Impresora">Impresora</option>
+          <option value="Servidor">Servidor</option>
+          <option value="Switch / Router">Switch / Router</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="marca">Marca</label>
+        <input type="text" id="marca" placeholder="Ej. Dell, HP, Lenovo" required>
+      </div>
+
+      <div class="form-group">
+        <label for="modelo">Modelo</label>
+        <input type="text" id="modelo" placeholder="Ej. Latitude 5420" required>
+      </div>
+
+      <div class="form-group">
+        <label for="numeroSerie">Número de Serie</label>
+        <input type="text" id="numeroSerie" placeholder="Ej. ABC123456XYZ" required>
+      </div>
+
+      <div class="form-group">
+        <label for="estado">Estado Inicial</label>
+        <select id="estado" required>
+          <option value="DISPONIBLE">DISPONIBLE</option>
+          <option value="EN USO">EN USO</option>
+          <option value="MANTENIMIENTO">MANTENIMIENTO</option>
+          <option value="RESGUARDO">RESGUARDO</option>
+        </select>
+      </div>
+
+      <!-- Especificaciones Técnicas -->
+      <div class="seccion-titulo">Especificaciones Técnicas</div>
+
+      <div class="form-group">
+        <label for="procesador">Procesador</label>
+        <input type="text" id="procesador" placeholder="Ej. Intel Core i7-1185G7">
+      </div>
+
+      <div class="form-group">
+        <label for="ramGb">Memoria RAM (GB)</label>
+        <input type="number" id="ramGb" placeholder="Ej. 16" min="1">
+      </div>
+
+      <div class="form-group">
+        <label for="almacenamientoGb">Almacenamiento (GB)</label>
+        <input type="number" id="almacenamientoGb" placeholder="Ej. 512" min="1">
+      </div>
+
+      <div class="form-group">
+        <label for="tipoAlmacenamiento">Tipo de Almacenamiento</label>
+        <input type="text" id="tipoAlmacenamiento" placeholder="Ej. NVMe SSD o HDD">
+      </div>
+
+      <div class="form-group full-width">
+        <label for="sistemaOperativo">Sistema Operativo</label>
+        <input type="text" id="sistemaOperativo" placeholder="Ej. Windows 11 Pro">
+      </div>
+
+      <!-- Fechas y Garantía -->
+      <div class="seccion-titulo">Fechas y Garantía</div>
+
+      <div class="form-group">
+        <label for="fechaAdquisicion">Fecha de Adquisición</label>
+        <input type="date" id="fechaAdquisicion" required>
+      </div>
+
+      <div class="form-group">
+        <label for="fechaFinGarantia">Fecha Fin de Garantía</label>
+        <input type="date" id="fechaFinGarantia">
+      </div>
+
+      <!-- Ubicación y Referencias -->
+      <div class="seccion-titulo">Ubicación Institucional</div>
+
+      <div class="form-group full-width">
+        <label for="area">Área / Departamento Asignado</label>
+        <input type="text" id="area" placeholder="Ej. Sistemas e Informática" required>
+      </div>
+
+      <div class="form-group">
+        <label for="idSede">ID Sede</label>
+        <input type="text" id="idSede" placeholder="Ej. Z5w1j5ApzkZachrCzfBf">
+      </div>
+
+      <div class="form-group">
+        <label for="idUbicacion">ID Ubicación</label>
+        <input type="text" id="idUbicacion" placeholder="Ej. EOJnqOd21Ggo98eBr22z">
+      </div>
+
+      <!-- Observaciones -->
+      <div class="seccion-titulo">Observaciones</div>
+      <div class="form-group full-width">
+        <textarea id="observaciones" placeholder="Detalles adicionales del equipo..."></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit"><i class="fa-solid fa-floppy-disk"></i> Registrar Equipo y Generar QR</button>
+    </form>
+  </main>
+
+  <!-- Contenedor oculto para generar la imagen del QR -->
+  <div id="qrcode" style="display:none;"></div>
+
+  <footer>
+    Servicios de Salud de Yucatán &copy; 2026 | Jurisdicción Sanitaria No. 2
+  </footer>
+
+  <!-- SCRIPT DE FIREBASE Y LÓGICA DE REGISTRO -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
+      authDomain: "control-de-equipos-762c4.firebaseapp.com",
+      projectId: "control-de-equipos-762c4",
+      storageBucket: "control-de-equipos-762c4.firebasestorage.app",
+      messagingSenderId: "711982599026",
+      appId: "1:711982599026:web:ba92c737011b38f882abeb",
+      measurementId: "G-X1M2R00M55"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.registrarEquipo = async function(event) {
+      event.preventDefault();
+
+      const codigoInterno = document.getElementById("codigoInterno").value.trim();
+      const codigoQr = `QR-${codigoInterno}`;
+
+      Swal.fire({
+        title: 'Registrando equipo...',
+        text: 'Guardando datos y generando etiqueta QR',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      try {
+        const fAdq = document.getElementById("fechaAdquisicion").value;
+        const fGar = document.getElementById("fechaFinGarantia").value;
+
+        const nuevoEquipo = {
+          activo: true,
+          codigoInterno: codigoInterno,
+          codigoQr: codigoQr,
+          tipoEquipo: document.getElementById("tipoEquipo").value,
+          marca: document.getElementById("marca").value.trim(),
+          modelo: document.getElementById("modelo").value.trim(),
+          numeroSerie: document.getElementById("numeroSerie").value.trim(),
+          estado: document.getElementById("estado").value,
+          especificaciones: {
+            procesador: document.getElementById("procesador").value.trim(),
+            ramGb: Number(document.getElementById("ramGb").value) || 0,
+            almacenamientoGb: Number(document.getElementById("almacenamientoGb").value) || 0,
+            tipoAlmacenamiento: document.getElementById("tipoAlmacenamiento").value.trim(),
+            sistemaOperativo: document.getElementById("sistemaOperativo").value.trim()
+          },
+          fechaAdquisicion: fAdq ? Timestamp.fromDate(new Date(fAdq + "T00:00:00")) : null,
+          fechaAlta: Timestamp.now(),
+          fechaFinGarantia: fGar ? Timestamp.fromDate(new Date(fGar + "T00:00:00")) : null,
+          ubicacionRef: {
+            area: document.getElementById("area").value.trim(),
+            idSede: document.getElementById("idSede").value.trim(),
+            idUbicacion: document.getElementById("idUbicacion").value.trim()
+          },
+          observaciones: document.getElementById("observaciones").value.trim()
+        };
+
+        // Guardar en Firestore
+        await addDoc(collection(db, "equipos"), nuevoEquipo);
+
+        // Generar y descargar el Código QR automáticamente
+        generarYDescargarQR(codigoQr);
+
+        Swal.fire({
+          title: '¡Registro Exitoso!',
+          text: `El equipo ${codigoInterno} se ha guardado correctamente y su etiqueta QR se ha descargado.`,
+          icon: 'success',
+          confirmButtonColor: '#18181b'
+        }).then(() => {
+          document.getElementById("formAltaEquipo").reset();
+        });
+
+      } catch (error) {
+        console.error("Error al registrar equipo:", error);
+        Swal.fire('Error', `No se pudo registrar el equipo: ${error.message}`, 'error');
+      }
+    };
+
+    function generarYDescargarQR(textoQr) {
+      const contenedorQR = document.getElementById("qrcode");
+      contenedorQR.innerHTML = "";
+      
+      new QRCode(contenedorQR, {
+        text: textoQr,
+        width: 300,
+        height: 300,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+      });
+
+      setTimeout(() => {
+        const img = contenedorQR.querySelector("img");
+        if (img) {
+          const enlace = document.createElement("a");
+          enlace.href = img.src;
+          enlace.download = `Etiqueta_${textoQr}.png`;
+          enlace.click();
+        }
+      }, 300);
+    }
+  </script>
+</body>
+</html>

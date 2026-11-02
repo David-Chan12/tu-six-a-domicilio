@@ -10,7 +10,7 @@
   <!-- Íconos FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- SweetAlert2 para alertas -->
+  <!-- SweetAlert2 para alertas y modales -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <!-- Librería Html5Qrcode para el manejo de la cámara -->
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
@@ -125,25 +125,6 @@
       background-color: #dc2626;
     }
 
-    /* Caja de resultados del equipo escaneado */
-    #resultado-equipo {
-      margin-top: 20px;
-      padding: 20px;
-      background: #ffffff;
-      border: 1px solid var(--borde-suave);
-      border-radius: 16px;
-      text-align: left;
-      display: none;
-    }
-
-    #resultado-equipo h3 {
-      color: var(--texto-titulos);
-      font-size: 1.2rem;
-      margin-bottom: 10px;
-      border-bottom: 1px solid var(--borde-suave);
-      padding-bottom: 5px;
-    }
-
     footer {
       border-top: 1px solid var(--borde-suave);
       padding: 20px 30px;
@@ -173,12 +154,6 @@
       <button id="btnIniciar" class="btn-control" onclick="iniciarEscaner()">Encender Cámara</button>
       <button id="btnDetener" class="btn-control btn-danger" onclick="detenerEscaner()" style="display:none;">Apagar Cámara</button>
     </div>
-
-    <!-- Ficha técnica que aparecerá al detectar el código -->
-    <div id="resultado-equipo">
-      <h3><i class="fa-solid fa-circle-check" style="color: #10b981;"></i> Equipo Identificado</h3>
-      <p id="info-detalle"></p>
-    </div>
   </main>
 
   <!-- PIE DE PÁGINA -->
@@ -189,7 +164,7 @@
   <!-- SCRIPT DE LÓGICA DE ESCANEO Y FIREBASE -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, query, where, doc, updateDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
@@ -205,6 +180,13 @@
     const db = getFirestore(app);
 
     let html5QrCode;
+
+    function formatearFechaInput(campoFecha) {
+      if (!campoFecha) return "";
+      let fecha = campoFecha?.toDate ? campoFecha.toDate() : new Date(campoFecha);
+      if (isNaN(fecha.getTime())) return "";
+      return fecha.toISOString().split("T")[0];
+    }
 
     window.iniciarEscaner = function() {
       const btnIniciar = document.getElementById("btnIniciar");
@@ -224,8 +206,8 @@
           // Detenemos la cámara temporalmente para procesar
           await detenerEscaner();
           
-          // Buscamos el código en la base de datos de Firestore (colección "equipos")
-          buscarEquipoEnBaseDatos(decodedText);
+          // Buscamos el equipo en la base de datos de Firestore
+          buscarYMostrarEquipo(decodedText);
         },
         (errorMessage) => {
           // Errores de escaneo continuo por fotograma (se ignoran para no saturar)
@@ -248,41 +230,163 @@
       document.getElementById("btnDetener").style.display = "none";
     };
 
-    async function buscarEquipoEnBaseDatos(codigoQrLeido) {
+    async function buscarYMostrarEquipo(codigoQrLeido) {
       Swal.fire({ title: 'Buscando equipo...', text: 'Consultando inventario', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
       try {
-        // Buscamos en la colección "equipos" donde el campo "codigoQr" o "codigoInterno" coincida
+        // Buscamos en la colección "equipos" donde coincida el codigoQr o el codigoInterno
         const q = query(collection(db, "equipos"), where("codigoQr", "==", codigoQrLeido));
-        const querySnapshot = await getDocs(q);
+        let querySnapshot = await getDocs(q);
+
+        // Si no se encuentra por codigoQr, intentamos buscar por codigoInterno
+        if (querySnapshot.empty) {
+          const q2 = query(collection(db, "equipos"), where("codigoInterno", "==", codigoQrLeido));
+          querySnapshot = await getDocs(q2);
+        }
 
         if (!querySnapshot.empty) {
-          querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            Swal.close();
-            
-            // Mostramos la ficha técnica encontrada
-            const contenedorResultado = document.getElementById("resultado-equipo");
-            const infoDetalle = document.getElementById("info-detalle");
-            
-            contenedorResultado.style.display = "block";
-            infoDetalle.innerHTML = `
-              <strong>Tipo:</strong> ${data.tipoEquipo || 'N/A'}<br>
-              <strong>Marca / Modelo:</strong> ${data.marca} ${data.modelo}<br>
-              <strong>Nº de Serie:</strong> ${data.numeroSerie}<br>
-              <strong>Estado Actual:</strong> <span style="color: #2563eb; font-weight: bold;">${data.estado}</span><br>
-              <strong>Código Interno:</strong> ${data.codigoInterno}
-            `;
-            
-            Swal.fire('¡Equipo Encontrado!', `Se cargó la información del equipo ${data.codigoInterno}`, 'success');
-          });
+          let docSnap = querySnapshot.docs[0];
+          let eq = docSnap.data();
+          let id = docSnap.id;
+          
+          Swal.close();
+          
+          // Mostramos la misma ventana modal de detalles y edición del inventario
+          mostrarModalEdicion(id, eq);
+
         } else {
-          Swal.fire('No encontrado', `El código QR "${codigoQrLeido}" no está registrado en el inventario institucional.`, 'warning');
+          Swal.fire({
+            title: 'No encontrado',
+            text: `El código QR "${codigoQrLeido}" no está registrado en el inventario institucional.`,
+            icon: 'warning',
+            confirmButtonColor: '#18181b'
+          });
         }
       } catch (error) {
         console.error("Error al consultar Firestore:", error);
         Swal.fire('Error', 'Ocurrió un error al consultar la base de datos.', 'error');
       }
+    }
+
+    function mostrarModalEdicion(id, eq) {
+      Swal.fire({
+        title: `Ficha Completa: ${eq.codigoInterno || 'Equipo'}`,
+        html: `
+          <div style="text-align: left; font-size: 0.9rem; line-height: 1.5; max-height: 65vh; overflow-y: auto; padding-right: 5px;">
+            <p><strong>Activo:</strong> 
+              <select id="editActivo" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;">
+                <option value="true" ${eq.activo !== false ? 'selected' : ''}>true (Activo)</option>
+                <option value="false" ${eq.activo === false ? 'selected' : ''}>false (Inactivo)</option>
+              </select>
+            </p>
+            <p><strong>Código Interno:</strong> <input id="editCodigoInterno" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.codigoInterno || ''}"></p>
+            <p><strong>Código QR:</strong> <input id="editCodigoQr" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.codigoQr || ''}"></p>
+            <p><strong>Tipo de Equipo:</strong> <input id="editTipo" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.tipoEquipo || ''}"></p>
+            <p><strong>Marca:</strong> <input id="editMarca" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.marca || ''}"></p>
+            <p><strong>Modelo:</strong> <input id="editModelo" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.modelo || ''}"></p>
+            <p><strong>Número de Serie:</strong> <input id="editSerie" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.numeroSerie || ''}"></p>
+            
+            <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
+            <h4 style="margin-bottom:8px; color:#18181b;">Especificaciones</h4>
+            <p><strong>Procesador:</strong> <input id="editProc" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.procesador || ''}"></p>
+            <p><strong>RAM (GB):</strong> <input type="number" id="editRam" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.ramGb || 0}"></p>
+            <p><strong>Almacenamiento (GB):</strong> <input type="number" id="editAlm" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.almacenamientoGb || 0}"></p>
+            <p><strong>Tipo Almacenamiento:</strong> <input id="editTipoAlm" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.tipoAlmacenamiento || ''}"></p>
+            <p><strong>Sistema Operativo:</strong> <input id="editSo" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.sistemaOperativo || ''}"></p>
+            
+            <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
+            <p><strong>Estado:</strong> 
+              <select id="editEstado" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;">
+                <option value="DISPONIBLE" ${eq.estado === 'DISPONIBLE' ? 'selected' : ''}>DISPONIBLE</option>
+                <option value="EN USO" ${eq.estado === 'EN USO' ? 'selected' : ''}>EN USO</option>
+                <option value="MANTENIMIENTO" ${eq.estado === 'MANTENIMIENTO' ? 'selected' : ''}>MANTENIMIENTO</option>
+                <option value="RESGUARDO" ${eq.estado === 'RESGUARDO' ? 'selected' : ''}>RESGUARDO</option>
+                <option value="BAJA" ${eq.estado === 'BAJA' ? 'selected' : ''}>BAJA</option>
+              </select>
+            </p>
+
+            <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
+            <h4 style="margin-bottom:8px; color:#18181b;">Fechas del Registro</h4>
+            <p><strong>Fecha Adquisición:</strong> <input type="date" id="editFechaAdq" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${formatearFechaInput(eq.fechaAdquisicion)}"></p>
+            <p><strong>Fecha Alta:</strong> <input type="date" id="editFechaAlta" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${formatearFechaInput(eq.fechaAlta)}"></p>
+            <p><strong>Fecha Fin Garantía:</strong> <input type="date" id="editFechaGarantia" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${formatearFechaInput(eq.fechaFinGarantia)}"></p>
+
+            <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
+            <h4 style="margin-bottom:8px; color:#18181b;">Ubicación (ubicacionRef)</h4>
+            <p><strong>Área:</strong> <input id="editArea" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.ubicacionRef?.area || ''}"></p>
+            <p><strong>ID Sede:</strong> <input id="editIdSede" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.ubicacionRef?.idSede || ''}"></p>
+            <p><strong>ID Ubicación:</strong> <input id="editIdUbicacion" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.ubicacionRef?.idUbicacion || ''}"></p>
+
+            <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
+            <!-- OBSERVACIONES COLOCADAS EXACTAMENTE AL FINAL -->
+            <p><strong>Observaciones:</strong> <textarea id="editObs" class="swal2-textarea" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem; height:80px; resize:vertical;">${eq.observaciones || ''}</textarea></p>
+          </div>
+        `,
+        width: '650px',
+        showCancelButton: true,
+        confirmButtonText: 'Guardar Cambios',
+        cancelButtonText: 'Cerrar',
+        confirmButtonColor: '#18181b',
+        preConfirm: () => {
+          const getVal = (fieldId) => {
+            const el = document.getElementById(fieldId);
+            return el ? el.value : "";
+          };
+
+          const datosActualizados = {
+            activo: getVal("editActivo") === "true",
+            codigoInterno: getVal("editCodigoInterno"),
+            codigoQr: getVal("editCodigoQr"),
+            tipoEquipo: getVal("editTipo"),
+            marca: getVal("editMarca"),
+            modelo: getVal("editModelo"),
+            numeroSerie: getVal("editSerie"),
+            especificaciones: {
+              procesador: getVal("editProc"),
+              ramGb: Number(getVal("editRam")) || 0,
+              almacenamientoGb: Number(getVal("editAlm")) || 0,
+              tipoAlmacenamiento: getVal("editTipoAlm"),
+              sistemaOperativo: getVal("editSo")
+            },
+            estado: getVal("editEstado"),
+            ubicacionRef: {
+              area: getVal("editArea"),
+              idSede: getVal("editIdSede"),
+              idUbicacion: getVal("editIdUbicacion")
+            },
+            observaciones: getVal("editObs")
+          };
+
+          const fAdqVal = getVal("editFechaAdq");
+          const fAltaVal = getVal("editFechaAlta");
+          const fGarVal = getVal("editFechaGarantia");
+
+          if (fAdqVal) datosActualizados.fechaAdquisicion = Timestamp.fromDate(new Date(fAdqVal + "T00:00:00"));
+          if (fAltaVal) datosActualizados.fechaAlta = Timestamp.fromDate(new Date(fAltaVal + "T00:00:00"));
+          if (fGarVal) datosActualizados.fechaFinGarantia = Timestamp.fromDate(new Date(fGarVal + "T00:00:00"));
+
+          return datosActualizados;
+        }
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            Swal.fire({ title: 'Guardando...', text: 'Actualizando registro en Firestore', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            const eqRef = doc(db, "equipos", id);
+            await updateDoc(eqRef, result.value);
+
+            Swal.fire({
+              title: '¡Actualizado!',
+              text: 'La información del equipo se ha actualizado correctamente.',
+              icon: 'success',
+              confirmButtonColor: '#18181b'
+            });
+          } catch (error) {
+            console.error("Error detallado al actualizar en Firestore:", error);
+            Swal.fire('Error', `No se pudieron guardar los cambios: ${error.message}`, 'error');
+          }
+        }
+      });
     }
   </script>
 </body>
