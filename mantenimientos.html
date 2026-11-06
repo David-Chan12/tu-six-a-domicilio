@@ -10,8 +10,9 @@
   <!-- Íconos FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- SweetAlert2 -->
+  <!-- SweetAlert2 y Html5Qrcode -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
   <style>
     :root {
@@ -210,7 +211,7 @@
 
     <!-- BUSCADOR -->
     <div class="controles-barra">
-      <input type="text" id="buscador" placeholder="Buscar por código interno, tipo de servicio o técnico..." onkeyup="filtrarMantenimientos()">
+      <input type="text" id="buscador" placeholder="Buscar por código interno, serie, servicio o técnico..." onkeyup="filtrarMantenimientos()">
     </div>
 
     <!-- TABLA DE MANTENIMIENTOS -->
@@ -219,6 +220,7 @@
         <thead>
           <tr>
             <th>Código Interno</th>
+            <th>Nº de Serie</th>
             <th>Tipo de Servicio</th>
             <th>Descripción / Acciones</th>
             <th>Técnico Responsable</th>
@@ -228,7 +230,7 @@
         </thead>
         <tbody id="tablaCuerpoMantenimiento">
           <tr>
-            <td colspan="6" style="text-align: center; color: var(--texto-mutado);">Cargando mantenimientos...</td>
+            <td colspan="7" style="text-align: center; color: var(--texto-mutado);">Cargando mantenimientos...</td>
           </tr>
         </tbody>
       </table>
@@ -242,7 +244,7 @@
   <!-- SCRIPT DE FIREBASE Y LÓGICA -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
@@ -258,22 +260,20 @@
     const db = getFirestore(app);
 
     let listaMantenimientos = [];
-    let listaEquiposDisponibles = [];
+    let listaEquiposCompletos = [];
 
     async function cargarDatos() {
       try {
-        // Cargar equipos para el select
         const snapEquipos = await getDocs(collection(db, "equipos"));
-        listaEquiposDisponibles = [];
-        snapEquipos.forEach(doc => {
-          listaEquiposDisponibles.push(doc.data().codigoInterno);
+        listaEquiposCompletos = [];
+        snapEquipos.forEach(docSnap => {
+          listaEquiposCompletos.push({ id: docSnap.id, ...docSnap.data() });
         });
 
-        // Cargar mantenimientos
         const snapMantenimientos = await getDocs(collection(db, "mantenimientos"));
         listaMantenimientos = [];
-        snapMantenimientos.forEach(doc => {
-          listaMantenimientos.push({ id: doc.id, ...doc.data() });
+        snapMantenimientos.forEach(docSnap => {
+          listaMantenimientos.push({ id: docSnap.id, ...docSnap.data() });
         });
 
         renderizarTabla();
@@ -289,13 +289,14 @@
 
       let filtrados = listaMantenimientos.filter(m => 
         (m.codigoInterno && m.codigoInterno.toLowerCase().includes(textoBusqueda)) ||
+        (m.numeroSerie && m.numeroSerie.toLowerCase().includes(textoBusqueda)) ||
         (m.tipoServicio && m.tipoServicio.toLowerCase().includes(textoBusqueda)) ||
         (m.tecnico && m.tecnico.toLowerCase().includes(textoBusqueda)) ||
         (m.descripcion && m.descripcion.toLowerCase().includes(textoBusqueda))
       );
 
       if (filtrados.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--texto-mutado);">No se encontraron registros de mantenimiento.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--texto-mutado);">No se encontraron registros de mantenimiento.</td></tr>`;
         return;
       }
 
@@ -310,6 +311,7 @@
         html += `
           <tr>
             <td><strong>${m.codigoInterno || 'S/C'}</strong></td>
+            <td>${m.numeroSerie || 'N/A'}</td>
             <td><span class="badge-tipo ${claseTipo}">${m.tipoServicio || 'PREVENTIVO'}</span></td>
             <td>${m.descripcion || 'Sin descripción'}</td>
             <td>${m.tecnico || 'N/A'}</td>
@@ -327,17 +329,140 @@
       renderizarTabla();
     };
 
+    // 1. Preguntar si desea escanear o ingresar manualmente
     window.abrirModalNuevoMantenimiento = function() {
-      let opcionesEquipos = listaEquiposDisponibles.map(eq => `<option value="${eq}">${eq}</option>`).join('');
+      Swal.fire({
+        title: 'Registrar Mantenimiento',
+        text: 'Seleccione el método para identificar el equipo:',
+        icon: 'question',
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: '<i class="fa-solid fa-qrcode"></i> Escanear Código QR',
+        denyButtonText: '<i class="fa-solid fa-keyboard"></i> Ingresar / Seleccionar Manual',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#18181b',
+        denyButtonColor: '#71717a'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          iniciarEscanerParaMantenimiento();
+        } else if (result.isDenied) {
+          mostrarFormularioMantenimiento("", "");
+        }
+      });
+    };
+
+    // 2. Abrir escáner con opción de respaldo manual
+    function iniciarEscanerParaMantenimiento() {
+      Swal.fire({
+        title: 'Escáner QR de Equipo',
+        html: `
+          <p style="font-size:0.9rem; color:#71717a; margin-bottom:15px;">Apunta con la cámara al código QR de la etiqueta.</p>
+          <div id="reader-mant" style="width:100%; border-radius:12px; overflow:hidden; border:2px solid #e4e4e7; background:#000;"></div>
+          <button id="btnFallbackManual" class="swal2-confirm swal2-styled" style="margin-top:15px; background-color:#71717a; font-size:0.9rem;"><i class="fa-solid fa-keyboard"></i> Llenar Manualmente</button>
+        `,
+        width: '500px',
+        showConfirmButton: false,
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar',
+        didOpen: () => {
+          const html5QrCode = new Html5Qrcode("reader-mant");
+          html5QrCode.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: { width: 220, height: 220 } },
+            async (decodedText) => {
+              try {
+                if (html5QrCode.isScanning) {
+                  await html5QrCode.stop();
+                }
+              } catch(e) {}
+              Swal.close();
+              buscarEquipoPorQR(decodedText);
+            },
+            () => {}
+          ).catch(err => {
+            console.error("Error al iniciar cámara:", err);
+            Swal.fire('Error de Cámara', 'No se pudo acceder a la cámara. Puede usar la opción manual.', 'error').then(() => {
+              mostrarFormularioMantenimiento("", "");
+            });
+          });
+
+          document.getElementById("btnFallbackManual").onclick = async () => {
+            try {
+              if (html5QrCode.isScanning) {
+                await html5QrCode.stop();
+              }
+            } catch(e) {}
+            Swal.close();
+            mostrarFormularioMantenimiento("", "");
+          };
+        },
+        willClose: () => {
+          try {
+            const scannerElem = Html5Qrcode.getCameras();
+          } catch(e) {}
+        }
+      });
+    }
+
+    // 3. Buscar equipo en Firestore a partir del texto escaneado
+    async function buscarEquipoPorQR(codigoLeido) {
+      Swal.fire({ title: 'Buscando equipo...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      try {
+        let eqEncontrado = null;
+        const q = query(collection(db, "equipos"), where("codigoQr", "==", codigoLeido));
+        let snap = await getDocs(q);
+        if (snap.empty) {
+          const q2 = query(collection(db, "equipos"), where("codigoInterno", "==", codigoLeido));
+          snap = await getDocs(q2);
+        }
+
+        if (!snap.empty) {
+          eqEncontrado = snap.docs[0].data();
+          Swal.close();
+          mostrarFormularioMantenimiento(eqEncontrado.codigoInterno || "", eqEncontrado.numeroSerie || "");
+        } else {
+          Swal.fire({
+            title: 'No encontrado',
+            text: `El código "${codigoLeido}" no está registrado en el inventario. ¿Desea ingresarlo manualmente?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ingresar Manual',
+            cancelButtonText: 'Reintentar Escaneo',
+            confirmButtonColor: '#18181b'
+          }).then((res) => {
+            if (res.isConfirmed) {
+              mostrarFormularioMantenimiento("", "");
+            } else {
+              iniciarEscanerParaMantenimiento();
+            }
+          });
+        }
+      } catch (err) {
+        console.error("Error al buscar equipo:", err);
+        Swal.fire('Error', 'Ocurrió un error al consultar el equipo.', 'error').then(() => {
+          mostrarFormularioMantenimiento("", "");
+        });
+      }
+    }
+
+    // 4. Mostrar el formulario con Código e Identificador autocompletados (o manuales)
+    window.mostrarFormularioMantenimiento = function(codigoPrellenado, seriePrellenada) {
+      let opcionesEquipos = listaEquiposCompletos.map(eq => 
+        `<option value="${eq.codigoInterno}" data-serie="${eq.numeroSerie || ''}" ${eq.codigoInterno === codigoPrellenado ? 'selected' : ''}>${eq.codigoInterno} (${eq.marca || ''} ${eq.modelo || ''})</option>`
+      ).join('');
 
       Swal.fire({
         title: 'Registrar Mantenimiento o Servicio',
         html: `
           <div style="text-align: left; font-size: 0.9rem;">
             <p><strong>Código Interno del Equipo:</strong> 
-              <select id="newCodigo" class="swal2-input" style="margin:5px 0 10px 0; width:100%; font-size:0.9rem;">
-                ${opcionesEquipos || '<option value="">No hay equipos cargados</option>'}
+              <select id="newCodigo" class="swal2-input" style="margin:5px 0 10px 0; width:100%; font-size:0.9rem;" onchange="actualizarSerieManual(this)">
+                <option value="">Seleccione o escanee un equipo...</option>
+                ${opcionesEquipos}
               </select>
+            </p>
+            <p><strong>Número de Serie:</strong> 
+              <input id="newSerie" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem; background:#f4f4f6;" value="${seriePrellenada}" readonly placeholder="Se autocompleta automáticamente">
             </p>
             <p><strong>Tipo de Servicio:</strong> 
               <select id="newTipo" class="swal2-input" style="margin:5px 0 10px 0; width:100%; font-size:0.9rem;">
@@ -353,13 +478,27 @@
         `,
         width: '600px',
         showCancelButton: true,
-        confirmButtonText: 'Guardar Registro',
+        confirmButtonText: 'Guardar y Cambiar a Mantenimiento',
         cancelButtonText: 'Cancelar',
         confirmButtonColor: '#18181b',
+        didOpen: () => {
+          // Si se seleccionó por QR pero el select no tenía seleccionado el valor exacto
+          if (codigoPrellenado) {
+            const selectEl = document.getElementById("newCodigo");
+            selectEl.value = codigoPrellenado;
+            if (!seriePrellenada) {
+              const eqMatch = listaEquiposCompletos.find(e => e.codigoInterno === codigoPrellenado);
+              if (eqMatch) {
+                document.getElementById("newSerie").value = eqMatch.numeroSerie || "";
+              }
+            }
+          }
+        },
         preConfirm: () => {
           const getVal = (id) => document.getElementById(id)?.value || "";
           return {
             codigoInterno: getVal("newCodigo"),
+            numeroSerie: getVal("newSerie"),
             tipoServicio: getVal("newTipo"),
             tecnico: getVal("newTecnico"),
             fechaStr: getVal("newFecha"),
@@ -370,29 +509,52 @@
         if (result.isConfirmed) {
           const data = result.value;
           if (!data.codigoInterno || !data.tecnico) {
-            Swal.fire('Atención', 'Por favor complete los campos obligatorios.', 'warning');
+            Swal.fire('Atención', 'Por favor seleccione el equipo y complete el técnico responsable.', 'warning');
             return;
           }
 
           try {
-            Swal.fire({ title: 'Guardando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            Swal.fire({ title: 'Registrando...', text: 'Guardando servicio y actualizando equipo', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
+            // 1. Guardar el registro de mantenimiento con código y serie
             await addDoc(collection(db, "mantenimientos"), {
               codigoInterno: data.codigoInterno,
+              numeroSerie: data.numeroSerie,
               tipoServicio: data.tipoServicio,
               tecnico: data.tecnico,
               fechaServicio: data.fechaStr ? Timestamp.fromDate(new Date(data.fechaStr + "T00:00:00")) : Timestamp.now(),
               descripcion: data.descripcion
             });
 
-            Swal.fire('¡Registrado!', 'El servicio se ha guardado correctamente.', 'success');
+            // 2. Actualizar estado del equipo a MANTENIMIENTO en Firestore
+            const q = query(collection(db, "equipos"), where("codigoInterno", "==", data.codigoInterno));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+              const equipoDocRef = querySnapshot.docs[0].ref;
+              await updateDoc(equipoDocRef, { estado: "MANTENIMIENTO" });
+            }
+
+            Swal.fire('¡Registrado y Actualizado!', 'El servicio se guardó y el equipo cambió su estado a MANTENIMIENTO.', 'success');
             cargarDatos();
           } catch (error) {
             console.error("Error al guardar mantenimiento:", error);
-            Swal.fire('Error', 'No se pudo guardar el registro.', 'error');
+            Swal.fire('Error', 'No se pudo completar la operación.', 'error');
           }
         }
       });
+    };
+
+    // Autocompletar la serie si se selecciona manualmente en el menú desplegable
+    window.actualizarSerieManual = function(selectEl) {
+      const selectedValue = selectEl.value;
+      const eqMatch = listaEquiposCompletos.find(e => e.codigoInterno ===selectedValue);
+      const inputSerie = document.getElementById("newSerie");
+      if (eqMatch && inputSerie) {
+        inputSerie.value = eqMatch.numeroSerie || "";
+      } else if (inputSerie) {
+        inputSerie.value = "";
+      }
     };
 
     window.verDetalleMantenimiento = function(m) {
@@ -401,6 +563,7 @@
         title: `Servicio: ${m.codigoInterno}`,
         html: `
           <div style="text-align: left; font-size: 0.95rem; line-height: 1.6;">
+            <p><strong>Nº de Serie:</strong> ${m.numeroSerie || 'N/A'}</p>
             <p><strong>Tipo de Servicio:</strong> ${m.tipoServicio}</p>
             <p><strong>Técnico Responsable:</strong> ${m.tecnico}</p>
             <p><strong>Fecha:</strong> ${fechaStr}</p>
