@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mantenimientos y Servicios | Jurisdicción Sanitaria No. 2</title>
+  
+  <!-- Tipografía Moderna (Inter) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Íconos FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    :root {
+      --bg-principal: #ffffff;
+      --bg-secundario: #f4f4f6;
+      --tarjeta-bg: #f9f9fb;
+      --texto-titulos: #0f0f11;
+      --texto-cuerpo: #4a4a52;
+      --texto-mutado: #71717a;
+      --borde-suave: #e4e4e7;
+      --accent-black: #18181b;
+      --accent-hover: #27272a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-principal);
+      color: var(--texto-cuerpo);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 24px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-badge {
+      background-color: var(--bg-secundario);
+      color: var(--texto-titulos);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .main-container {
+      max-width: 1100px;
+      margin: 20px auto 60px auto;
+      padding: 30px;
+      background-color: var(--tarjeta-bg);
+      border: 1px solid var(--borde-suave);
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+      width: 100%;
+    }
+
+    .header-seccion {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .header-seccion h2 {
+      color: var(--texto-titulos);
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .btn-nuevo {
+      background-color: var(--accent-black);
+      color: #ffffff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-nuevo:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .controles-barra {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .controles-barra input {
+      padding: 10px 16px;
+      background-color: #ffffff;
+      border: 1px solid var(--borde-suave);
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      color: var(--texto-titulos);
+      outline: none;
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .controles-barra input:focus {
+      border-color: var(--accent-black);
+      box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.08);
+    }
+
+    .tabla-wrapper {
+      overflow-x: auto;
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid var(--borde-suave);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+
+    th, td {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--borde-suave);
+    }
+
+    th {
+      background-color: #fafafa;
+      color: var(--texto-titulos);
+      font-weight: 700;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge-tipo {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .tipo-preventivo { background: #dcfce7; color: #166534; }
+    .tipo-correctivo { background: #fee2e2; color: #991b1b; }
+    .tipo-soporte { background: #dbeafe; color: #1e40af; }
+
+    .btn-accion {
+      background: var(--bg-secundario);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--texto-titulos);
+      transition: background 0.2s;
+    }
+    .btn-accion:hover {
+      background: var(--borde-suave);
+    }
+
+    footer {
+      border-top: 1px solid var(--borde-suave);
+      padding: 20px 30px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--texto-mutado);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVEGACIÓN SUPERIOR -->
+  <nav>
+    <a href="index.html" class="brand-badge"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</a>
+    <span style="font-size: 0.85rem; color: var(--texto-mutado);">Módulo de Mantenimientos y Servicios</span>
+  </nav>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="main-container">
+    <div class="header-seccion">
+      <h2>Historial de Mantenimientos</h2>
+      <button class="btn-nuevo" onclick="abrirModalNuevoMantenimiento()"><i class="fa-solid fa-plus"></i> Registrar Servicio</button>
+    </div>
+
+    <!-- BUSCADOR -->
+    <div class="controles-barra">
+      <input type="text" id="buscador" placeholder="Buscar por código interno, tipo de servicio o técnico..." onkeyup="filtrarMantenimientos()">
+    </div>
+
+    <!-- TABLA DE MANTENIMIENTOS -->
+    <div class="tabla-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Código Interno</th>
+            <th>Tipo de Servicio</th>
+            <th>Descripción / Acciones</th>
+            <th>Técnico Responsable</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaCuerpoMantenimiento">
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--texto-mutado);">Cargando mantenimientos...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer>
+    Servicios de Salud de Yucatán &copy; 2026 | Jurisdicción Sanitaria No. 2
+  </footer>
+
+  <!-- SCRIPT DE FIREBASE Y LÓGICA -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
+      authDomain: "control-de-equipos-762c4.firebaseapp.com",
+      projectId: "control-de-equipos-762c4",
+      storageBucket: "control-de-equipos-762c4.firebasestorage.app",
+      messagingSenderId: "711982599026",
+      appId: "1:711982599026:web:ba92c737011b38f882abeb",
+      measurementId: "G-X1M2R00M55"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let listaMantenimientos = [];
+    let listaEquiposDisponibles = [];
+
+    async function cargarDatos() {
+      try {
+        // Cargar equipos para el select
+        const snapEquipos = await getDocs(collection(db, "equipos"));
+        listaEquiposDisponibles = [];
+        snapEquipos.forEach(doc => {
+          listaEquiposDisponibles.push(doc.data().codigoInterno);
+        });
+
+        // Cargar mantenimientos
+        const snapMantenimientos = await getDocs(collection(db, "mantenimientos"));
+        listaMantenimientos = [];
+        snapMantenimientos.forEach(doc => {
+          listaMantenimientos.push({ id: doc.id, ...doc.data() });
+        });
+
+        renderizarTabla();
+      } catch (error) {
+        console.error("Error al cargar datos:", error);
+        Swal.fire("Error", "No se pudo conectar con Firestore.", "error");
+      }
+    }
+
+    window.renderizarTabla = function() {
+      const tbody = document.getElementById("tablaCuerpoMantenimiento");
+      const textoBusqueda = document.getElementById("buscador").value.toLowerCase();
+
+      let filtrados = listaMantenimientos.filter(m => 
+        (m.codigoInterno && m.codigoInterno.toLowerCase().includes(textoBusqueda)) ||
+        (m.tipoServicio && m.tipoServicio.toLowerCase().includes(textoBusqueda)) ||
+        (m.tecnico && m.tecnico.toLowerCase().includes(textoBusqueda)) ||
+        (m.descripcion && m.descripcion.toLowerCase().includes(textoBusqueda))
+      );
+
+      if (filtrados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--texto-mutado);">No se encontraron registros de mantenimiento.</td></tr>`;
+        return;
+      }
+
+      let html = "";
+      filtrados.forEach(m => {
+        let claseTipo = "tipo-preventivo";
+        if (m.tipoServicio === "CORRECTIVO") claseTipo = "tipo-correctivo";
+        else if (m.tipoServicio === "SOPORTE") claseTipo = "tipo-soporte";
+
+        let fechaStr = m.fechaServicio?.toDate ? m.fechaServicio.toDate().toLocaleDateString() : 'N/A';
+
+        html += `
+          <tr>
+            <td><strong>${m.codigoInterno || 'S/C'}</strong></td>
+            <td><span class="badge-tipo ${claseTipo}">${m.tipoServicio || 'PREVENTIVO'}</span></td>
+            <td>${m.descripcion || 'Sin descripción'}</td>
+            <td>${m.tecnico || 'N/A'}</td>
+            <td>${fechaStr}</td>
+            <td>
+              <button class="btn-accion" onclick='verDetalleMantenimiento(${JSON.stringify(m)})' title="Ver Detalles"><i class="fa-solid fa-eye"></i></button>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    };
+
+    window.filtrarMantenimientos = function() {
+      renderizarTabla();
+    };
+
+    window.abrirModalNuevoMantenimiento = function() {
+      let opcionesEquipos = listaEquiposDisponibles.map(eq => `<option value="${eq}">${eq}</option>`).join('');
+
+      Swal.fire({
+        title: 'Registrar Mantenimiento o Servicio',
+        html: `
+          <div style="text-align: left; font-size: 0.9rem;">
+            <p><strong>Código Interno del Equipo:</strong> 
+              <select id="newCodigo" class="swal2-input" style="margin:5px 0 10px 0; width:100%; font-size:0.9rem;">
+                ${opcionesEquipos || '<option value="">No hay equipos cargados</option>'}
+              </select>
+            </p>
+            <p><strong>Tipo de Servicio:</strong> 
+              <select id="newTipo" class="swal2-input" style="margin:5px 0 10px 0; width:100%; font-size:0.9rem;">
+                <option value="PREVENTIVO">PREVENTIVO</option>
+                <option value="CORRECTIVO">CORRECTIVO</option>
+                <option value="SOPORTE">SOPORTE TÉCNICO</option>
+              </select>
+            </p>
+            <p><strong>Técnico Responsable:</strong> <input id="newTecnico" class="swal2-input" style="margin:5px 0 10px 0; width:100%; font-size:0.9rem;" placeholder="Nombre del técnico"></p>
+            <p><strong>Fecha del Servicio:</strong> <input type="date" id="newFecha" class="swal2-input" style="margin:5px 0 10px 0; width:100%; font-size:0.9rem;"></p>
+            <p><strong>Descripción de Acciones:</strong> <textarea id="newDesc" class="swal2-textarea" style="margin:5px 0 10px 0; width:100%; font-size:0.9rem; height:80px;" placeholder="Detalles de la reparación o mantenimiento..."></textarea></p>
+          </div>
+        `,
+        width: '600px',
+        showCancelButton: true,
+        confirmButtonText: 'Guardar Registro',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#18181b',
+        preConfirm: () => {
+          const getVal = (id) => document.getElementById(id)?.value || "";
+          return {
+            codigoInterno: getVal("newCodigo"),
+            tipoServicio: getVal("newTipo"),
+            tecnico: getVal("newTecnico"),
+            fechaStr: getVal("newFecha"),
+            descripcion: getVal("newDesc")
+          };
+        }
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const data = result.value;
+          if (!data.codigoInterno || !data.tecnico) {
+            Swal.fire('Atención', 'Por favor complete los campos obligatorios.', 'warning');
+            return;
+          }
+
+          try {
+            Swal.fire({ title: 'Guardando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            await addDoc(collection(db, "mantenimientos"), {
+              codigoInterno: data.codigoInterno,
+              tipoServicio: data.tipoServicio,
+              tecnico: data.tecnico,
+              fechaServicio: data.fechaStr ? Timestamp.fromDate(new Date(data.fechaStr + "T00:00:00")) : Timestamp.now(),
+              descripcion: data.descripcion
+            });
+
+            Swal.fire('¡Registrado!', 'El servicio se ha guardado correctamente.', 'success');
+            cargarDatos();
+          } catch (error) {
+            console.error("Error al guardar mantenimiento:", error);
+            Swal.fire('Error', 'No se pudo guardar el registro.', 'error');
+          }
+        }
+      });
+    };
+
+    window.verDetalleMantenimiento = function(m) {
+      let fechaStr = m.fechaServicio?.toDate ? m.fechaServicio.toDate().toLocaleDateString() : 'N/A';
+      Swal.fire({
+        title: `Servicio: ${m.codigoInterno}`,
+        html: `
+          <div style="text-align: left; font-size: 0.95rem; line-height: 1.6;">
+            <p><strong>Tipo de Servicio:</strong> ${m.tipoServicio}</p>
+            <p><strong>Técnico Responsable:</strong> ${m.tecnico}</p>
+            <p><strong>Fecha:</strong> ${fechaStr}</p>
+            <p><strong>Descripción:</strong> ${m.descripcion}</p>
+          </div>
+        `,
+        confirmButtonText: 'Cerrar',
+        confirmButtonColor: '#18181b'
+      });
+    };
+
+    cargarDatos();
+  </script>
+</body>
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bajas de Equipos | Jurisdicción Sanitaria No. 2</title>
+  
+  <!-- Tipografía Moderna (Inter) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Íconos FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- SweetAlert2 y QRCode Generator -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    :root {
+      --bg-principal: #ffffff;
+      --bg-secundario: #f4f4f6;
+      --tarjeta-bg: #f9f9fb;
+      --texto-titulos: #0f0f11;
+      --texto-cuerpo: #4a4a52;
+      --texto-mutado: #71717a;
+      --borde-suave: #e4e4e7;
+      --accent-black: #18181b;
+      --accent-hover: #27272a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-principal);
+      color: var(--texto-cuerpo);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 24px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-badge {
+      background-color: var(--bg-secundario);
+      color: var(--texto-titulos);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .main-container {
+      max-width: 1100px;
+      margin: 20px auto 60px auto;
+      padding: 30px;
+      background-color: var(--tarjeta-bg);
+      border: 1px solid var(--borde-suave);
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+      width: 100%;
+    }
+
+    .header-seccion {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .header-seccion h2 {
+      color: var(--texto-titulos);
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .controles-barra {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .controles-barra input, .controles-barra select {
+      padding: 10px 16px;
+      background-color: #ffffff;
+      border: 1px solid var(--borde-suave);
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      color: var(--texto-titulos);
+      outline: none;
+    }
+
+    .controles-barra input {
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .controles-barra input:focus, .controles-barra select:focus {
+      border-color: var(--accent-black);
+      box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.08);
+    }
+
+    .tabla-wrapper {
+      overflow-x: auto;
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid var(--borde-suave);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+
+    th, td {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--borde-suave);
+    }
+
+    th {
+      background-color: #fafafa;
+      color: var(--texto-titulos);
+      font-weight: 700;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .link-codigo {
+      color: #2563eb;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .link-codigo:hover {
+      text-decoration: underline;
+    }
+
+    .badge-estado {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .btn-accion {
+      background: var(--bg-secundario);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--texto-titulos);
+      transition: background 0.2s;
+    }
+    .btn-accion:hover {
+      background: var(--borde-suave);
+    }
+
+    footer {
+      border-top: 1px solid var(--borde-suave);
+      padding: 20px 30px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--texto-mutado);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVEGACIÓN SUPERIOR -->
+  <nav>
+    <a href="index.html" class="brand-badge"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</a>
+    <span style="font-size: 0.85rem; color: var(--texto-mutado);">Módulo de Bajas de Equipos</span>
+  </nav>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="main-container">
+    <div class="header-seccion">
+      <h2>Historial de Equipos Dados de Baja</h2>
+      <span id="contadorBajas" style="font-size: 0.9rem; color: var(--texto-mutado);">Cargando registros...</span>
+    </div>
+
+    <!-- BUSCADOR Y FILTROS -->
+    <div class="controles-barra">
+      <input type="text" id="buscador" placeholder="Buscar por código interno, marca, modelo o serie..." onkeyup="filtrarBajas()">
+      <select id="filtroOrden" onchange="renderizarTabla()">
+        <option value="desc">Fecha: Más reciente primero</option>
+        <option value="asc">Fecha: Más antiguo primero</option>
+      </select>
+    </div>
+
+    <!-- TABLA DE EQUIPOS DADOS DE BAJA -->
+    <div class="tabla-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Código Interno</th>
+            <th>Tipo</th>
+            <th>Marca y Modelo</th>
+            <th>Nº de Serie</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaCuerpoBajas">
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--texto-mutado);">Cargando registros de baja...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <div id="qrcode" style="display:none;"></div>
+
+  <footer>
+    Servicios de Salud de Yucatán &copy; 2026 | Jurisdicción Sanitaria No. 2
+  </footer>
+
+  <!-- SCRIPT DE FIREBASE Y LÓGICA EN TIEMPO REAL -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, doc, updateDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
+      authDomain: "control-de-equipos-762c4.firebaseapp.com",
+      projectId: "control-de-equipos-762c4",
+      storageBucket: "control-de-equipos-762c4.firebasestorage.app",
+      messagingSenderId: "711982599026",
+      appId: "1:711982599026:web:ba92c737011b38f882abeb",
+      measurementId: "G-X1M2R00M55"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let listaBajas = [];
+
+    function formatearFechaInput(campoFecha) {
+      if (!campoFecha) return "";
+      let fecha = campoFecha?.toDate ? campoFecha.toDate() : new Date(campoFecha);
+      if (isNaN(fecha.getTime())) return "";
+      return fecha.toISOString().split("T")[0];
+    }
+
+    // Escuchar únicamente equipos con estado "BAJA" en tiempo real
+    function escucharBajasEnTiempoReal() {
+      onSnapshot(collection(db, "equipos"), (querySnapshot) => {
+        listaBajas = [];
+        querySnapshot.forEach((documento) => {
+          const data = documento.data();
+          if (data.estado === "BAJA") {
+            listaBajas.push({ id: documento.id, ...data });
+          }
+        });
+        renderizarTabla();
+      }, (error) => {
+        console.error("Error al escuchar bajas:", error);
+        Swal.fire("Error", "No se pudo sincronizar el registro de bajas.", "error");
+      });
+    }
+
+    window.renderizarTabla = function() {
+      const tbody = document.getElementById("tablaCuerpoBajas");
+      const orden = document.getElementById("filtroOrden").value;
+      const textoBusqueda = document.getElementById("buscador").value.toLowerCase();
+
+      let filtrados = listaBajas.filter(eq => 
+        (eq.codigoInterno && eq.codigoInterno.toLowerCase().includes(textoBusqueda)) ||
+        (eq.marca && eq.marca.toLowerCase().includes(textoBusqueda)) ||
+        (eq.modelo && eq.modelo.toLowerCase().includes(textoBusqueda)) ||
+        (eq.numeroSerie && eq.numeroSerie.toLowerCase().includes(textoBusqueda)) ||
+        (eq.tipoEquipo && eq.tipoEquipo.toLowerCase().includes(textoBusqueda))
+      );
+
+      filtrados.sort((a, b) => {
+        const fechaA = a.fechaAlta?.toDate ? a.fechaAlta.toDate() : new Date(a.fechaAlta || 0);
+        const fechaB = b.fechaAlta?.toDate ? b.fechaAlta.toDate() : new Date(b.fechaAlta || 0);
+        return orden === "asc" ? fechaA - fechaB : fechaB - fechaA;
+      });
+
+      document.getElementById("contadorBajas").innerText = `${filtrados.length} equipos dados de baja`;
+
+      if (filtrados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--texto-mutado);">No hay equipos dados de baja registrados.</td></tr>`;
+        return;
+      }
+
+      let html = "";
+      filtrados.forEach(eq => {
+        html += `
+          <tr>
+            <td><a class="link-codigo" onclick="verDetallesEquipo('${eq.id}')">${eq.codigoInterno || 'S/C'}</a></td>
+            <td>${eq.tipoEquipo || 'N/A'}</td>
+            <td>${eq.marca || ''} ${eq.modelo || ''}</td>
+            <td>${eq.numeroSerie || 'N/A'}</td>
+            <td><span class="badge-estado">BAJA</span></td>
+            <td>
+              <button class="btn-accion" onclick="verDetallesEquipo('${eq.id}')" title="Ver Ficha y Observaciones"><i class="fa-solid fa-eye"></i></button>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    };
+
+    window.filtrarBajas = function() {
+      renderizarTabla();
+    };
+
+    window.verDetallesEquipo = function(id) {
+      const eq = listaBajas.find(item => item.id === id);
+      if (!eq) return;
+
+      Swal.fire({
+        title: `Ficha de Baja: ${eq.codigoInterno || 'Equipo'}`,
+        html: `
+          <div style="text-align: left; font-size: 0.9rem; line-height: 1.5; max-height: 65vh; overflow-y: auto; padding-right: 5px;">
+            <p><strong>Activo:</strong> 
+              <select id="editActivo" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;">
+                <option value="true" ${eq.activo !== false ? 'selected' : ''}>true (Activo)</option>
+                <option value="false" ${eq.activo === false ? 'selected' : ''}>false (Inactivo)</option>
+              </select>
+            </p>
+            <p><strong>Código Interno:</strong> <input id="editCodigoInterno" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.codigoInterno || ''}"></p>
+            <p><strong>Código QR:</strong> <input id="editCodigoQr" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.codigoQr || ''}"></p>
+            <p><strong>Tipo de Equipo:</strong> <input id="editTipo" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.tipoEquipo || ''}"></p>
+            <p><strong>Marca:</strong> <input id="editMarca" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.marca || ''}"></p>
+            <p><strong>Modelo:</strong> <input id="editModelo" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.modelo || ''}"></p>
+            <p><strong>Número de Serie:</strong> <input id="editSerie" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.numeroSerie || ''}"></p>
+            
+            <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
+            <h4 style="margin-bottom:8px; color:#18181b;">Especificaciones</h4>
+            <p><strong>Procesador:</strong> <input id="editProc" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.procesador || ''}"></p>
+            <p><strong>RAM (GB):</strong> <input type="number" id="editRam" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.ramGb || 0}"></p>
+            <p><strong>Almacenamiento (GB):</strong> <input type="number" id="editAlm" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.almacenamientoGb || 0}"></p>
+            <p><strong>Tipo Almacenamiento:</strong> <input id="editTipoAlm" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.tipoAlmacenamiento || ''}"></p>
+            <p><strong>Sistema Operativo:</strong> <input id="editSo" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.sistemaOperativo || ''}"></p>
+            
+            <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
+            <p><strong>Estado:</strong> 
+              <select id="editEstado" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;">
+                <option value="DISPONIBLE" ${eq.estado === 'DISPONIBLE' ? 'selected' : ''}>DISPONIBLE</option>
+                <option value="EN USO" ${eq.estado === 'EN USO' ? 'selected' : ''}>EN USO</option>
+                <option value="MANTENIMIENTO" ${eq.estado === 'MANTENIMIENTO' ? 'selected' : ''}>MANTENIMIENTO</option>
+                <option value="RESGUARDO" ${eq.estado === 'RESGUARDO' ? 'selected' : ''}>RESGUARDO</option>
+                <option value="BAJA" ${eq.estado === 'BAJA' ? 'selected' : ''}>BAJA</option>
+              </select>
+            </p>
+
+            <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
+            <h4 style="margin-bottom:8px; color:#18181b;">Fechas del Registro</h4>
+            <p><strong>Fecha Adquisición:</strong> <input type="date" id="editFechaAdq" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${formatearFechaInput(eq.fechaAdquisicion)}"></p>
+            <p><strong>Fecha Alta:</strong> <input type="date" id="editFechaAlta" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${formatearFechaInput(eq.fechaAlta)}"></p>
+            <p><strong>Fecha Fin Garantía:</strong> <input type="date" id="editFechaGarantia" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${formatearFechaInput(eq.fechaFinGarantia)}"></p>
+
+            <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
+            <h4 style="margin-bottom:8px; color:#18181b;">Ubicación (ubicacionRef)</h4>
+            <p><strong>Área:</strong> <input id="editArea" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.ubicacionRef?.area || ''}"></p>
+            <p><strong>ID Sede:</strong> <input id="editIdSede" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.ubicacionRef?.idSede || ''}"></p>
+            <p><strong>ID Ubicación:</strong> <input id="editIdUbicacion" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.ubicacionRef?.idUbicacion || ''}"></p>
+
+            <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
+            <!-- OBSERVACIONES / MOTIVO DE BAJA COLOCADAS AL FINAL -->
+            <p><strong>Observaciones / Motivo de Baja:</strong> <textarea id="editObs" class="swal2-textarea" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem; height:80px; resize:vertical;">${eq.observaciones || ''}</textarea></p>
+          </div>
+        `,
+        width: '650px',
+        showCancelButton: true,
+        confirmButtonText: 'Guardar Cambios',
+        cancelButtonText: 'Cerrar',
+        confirmButtonColor: '#18181b',
+        preConfirm: () => {
+          const getVal = (fieldId) => {
+            const el = document.getElementById(fieldId);
+            return el ? el.value : "";
+          };
+
+          const datosActualizados = {
+            activo: getVal("editActivo") === "true",
+            codigoInterno: getVal("editCodigoInterno"),
+            codigoQr: getVal("editCodigoQr"),
+            tipoEquipo: getVal("editTipo"),
+            marca: getVal("editMarca"),
+            modelo: getVal("editModelo"),
+            numeroSerie: getVal("editSerie"),
+            especificaciones: {
+              procesador: getVal("editProc"),
+              ramGb: Number(getVal("editRam")) || 0,
+              almacenamientoGb: Number(getVal("editAlm")) || 0,
+              tipoAlmacenamiento: getVal("editTipoAlm"),
+              sistemaOperativo: getVal("editSo")
+            },
+            estado: getVal("editEstado"),
+            ubicacionRef: {
+              area: getVal("editArea"),
+              idSede: getVal("editIdSede"),
+              idUbicacion: getVal("editIdUbicacion")
+            },
+            observaciones: getVal("editObs")
+          };
+
+          const fAdqVal = getVal("editFechaAdq");
+          const fAltaVal = getVal("editFechaAlta");
+          const fGarVal = getVal("editFechaGarantia");
+
+          if (fAdqVal) datosActualizados.fechaAdquisicion = Timestamp.fromDate(new Date(fAdqVal + "T00:00:00"));
+          if (fAltaVal) datosActualizados.fechaAlta = Timestamp.fromDate(new Date(fAltaVal + "T00:00:00"));
+          if (fGarVal) datosActualizados.fechaFinGarantia = Timestamp.fromDate(new Date(fGarVal + "T00:00:00"));
+
+          return datosActualizados;
+        }
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            Swal.fire({ title: 'Guardando...', text: 'Actualizando registro en Firestore', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            const eqRef = doc(db, "equipos", id);
+            await updateDoc(eqRef, result.value);
+
+            Swal.fire('¡Actualizado!', 'La información del equipo se ha actualizado correctamente.', 'success');
+          } catch (error) {
+            console.error("Error al actualizar baja:", error);
+            Swal.fire('Error', `No se pudieron guardar los cambios: ${error.message}`, 'error');
+          }
+        }
+      });
+    };
+
+    // Inicializar la escucha en tiempo real de bajas
+    escucharBajasEnTiempoReal();
+  </script>
+</body>
+</html>
