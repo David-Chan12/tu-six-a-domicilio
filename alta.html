@@ -292,16 +292,6 @@
         <input type="text" id="area" placeholder="Ej. Sistemas e Informática" required>
       </div>
 
-      <div class="form-group">
-        <label for="idSede">ID Sede</label>
-        <input type="text" id="idSede" placeholder="Ej. Z5w1j5ApzkZachrCzfBf">
-      </div>
-
-      <div class="form-group">
-        <label for="idUbicacion">ID Ubicación</label>
-        <input type="text" id="idUbicacion" placeholder="Ej. EOJnqOd21Ggo98eBr22z">
-      </div>
-
       <!-- Observaciones -->
       <div class="seccion-titulo">Observaciones</div>
       <div class="form-group full-width">
@@ -319,7 +309,7 @@
     Servicios de Salud de Yucatán &copy; 2026 | Jurisdicción Sanitaria No. 2
   </footer>
 
-  <!-- SCRIPT DE FIREBASE Y LÓGICA DE REGISTRO -->
+  <!-- SCRIPT DE FIREBASE Y LÓGICA DE REGISTRO CON LECTURA SEGURA -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -340,7 +330,15 @@
     window.registrarEquipo = async function(event) {
       event.preventDefault();
 
-      const codigoInterno = document.getElementById("codigoInterno").value.trim();
+      // Función auxiliar segura para extraer valores sin riesgo de errores null
+      const getVal = (id) => document.getElementById(id)?.value?.trim() || "";
+
+      const codigoInterno = getVal("codigoInterno");
+      if (!codigoInterno) {
+        Swal.fire('Atención', 'El código interno es obligatorio.', 'warning');
+        return;
+      }
+
       const codigoQr = `QR-${codigoInterno}`;
 
       Swal.fire({
@@ -351,34 +349,34 @@
       });
 
       try {
-        const fAdq = document.getElementById("fechaAdquisicion").value;
-        const fGar = document.getElementById("fechaFinGarantia").value;
+        const fAdq = getVal("fechaAdquisicion");
+        const fGar = getVal("fechaFinGarantia");
 
         const nuevoEquipo = {
           activo: true,
           codigoInterno: codigoInterno,
           codigoQr: codigoQr,
-          tipoEquipo: document.getElementById("tipoEquipo").value,
-          marca: document.getElementById("marca").value.trim(),
-          modelo: document.getElementById("modelo").value.trim(),
-          numeroSerie: document.getElementById("numeroSerie").value.trim(),
-          estado: document.getElementById("estado").value,
+          tipoEquipo: getVal("tipoEquipo"),
+          marca: getVal("marca"),
+          modelo: getVal("modelo"),
+          numeroSerie: getVal("numeroSerie"),
+          estado: getVal("estado"),
           especificaciones: {
-            procesador: document.getElementById("procesador").value.trim(),
-            ramGb: Number(document.getElementById("ramGb").value) || 0,
-            almacenamientoGb: Number(document.getElementById("almacenamientoGb").value) || 0,
-            tipoAlmacenamiento: document.getElementById("tipoAlmacenamiento").value.trim(),
-            sistemaOperativo: document.getElementById("sistemaOperativo").value.trim()
+            procesador: getVal("procesador"),
+            ramGb: Number(getVal("ramGb")) || 0,
+            almacenamientoGb: Number(getVal("almacenamientoGb")) || 0,
+            tipoAlmacenamiento: getVal("tipoAlmacenamiento"),
+            sistemaOperativo: getVal("sistemaOperativo")
           },
           fechaAdquisicion: fAdq ? Timestamp.fromDate(new Date(fAdq + "T00:00:00")) : null,
           fechaAlta: Timestamp.now(),
           fechaFinGarantia: fGar ? Timestamp.fromDate(new Date(fGar + "T00:00:00")) : null,
           ubicacionRef: {
-            area: document.getElementById("area").value.trim(),
-            idSede: document.getElementById("idSede").value.trim(),
-            idUbicacion: document.getElementById("idUbicacion").value.trim()
+            area: getVal("area"),
+            idSede: "",       // Campo omitido de forma segura
+            idUbicacion: ""   // Campo omitido de forma segura
           },
-          observaciones: document.getElementById("observaciones").value.trim()
+          observaciones: getVal("observaciones")
         };
 
         // Guardar en Firestore
