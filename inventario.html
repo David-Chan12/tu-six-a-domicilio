@@ -390,8 +390,6 @@
             <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
             <h4 style="margin-bottom:8px; color:#18181b;">Ubicación (ubicacionRef)</h4>
             <p><strong>Área:</strong> <input id="editArea" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.ubicacionRef?.area || ''}"></p>
-            <p><strong>ID Sede:</strong> <input id="editIdSede" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.ubicacionRef?.idSede || ''}"></p>
-            <p><strong>ID Ubicación:</strong> <input id="editIdUbicacion" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.ubicacionRef?.idUbicacion || ''}"></p>
 
             <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
             <!-- OBSERVACIONES COLOCADAS EXACTAMENTE AL FINAL -->
@@ -404,7 +402,6 @@
         cancelButtonText: 'Cancelar',
         confirmButtonColor: '#18181b',
         preConfirm: () => {
-          // Capturar los valores de forma segura antes de que se cierre el modal
           const getVal = (id) => {
             const el = document.getElementById(id);
             return el ? el.value : "";
@@ -428,8 +425,8 @@
             estado: getVal("editEstado"),
             ubicacionRef: {
               area: getVal("editArea"),
-              idSede: getVal("editIdSede"),
-              idUbicacion: getVal("editIdUbicacion")
+              idSede: "",
+              idUbicacion: ""
             },
             observaciones: getVal("editObs")
           };
