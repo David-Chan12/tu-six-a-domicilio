@@ -15,15 +15,19 @@
 
   <style>
     :root {
-      --bg-principal: #ffffff;
-      --bg-secundario: #f4f4f6;
-      --tarjeta-bg: #f9f9fb;
-      --texto-titulos: #0f0f11;
+      /* Paleta Institucional Renacimiento Maya Yucatán */
+      --yucatan-guinda: #8A1538;
+      --yucatan-guinda-hover: #6E102C;
+      --yucatan-guinda-suave: rgba(138, 21, 56, 0.08);
+      --yucatan-dorado: #C59B49;
+      --yucatan-dorado-suave: #FAF6EE;
+      
+      --bg-principal: #f4f3ef;
+      --bg-tarjeta: #ffffff;
+      --texto-titulos: #18181b;
       --texto-cuerpo: #4a4a52;
       --texto-mutado: #71717a;
-      --borde-suave: #e4e4e7;
-      --accent-black: #18181b;
-      --accent-hover: #27272a;
+      --borde-suave: #e5e2dc;
     }
 
     * {
@@ -43,50 +47,180 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    nav {
-      max-width: 1200px;
-      margin: 0 auto;
+    /* ENCABEZADO SUPERIOR */
+    .header-institucional {
       width: 100%;
-      padding: 24px 20px;
+      background-color: var(--bg-principal);
+      border-bottom: 1px solid var(--borde-suave);
+      padding: 18px 24px;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
     }
 
-    .brand-badge {
-      background-color: var(--bg-secundario);
-      color: var(--texto-titulos);
-      padding: 8px 16px;
-      border-radius: 20px;
+    .header-institucional img {
+      max-width: 900px;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      transform: translateX(65px);
+    }
+
+    /* CONTENEDOR PRINCIPAL */
+    .split-layout {
+      max-width: 1140px;
+      margin: 20px auto 40px auto;
+      width: 100%;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 56px;
+      align-items: center;
+    }
+
+    /* COLUMNA IZQUIERDA: TARJETA VISUAL CON TRANSICIÓN LIMPIA DE 5 SEGUNDOS */
+    .visual-column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .logo-showcase-card {
+      background-color: var(--bg-tarjeta);
+      border: 1px solid var(--borde-suave);
+      border-top: 5px solid var(--yucatan-guinda);
+      border-radius: 24px;
+      padding: 50px 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      min-height: 280px;
+    }
+
+    .logo-showcase-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--yucatan-guinda), var(--yucatan-dorado));
+    }
+
+    .glitch-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 120px;
+    }
+
+    .glitch-element {
+      position: absolute;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* Letrero Pixel Art maximizado y limpio */
+    .pixel-sign {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: 800;
+      font-size: 3.2rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background-image: linear-gradient(180deg, var(--yucatan-guinda), #6E102C);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 1px 1px 0px var(--yucatan-dorado);
+      image-rendering: pixelated;
+      white-space: nowrap;
+    }
+
+    .glitch-image {
+      max-width: 100%;
+      width: 320px;
+      height: auto;
+      object-fit: contain;
+    }
+
+    /* ANIMACIÓN DE 10 SEGUNDOS: 
+       - 0% a 48%: Se ve "BIENVENIDOS" totalmente fijo y claro.
+       - 48% a 50%: Destello rápido de glitch (2%).
+       - 50% a 98%: Se ve la imagen de la Secretaría de Salud FIJA y completa por 5 segundos.
+       - 98% a 100%: Destello de regreso. */
+    .show-welcome {
+      animation: holdWelcome 10s infinite;
+    }
+
+    .show-logo {
+      animation: holdLogo 10s infinite;
+    }
+
+    @keyframes holdWelcome {
+      0%, 48% { opacity: 1; transform: translate(0); filter: none; }
+      49% { opacity: 0; transform: skewX(-15deg) translateX(-8px); filter: blur(2px); }
+      50%, 100% { opacity: 0; transform: translate(0); }
+    }
+
+    @keyframes holdLogo {
+      0%, 49% { opacity: 0; transform: translate(0); filter: none; }
+      50% { opacity: 0; transform: skewX(15deg) translateX(8px); filter: blur(2px); }
+      51%, 98% { opacity: 1; transform: translate(0); filter: none; }
+      99%, 100% { opacity: 0; transform: translate(0); }
+    }
+
+    .visual-caption {
       font-size: 0.85rem;
+      color: var(--texto-mutado);
+      line-height: 1.5;
+      padding-left: 4px;
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .visual-caption strong {
+      color: var(--yucatan-guinda);
       font-weight: 600;
     }
 
-    .auth-container {
-      max-width: 480px;
-      margin: 20px auto 60px auto;
-      padding: 40px;
-      background-color: var(--tarjeta-bg);
+    /* COLUMNA DERECHA: FORMULARIO */
+    .auth-column {
+      background-color: var(--bg-tarjeta);
       border: 1px solid var(--borde-suave);
       border-radius: 24px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+      padding: 40px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
       width: 100%;
+      max-width: 460px;
     }
 
-    .auth-container h2 {
+    .auth-column h1 {
       color: var(--texto-titulos);
-      font-size: 4.00rem;
+      font-size: 2.3rem;
       font-weight: 800;
-      letter-spacing: -0.5px;
-      margin-bottom: 8px;
-      text-align: center;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 10px;
     }
 
-    .auth-container p.sub {
+    .auth-column h1 span {
+      color: var(--yucatan-guinda);
+    }
+
+    .auth-column p.sub {
       color: var(--texto-mutado);
       font-size: 0.95rem;
-      text-align: center;
-      margin-bottom: 30px;
+      line-height: 1.5;
+      margin-bottom: 28px;
     }
 
     .form-group {
@@ -103,7 +237,7 @@
 
     input {
       width: 100%;
-      padding: 12px 16px;
+      padding: 13px 16px;
       background-color: #ffffff;
       border: 1px solid var(--borde-suave);
       border-radius: 12px;
@@ -115,12 +249,12 @@
 
     input:focus {
       outline: none;
-      border-color: var(--accent-black);
-      box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.08);
+      border-color: var(--yucatan-guinda);
+      box-shadow: 0 0 0 3px var(--yucatan-guinda-suave);
     }
 
     .btn-submit {
-      background-color: var(--accent-black);
+      background-color: var(--yucatan-guinda);
       color: #ffffff;
       border: none;
       width: 100%;
@@ -129,36 +263,14 @@
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background-color 0.2s ease;
-      margin-top: 10px;
+      transition: all 0.2s ease;
+      margin-top: 6px;
+      box-shadow: 0 4px 12px rgba(138, 21, 56, 0.2);
     }
 
     .btn-submit:hover {
-      background-color: var(--accent-hover);
-    }
-
-    /* Botón de Registro secundario que reemplaza al de Google */
-    .btn-link-registro {
-      background-color: #ffffff;
-      color: var(--texto-titulos);
-      border: 1px solid var(--borde-suave);
-      width: 100%;
-      padding: 12px;
-      border-radius: 12px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      text-decoration: none;
-      transition: background-color 0.2s ease;
-      margin-top: 15px;
-    }
-
-    .btn-link-registro:hover {
-      background-color: var(--bg-secundario);
+      background-color: var(--yucatan-guinda-hover);
+      transform: translateY(-1px);
     }
 
     .separator {
@@ -176,63 +288,124 @@
       border-bottom: 1px solid var(--borde-suave);
     }
 
-    .separator::before { margin-right: 10px; }
-    .separator::after { margin-left: 10px; }
+    .separator::before { margin-right: 12px; }
+    .separator::after { margin-left: 12px; }
 
+    .btn-link-registro {
+      background-color: #ffffff;
+      color: var(--texto-titulos);
+      border: 1px solid var(--borde-suave);
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-link-registro:hover {
+      background-color: var(--yucatan-dorado-suave);
+      border-color: var(--yucatan-dorado);
+      color: var(--yucatan-guinda);
+    }
+
+    /* PIE DE PÁGINA */
     footer {
       border-top: 1px solid var(--borde-suave);
-      padding: 20px 30px;
+      padding: 18px 30px;
       text-align: center;
       font-size: 0.85rem;
       color: var(--texto-mutado);
+      background-color: var(--bg-principal);
     }
 
-    @media (max-width: 480px) {
-      .auth-container {
-        padding: 20px;
-        margin: 10px;
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .split-layout {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      .header-institucional img {
+        transform: none;
+      }
+      .logo-showcase-card {
+        padding: 35px 20px;
+      }
+      .pixel-sign {
+        font-size: 2rem;
+      }
+      .auth-column {
+        padding: 24px;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAVEGACIÓN SUPERIOR -->
-  <nav>
-    <div class="brand-badge">Jurisdicción Sanitaria No. 2</div>
-    <span style="font-size: 0.85rem; color: var(--texto-mutado);">Control Patrimonial de TI</span>
-  </nav>
+  <!-- ENCABEZADO SUPERIOR INSTITUCIONAL -->
+  <header class="header-institucional">
+    <img src="C:/Users/djcch/OneDrive/Documentos/Proyecto para Residencia/nuevos logos local/nuevos logos local/encabezados/header_2520.jpg" alt="Gobierno del Estado de Yucatán - Secretaría de Salud">
+  </header>
 
-  <!-- CONTENEDOR PRINCIPAL DE ACCESO -->
-  <main class="auth-container">
-    <h2>Bienvenido</h2>
-    <p class="sub">Ingresa con tus credenciales institucionales.</p>
-
-    <form id="formLogin" onsubmit="manejarLogin(event)">
-      <div class="form-group">
-        <label for="email">Correo Electrónico</label>
-        <input type="email" id="email" required placeholder="correo@ejemplo.com">
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="split-layout">
+    
+    <!-- COLUMNA IZQUIERDA: TARJETA VISUAL CON TIEMPOS ESTABLES -->
+    <section class="visual-column">
+      <div class="logo-showcase-card">
+        <div class="glitch-container">
+          <!-- Letrero de Bienvenida (Estático 5 segundos) -->
+          <div class="glitch-element show-welcome">
+            <span class="pixel-sign">BIENVENIDO</span>
+          </div>
+          <!-- Imagen de la Secretaría de Salud (Estática y completa 5 segundos) -->
+          <div class="glitch-element show-logo">
+            <img src="C:/Users/djcch/OneDrive/Documentos/Proyecto para Residencia/nuevos logos local/nuevos logos local/logos/logo_secretaria_salud.jpg" alt="Secretaría de Salud" class="glitch-image">
+          </div>
+        </div>
       </div>
+      <p class="visual-caption">
+        Módulo centralizado de trazabilidad, mantenimiento y resguardo de equipos de cómputo para los <strong>Servicios de Salud de Yucatán</strong>.
+      </p>
+    </section>
 
-      <div class="form-group">
-        <label for="password">Contraseña</label>
-        <input type="password" id="password" required placeholder="••••••••">
-      </div>
+    <!-- COLUMNA DERECHA: FORMULARIO DE INICIO DE SESIÓN -->
+    <section class="auth-column">
+      <h1>Iniciar <span>Sesión</span></h1>
+      <p class="sub">Ingresa con tus credenciales institucionales para gestionar el inventario tecnológico.</p>
 
-      <button type="submit" class="btn-submit">Iniciar Sesión</button>
-    </form>
+      <form id="formLogin" onsubmit="manejarLogin(event)">
+        <div class="form-group">
+          <label for="email">Correo Electrónico</label>
+          <input type="email" id="email" required placeholder="usuario@salud.yucatan.gob.mx">
+        </div>
 
-    <div class="separator">¿No tienes cuenta?</div>
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" required placeholder="••••••••">
+        </div>
 
-    <!-- Botón que toma el lugar del de Google para ir al registro -->
-    <a href="registro.html" class="btn-link-registro">
-      <i class="fa-solid fa-user-plus" style="color: var(--texto-titulos);"></i> Crear una cuenta nueva
-    </a>
+        <button type="submit" class="btn-submit">Acceder al Sistema</button>
+      </form>
+
+      <div class="separator">¿No tienes cuenta?</div>
+
+      <a href="registro.html" class="btn-link-registro">
+        <i class="fa-solid fa-user-plus" style="color: var(--yucatan-dorado);"></i> Crear una cuenta nueva
+      </a>
+    </section>
+
   </main>
 
   <!-- PIE DE PÁGINA -->
   <footer>
-    Servicios de Salud de Yucatán &copy; 2026 | Plataforma Web de Inventarios
+    Servicios de Salud de Yucatán &copy; 2026 | Jurisdicción Sanitaria No. 2
   </footer>
 
   <!-- SCRIPTS DE FIREBASE Y LÓGICA DE ACCESO -->
@@ -244,7 +417,6 @@
       signInWithEmailAndPassword 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // Credenciales de tu base de datos Firebase[cite: 10]
     const firebaseConfig = {
       apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
       authDomain: "control-de-equipos-762c4.firebaseapp.com",
@@ -259,20 +431,22 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // Función de Inicio de Sesión con Correo y Contraseña
     window.manejarLogin = async function(event) {
       event.preventDefault();
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
 
       try {
-        Swal.fire({ title: 'Iniciando sesión...', text: 'Verificando credenciales', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ 
+          title: 'Iniciando sesión...', 
+          text: 'Verificando credenciales', 
+          allowOutsideClick: false, 
+          didOpen: () => Swal.showLoading() 
+        });
 
-        // 1. Validar en Firebase Auth[cite: 9]
         const credenciales = await signInWithEmailAndPassword(auth, email, password);
         const uid = credenciales.user.uid;
 
-        // 2. Comprobar perfil y rol en Firestore[cite: 9]
         const docSnap = await getDoc(doc(db, "usuarios", uid));
         if (docSnap.exists() && docSnap.data().activo) {
           const usuarioData = docSnap.data();
@@ -281,18 +455,29 @@
             title: `¡Bienvenido, ${usuarioData.nombre}!`,
             text: `Rol asignado: ${usuarioData.rol}`,
             icon: 'success',
+            iconColor: '#8A1538',
             timer: 1800,
             showConfirmButton: false
           }).then(() => {
             window.location.href = "index.html";
           });
         } else {
-          Swal.fire('Acceso denegado', 'El usuario no existe o se encuentra desactivado en la base de datos.', 'error');
+          Swal.fire({
+            title: 'Acceso denegado',
+            text: 'El usuario no existe o se encuentra desactivado en la base de datos.',
+            icon: 'error',
+            confirmButtonColor: '#8A1538'
+          });
         }
 
       } catch (error) {
         console.error("Error en login:", error);
-        Swal.fire('Error de Acceso', 'Correo o contraseña incorrectos.', 'error');
+        Swal.fire({
+          title: 'Error de Acceso',
+          text: 'Correo o contraseña incorrectos.',
+          icon: 'error',
+          confirmButtonColor: '#8A1538'
+        });
       }
     };
   </script>

@@ -1,0 +1,3 @@
+Descomprimir el archivo logos.zip en la ruta C:\wamp\www\sissy\images\logos
+Descomprimir el archivo encabezados.zip en la ruta C:\wamp\www\sissy\images\headers
+Descomprimir el archivo otros.zip en C:\wamp\www\sissy\images
