@@ -68,13 +68,13 @@
 
     /* CONTENEDOR PRINCIPAL */
     .split-layout {
-      max-width: 1140px;
+      max-width: 1180px;
       margin: 20px auto 40px auto;
       width: 100%;
       padding: 0 24px;
       display: grid;
-      grid-template-columns: 1.15fr 1fr;
-      gap: 56px;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 48px;
       align-items: center;
     }
 
@@ -90,7 +90,7 @@
       border: 1px solid var(--borde-suave);
       border-top: 5px solid var(--yucatan-guinda);
       border-radius: 24px;
-      padding: 50px 30px;
+      padding: 46px 24px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
       display: flex;
       flex-direction: column;
@@ -98,7 +98,7 @@
       justify-content: center;
       position: relative;
       overflow: hidden;
-      min-height: 280px;
+      min-height: 290px;
     }
 
     .logo-showcase-card::after {
@@ -117,7 +117,7 @@
       align-items: center;
       justify-content: center;
       width: 100%;
-      min-height: 120px;
+      min-height: 130px;
     }
 
     .glitch-element {
@@ -127,20 +127,22 @@
       align-items: center;
       justify-content: center;
       text-align: center;
+      padding: 0 8px;
     }
 
-    /* Letrero Pixel Art maximizado y limpio */
+    /* Letrero Pixel Art expandido a lo ancho del rectángulo con alta visibilidad */
     .pixel-sign {
+      display: block;
+      width: 100%;
       font-family: 'Courier New', Courier, monospace;
-      font-weight: 800;
-      font-size: 3.2rem;
-      letter-spacing: 2px;
+      font-weight: 900;
+      font-size: clamp(2.4rem, 5.2vw, 4.35rem);
+      line-height: 1;
+      letter-spacing: clamp(2px, 0.45vw, 7px);
       text-transform: uppercase;
-      background-image: linear-gradient(180deg, var(--yucatan-guinda), #6E102C);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow: 1px 1px 0px var(--yucatan-dorado);
+      color: var(--yucatan-dorado);
+      -webkit-text-stroke: 1.5px var(--yucatan-guinda);
+      text-shadow: 0 3px 0 var(--yucatan-guinda), 0 6px 14px rgba(138, 21, 56, 0.22);
       image-rendering: pixelated;
       white-space: nowrap;
     }
@@ -152,8 +154,8 @@
       object-fit: contain;
     }
 
-    /* ANIMACIÓN DE 10 SEGUNDOS: 
-       - 0% a 48%: Se ve "BIENVENIDOS" totalmente fijo y claro.
+    /* ANIMACIÓN DE 10 SEGUNDOS:
+       - 0% a 48%: Se ve "BIENVENIDO" totalmente fijo y claro.
        - 48% a 50%: Destello rápido de glitch (2%).
        - 50% a 98%: Se ve la imagen de la Secretaría de Salud FIJA y completa por 5 segundos.
        - 98% a 100%: Destello de regreso. */
@@ -335,10 +337,11 @@
         transform: none;
       }
       .logo-showcase-card {
-        padding: 35px 20px;
+        padding: 35px 18px;
       }
       .pixel-sign {
-        font-size: 2rem;
+        font-size: clamp(1.85rem, 8.2vw, 2.8rem);
+        letter-spacing: 2px;
       }
       .auth-column {
         padding: 24px;
@@ -411,11 +414,8 @@
   <!-- SCRIPTS DE FIREBASE Y LÓGICA DE ACCESO -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { 
-      getAuth, 
-      signInWithEmailAndPassword 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
@@ -450,6 +450,16 @@
         const docSnap = await getDoc(doc(db, "usuarios", uid));
         if (docSnap.exists() && docSnap.data().activo) {
           const usuarioData = docSnap.data();
+
+          // Guardar registro de auditoría en Firestore
+          await addDoc(collection(db, "historial_accesos"), {
+            uid: uid,
+            nombre: usuarioData.nombre,
+            email: email,
+            rol: usuarioData.rol,
+            fecha: Timestamp.now(),
+            navegador: navigator.platform || "Navegador Web"
+          });
           
           Swal.fire({
             title: `¡Bienvenido, ${usuarioData.nombre}!`,

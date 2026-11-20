@@ -16,15 +16,17 @@
 
   <style>
     :root {
-      --bg-principal: #ffffff;
-      --bg-secundario: #f4f4f6;
-      --tarjeta-bg: #f9f9fb;
-      --texto-titulos: #0f0f11;
+      --yucatan-guinda: #8A1538;
+      --yucatan-guinda-hover: #6E102C;
+      --yucatan-guinda-suave: rgba(138, 21, 56, 0.08);
+      --yucatan-dorado: #C59B49;
+      --yucatan-dorado-suave: #FAF6EE;
+      --bg-principal: #f4f3ef;
+      --bg-tarjeta: #ffffff;
+      --texto-titulos: #18181b;
       --texto-cuerpo: #4a4a52;
       --texto-mutado: #71717a;
-      --borde-suave: #e4e4e7;
-      --accent-black: #18181b;
-      --accent-hover: #27272a;
+      --borde-suave: #e5e2dc;
     }
 
     * {
@@ -44,42 +46,80 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* BARRA SUPERIOR */
     nav {
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 100%;
-      padding: 24px 20px;
+      background-color: var(--bg-tarjeta);
+      border-bottom: 1px solid var(--borde-suave);
+      padding: 16px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .brand-badge {
-      background-color: var(--bg-secundario);
-      color: var(--texto-titulos);
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-volver {
+      background-color: var(--yucatan-guinda-suave);
+      color: var(--yucatan-guinda);
       padding: 8px 16px;
-      border-radius: 20px;
+      border-radius: 12px;
       font-size: 0.85rem;
-      font-weight: 600;
+      font-weight: 700;
       text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-volver:hover {
+      background-color: var(--yucatan-guinda);
+      color: #ffffff;
+    }
+
+    .nav-title {
+      font-weight: 800;
+      color: var(--texto-titulos);
+      font-size: 1.1rem;
+    }
+
+    .nav-title span {
+      color: var(--yucatan-guinda);
+    }
+
+    .rol-pill {
+      background-color: var(--yucatan-dorado-suave);
+      color: var(--yucatan-guinda);
+      border: 1px solid rgba(197, 155, 73, 0.45);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
     }
 
     .main-container {
-      max-width: 1100px;
-      margin: 20px auto 60px auto;
-      padding: 30px;
-      background-color: var(--tarjeta-bg);
+      max-width: 1140px;
+      margin: 32px auto 60px auto;
+      padding: 32px;
+      background-color: var(--bg-tarjeta);
       border: 1px solid var(--borde-suave);
+      border-top: 5px solid var(--yucatan-guinda);
       border-radius: 24px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-      width: 100%;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.04);
+      width: 94%;
     }
 
     .header-seccion {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 18px;
       flex-wrap: wrap;
       gap: 15px;
     }
@@ -89,6 +129,43 @@
       font-size: 1.8rem;
       font-weight: 800;
       letter-spacing: -0.5px;
+    }
+
+    .header-seccion h2 span {
+      color: var(--yucatan-guinda);
+    }
+
+    .contador-pill {
+      background-color: var(--yucatan-dorado-suave);
+      color: var(--yucatan-guinda);
+      border: 1px solid rgba(197, 155, 73, 0.45);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    /* Aviso visible solo cuando el usuario está en modo CONSULTA */
+    .aviso-solo-lectura {
+      display: none;
+      background-color: var(--yucatan-dorado-suave);
+      border: 1px solid rgba(197, 155, 73, 0.55);
+      color: var(--yucatan-guinda);
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      align-items: center;
+      gap: 10px;
+    }
+
+    body.solo-lectura .aviso-solo-lectura {
+      display: flex;
+    }
+
+    body.solo-lectura .btn-editar-fila {
+      display: none !important;
     }
 
     .controles-barra {
@@ -107,6 +184,7 @@
       font-size: 0.95rem;
       color: var(--texto-titulos);
       outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .controles-barra input {
@@ -115,8 +193,8 @@
     }
 
     .controles-barra input:focus, .controles-barra select:focus {
-      border-color: var(--accent-black);
-      box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.08);
+      border-color: var(--yucatan-guinda);
+      box-shadow: 0 0 0 3px var(--yucatan-guinda-suave);
     }
 
     .tabla-wrapper {
@@ -139,9 +217,13 @@
     }
 
     th {
-      background-color: #fafafa;
+      background-color: var(--bg-principal);
       color: var(--texto-titulos);
       font-weight: 700;
+    }
+
+    tr:hover td {
+      background-color: #faf9f7;
     }
 
     tr:last-child td {
@@ -149,7 +231,7 @@
     }
 
     .link-codigo {
-      color: #2563eb;
+      color: var(--yucatan-guinda);
       font-weight: 700;
       text-decoration: none;
       cursor: pointer;
@@ -172,25 +254,37 @@
     .estado-baja { background: #fee2e2; color: #991b1b; }
 
     .btn-accion {
-      background: var(--bg-secundario);
+      background: var(--yucatan-guinda-suave);
       border: none;
-      padding: 6px 12px;
+      padding: 7px 12px;
       border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
-      color: var(--texto-titulos);
-      transition: background 0.2s;
+      color: var(--yucatan-guinda);
+      transition: all 0.2s;
+      margin-right: 4px;
     }
     .btn-accion:hover {
-      background: var(--borde-suave);
+      background: var(--yucatan-guinda);
+      color: #ffffff;
     }
 
     footer {
       border-top: 1px solid var(--borde-suave);
-      padding: 20px 30px;
+      padding: 18px 24px;
       text-align: center;
       font-size: 0.85rem;
       color: var(--texto-mutado);
+      background-color: var(--bg-tarjeta);
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        padding: 14px 18px;
+      }
+      .main-container {
+        padding: 22px 18px;
+      }
     }
   </style>
 </head>
@@ -198,15 +292,23 @@
 
   <!-- NAVEGACIÓN SUPERIOR -->
   <nav>
-    <a href="index.html" class="brand-badge"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</a>
-    <span style="font-size: 0.85rem; color: var(--texto-mutado);">Módulo de Inventario General</span>
+    <div class="nav-left">
+      <a href="index.html" class="btn-volver"><i class="fa-solid fa-arrow-left"></i> Inicio</a>
+      <div class="nav-title">Inventario y <span>Ubicación</span></div>
+    </div>
+    <span id="badgeRolActual" class="rol-pill">Módulo de Inventario General</span>
   </nav>
 
   <!-- CONTENEDOR PRINCIPAL -->
   <main class="main-container">
     <div class="header-seccion">
-      <h2>Inventario de Equipos</h2>
-      <span id="contadorEquipos" style="font-size: 0.9rem; color: var(--texto-mutado);">Cargando registros...</span>
+      <h2>Inventario de <span>Equipos</span></h2>
+      <span id="contadorEquipos" class="contador-pill">Cargando registros...</span>
+    </div>
+
+    <div class="aviso-solo-lectura">
+      <i class="fa-solid fa-eye"></i>
+      <span>Vista en modo <strong>CONSULTA (Solo lectura)</strong>: puedes consultar los detalles y descargar códigos QR, pero no modificar registros.</span>
     </div>
 
     <!-- BUSCADOR Y FILTROS -->
@@ -249,7 +351,8 @@
   <!-- SCRIPT DE FIREBASE Y LÓGICA -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, updateDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
@@ -262,9 +365,35 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
 
     let listaEquipos = [];
+    let puedeEditar = false;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      try {
+        const snapUsuario = await getDoc(doc(db, "usuarios", user.uid));
+        const rol = snapUsuario.exists() && snapUsuario.data().activo
+          ? (snapUsuario.data().rol || "CONSULTA").toUpperCase()
+          : "CONSULTA";
+
+        puedeEditar = ["ADMINISTRADOR", "TÉCNICO"].includes(rol);
+        document.body.classList.toggle("solo-lectura", !puedeEditar);
+        document.getElementById("badgeRolActual").innerText = `Rol: ${rol} ${puedeEditar ? "(Edición habilitada)" : "(Solo lectura)"}`;
+      } catch (error) {
+        console.error("Error verificando rol:", error);
+        puedeEditar = false;
+        document.body.classList.add("solo-lectura");
+      }
+
+      cargarInventario();
+    });
 
     function formatearFechaInput(campoFecha) {
       if (!campoFecha) return "";
@@ -320,6 +449,10 @@
         else if (eq.estado === "MANTENIMIENTO") claseEstado = "estado-mantenimiento";
         else if (eq.estado === "BAJA") claseEstado = "estado-baja";
 
+        const botonEditar = puedeEditar
+          ? `<button class="btn-accion btn-editar-fila" onclick="verDetallesEquipo('${eq.id}')" title="Ver y Editar"><i class="fa-solid fa-pen-to-square"></i></button>`
+          : "";
+
         html += `
           <tr>
             <td><a class="link-codigo" onclick="verDetallesEquipo('${eq.id}')">${eq.codigoInterno || 'S/C'}</a></td>
@@ -328,7 +461,7 @@
             <td>${eq.numeroSerie || 'N/A'}</td>
             <td><span class="badge-estado ${claseEstado}">${eq.estado || 'DISPONIBLE'}</span></td>
             <td>
-              <button class="btn-accion" onclick="verDetallesEquipo('${eq.id}')" title="Ver y Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+              ${botonEditar}
               <button class="btn-accion" onclick="descargarQREquipo('${eq.codigoQr || eq.codigoInterno}')" title="Descargar QR"><i class="fa-solid fa-qrcode"></i></button>
             </td>
           </tr>
@@ -345,34 +478,36 @@
       const eq = listaEquipos.find(item => item.id === id);
       if (!eq) return;
 
+      const attrSoloLectura = puedeEditar ? "" : "disabled";
+
       Swal.fire({
-        title: `Ficha Completa: ${eq.codigoInterno || 'Equipo'}`,
+        title: puedeEditar ? `Ficha Completa: ${eq.codigoInterno || 'Equipo'}` : `Consulta de Equipo: ${eq.codigoInterno || 'Equipo'}`,
         html: `
           <div style="text-align: left; font-size: 0.9rem; line-height: 1.5; max-height: 65vh; overflow-y: auto; padding-right: 5px;">
             <p><strong>Activo:</strong> 
-              <select id="editActivo" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;">
+              <select id="editActivo" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" ${attrSoloLectura}>
                 <option value="true" ${eq.activo !== false ? 'selected' : ''}>true (Activo)</option>
                 <option value="false" ${eq.activo === false ? 'selected' : ''}>false (Inactivo)</option>
               </select>
             </p>
-            <p><strong>Código Interno:</strong> <input id="editCodigoInterno" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.codigoInterno || ''}"></p>
-            <p><strong>Código QR:</strong> <input id="editCodigoQr" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.codigoQr || ''}"></p>
-            <p><strong>Tipo de Equipo:</strong> <input id="editTipo" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.tipoEquipo || ''}"></p>
-            <p><strong>Marca:</strong> <input id="editMarca" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.marca || ''}"></p>
-            <p><strong>Modelo:</strong> <input id="editModelo" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.modelo || ''}"></p>
-            <p><strong>Número de Serie:</strong> <input id="editSerie" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.numeroSerie || ''}"></p>
+            <p><strong>Código Interno:</strong> <input id="editCodigoInterno" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.codigoInterno || ''}" ${attrSoloLectura}></p>
+            <p><strong>Código QR:</strong> <input id="editCodigoQr" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.codigoQr || ''}" ${attrSoloLectura}></p>
+            <p><strong>Tipo de Equipo:</strong> <input id="editTipo" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.tipoEquipo || ''}" ${attrSoloLectura}></p>
+            <p><strong>Marca:</strong> <input id="editMarca" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.marca || ''}" ${attrSoloLectura}></p>
+            <p><strong>Modelo:</strong> <input id="editModelo" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.modelo || ''}" ${attrSoloLectura}></p>
+            <p><strong>Número de Serie:</strong> <input id="editSerie" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.numeroSerie || ''}" ${attrSoloLectura}></p>
             
             <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
-            <h4 style="margin-bottom:8px; color:#18181b;">Especificaciones</h4>
-            <p><strong>Procesador:</strong> <input id="editProc" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.procesador || ''}"></p>
-            <p><strong>RAM (GB):</strong> <input type="number" id="editRam" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.ramGb || 0}"></p>
-            <p><strong>Almacenamiento (GB):</strong> <input type="number" id="editAlm" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.almacenamientoGb || 0}"></p>
-            <p><strong>Tipo Almacenamiento:</strong> <input id="editTipoAlm" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.tipoAlmacenamiento || ''}"></p>
-            <p><strong>Sistema Operativo:</strong> <input id="editSo" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.sistemaOperativo || ''}"></p>
+            <h4 style="margin-bottom:8px; color:#8A1538;">Especificaciones</h4>
+            <p><strong>Procesador:</strong> <input id="editProc" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.procesador || ''}" ${attrSoloLectura}></p>
+            <p><strong>RAM (GB):</strong> <input type="number" id="editRam" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.ramGb || 0}" ${attrSoloLectura}></p>
+            <p><strong>Almacenamiento (GB):</strong> <input type="number" id="editAlm" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.almacenamientoGb || 0}" ${attrSoloLectura}></p>
+            <p><strong>Tipo Almacenamiento:</strong> <input id="editTipoAlm" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.tipoAlmacenamiento || ''}" ${attrSoloLectura}></p>
+            <p><strong>Sistema Operativo:</strong> <input id="editSo" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.especificaciones?.sistemaOperativo || ''}" ${attrSoloLectura}></p>
             
             <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
             <p><strong>Estado:</strong> 
-              <select id="editEstado" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;">
+              <select id="editEstado" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" ${attrSoloLectura}>
                 <option value="DISPONIBLE" ${eq.estado === 'DISPONIBLE' ? 'selected' : ''}>DISPONIBLE</option>
                 <option value="EN USO" ${eq.estado === 'EN USO' ? 'selected' : ''}>EN USO</option>
                 <option value="MANTENIMIENTO" ${eq.estado === 'MANTENIMIENTO' ? 'selected' : ''}>MANTENIMIENTO</option>
@@ -382,26 +517,31 @@
             </p>
 
             <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
-            <h4 style="margin-bottom:8px; color:#18181b;">Fechas del Registro</h4>
-            <p><strong>Fecha Adquisición:</strong> <input type="date" id="editFechaAdq" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${formatearFechaInput(eq.fechaAdquisicion)}"></p>
-            <p><strong>Fecha Alta:</strong> <input type="date" id="editFechaAlta" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${formatearFechaInput(eq.fechaAlta)}"></p>
-            <p><strong>Fecha Fin Garantía:</strong> <input type="date" id="editFechaGarantia" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${formatearFechaInput(eq.fechaFinGarantia)}"></p>
+            <h4 style="margin-bottom:8px; color:#8A1538;">Fechas del Registro</h4>
+            <p><strong>Fecha Adquisición:</strong> <input type="date" id="editFechaAdq" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${formatearFechaInput(eq.fechaAdquisicion)}" ${attrSoloLectura}></p>
+            <p><strong>Fecha Alta:</strong> <input type="date" id="editFechaAlta" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${formatearFechaInput(eq.fechaAlta)}" ${attrSoloLectura}></p>
+            <p><strong>Fecha Fin Garantía:</strong> <input type="date" id="editFechaGarantia" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${formatearFechaInput(eq.fechaFinGarantia)}" ${attrSoloLectura}></p>
 
             <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
-            <h4 style="margin-bottom:8px; color:#18181b;">Ubicación (ubicacionRef)</h4>
-            <p><strong>Área:</strong> <input id="editArea" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.ubicacionRef?.area || ''}"></p>
+            <h4 style="margin-bottom:8px; color:#8A1538;">Ubicación (ubicacionRef)</h4>
+            <p><strong>Área:</strong> <input id="editArea" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.ubicacionRef?.area || ''}" ${attrSoloLectura}></p>
 
             <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
-            <!-- OBSERVACIONES COLOCADAS EXACTAMENTE AL FINAL -->
-            <p><strong>Observaciones:</strong> <textarea id="editObs" class="swal2-textarea" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem; height:80px; resize:vertical;">${eq.observaciones || ''}</textarea></p>
+            <p><strong>Observaciones:</strong> <textarea id="editObs" class="swal2-textarea" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem; height:80px; resize:vertical;" ${attrSoloLectura}>${eq.observaciones || ''}</textarea></p>
           </div>
         `,
         width: '650px',
+        showConfirmButton: puedeEditar,
         showCancelButton: true,
         confirmButtonText: 'Guardar Cambios',
-        cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#18181b',
+        cancelButtonText: puedeEditar ? 'Cancelar' : 'Cerrar',
+        confirmButtonColor: '#8A1538',
         preConfirm: () => {
+          if (!puedeEditar) {
+            Swal.showValidationMessage("No tienes permisos para editar registros con el rol CONSULTA.");
+            return false;
+          }
+
           const getVal = (id) => {
             const el = document.getElementById(id);
             return el ? el.value : "";
@@ -442,14 +582,19 @@
           return datosActualizados;
         }
       }).then(async (result) => {
-        if (result.isConfirmed) {
+        if (result.isConfirmed && puedeEditar) {
           try {
             Swal.fire({ title: 'Guardando...', text: 'Actualizando registro en Firestore', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
             const eqRef = doc(db, "equipos", id);
             await updateDoc(eqRef, result.value);
 
-            Swal.fire('¡Actualizado!', 'La información del equipo se ha actualizado correctamente.', 'success');
+            Swal.fire({
+              title: '¡Actualizado!',
+              text: 'La información del equipo se ha actualizado correctamente.',
+              icon: 'success',
+              confirmButtonColor: '#8A1538'
+            });
             cargarInventario();
           } catch (error) {
             console.error("Error detallado al actualizar en Firestore:", error);
@@ -489,8 +634,6 @@
         }
       }, 300);
     };
-
-    cargarInventario();
   </script>
 </body>
 </html>

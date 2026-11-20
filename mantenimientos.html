@@ -16,15 +16,17 @@
 
   <style>
     :root {
-      --bg-principal: #ffffff;
-      --bg-secundario: #f4f4f6;
-      --tarjeta-bg: #f9f9fb;
-      --texto-titulos: #0f0f11;
+      --yucatan-guinda: #8A1538;
+      --yucatan-guinda-hover: #6E102C;
+      --yucatan-guinda-suave: rgba(138, 21, 56, 0.08);
+      --yucatan-dorado: #C59B49;
+      --yucatan-dorado-suave: #FAF6EE;
+      --bg-principal: #f4f3ef;
+      --bg-tarjeta: #ffffff;
+      --texto-titulos: #18181b;
       --texto-cuerpo: #4a4a52;
       --texto-mutado: #71717a;
-      --borde-suave: #e4e4e7;
-      --accent-black: #18181b;
-      --accent-hover: #27272a;
+      --borde-suave: #e5e2dc;
     }
 
     * {
@@ -44,35 +46,73 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* BARRA SUPERIOR */
     nav {
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 100%;
-      padding: 24px 20px;
+      background-color: var(--bg-tarjeta);
+      border-bottom: 1px solid var(--borde-suave);
+      padding: 16px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .brand-badge {
-      background-color: var(--bg-secundario);
-      color: var(--texto-titulos);
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-volver {
+      background-color: var(--yucatan-guinda-suave);
+      color: var(--yucatan-guinda);
       padding: 8px 16px;
-      border-radius: 20px;
+      border-radius: 12px;
       font-size: 0.85rem;
-      font-weight: 600;
+      font-weight: 700;
       text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-volver:hover {
+      background-color: var(--yucatan-guinda);
+      color: #ffffff;
+    }
+
+    .nav-title {
+      font-weight: 800;
+      color: var(--texto-titulos);
+      font-size: 1.1rem;
+    }
+
+    .nav-title span {
+      color: var(--yucatan-guinda);
+    }
+
+    .modulo-pill {
+      background-color: var(--yucatan-dorado-suave);
+      color: var(--yucatan-guinda);
+      border: 1px solid rgba(197, 155, 73, 0.45);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
     }
 
     .main-container {
-      max-width: 1100px;
-      margin: 20px auto 60px auto;
-      padding: 30px;
-      background-color: var(--tarjeta-bg);
+      max-width: 1140px;
+      margin: 32px auto 60px auto;
+      padding: 32px;
+      background-color: var(--bg-tarjeta);
       border: 1px solid var(--borde-suave);
+      border-top: 5px solid var(--yucatan-guinda);
       border-radius: 24px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-      width: 100%;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.04);
+      width: 94%;
     }
 
     .header-seccion {
@@ -91,19 +131,24 @@
       letter-spacing: -0.5px;
     }
 
+    .header-seccion h2 span {
+      color: var(--yucatan-guinda);
+    }
+
     .btn-nuevo {
-      background-color: var(--accent-black);
+      background-color: var(--yucatan-guinda);
       color: #ffffff;
       border: none;
-      padding: 10px 18px;
+      padding: 11px 20px;
       border-radius: 12px;
       font-size: 0.9rem;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.15s;
     }
     .btn-nuevo:hover {
-      background-color: var(--accent-hover);
+      background-color: var(--yucatan-guinda-hover);
+      transform: translateY(-1px);
     }
 
     .controles-barra {
@@ -124,11 +169,12 @@
       outline: none;
       flex: 1;
       min-width: 240px;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .controles-barra input:focus {
-      border-color: var(--accent-black);
-      box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.08);
+      border-color: var(--yucatan-guinda);
+      box-shadow: 0 0 0 3px var(--yucatan-guinda-suave);
     }
 
     .tabla-wrapper {
@@ -151,9 +197,13 @@
     }
 
     th {
-      background-color: #fafafa;
+      background-color: var(--bg-principal);
       color: var(--texto-titulos);
       font-weight: 700;
+    }
+
+    tr:hover td {
+      background-color: #faf9f7;
     }
 
     tr:last-child td {
@@ -172,25 +222,36 @@
     .tipo-soporte { background: #dbeafe; color: #1e40af; }
 
     .btn-accion {
-      background: var(--bg-secundario);
+      background: var(--yucatan-guinda-suave);
       border: none;
-      padding: 6px 12px;
+      padding: 7px 12px;
       border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
-      color: var(--texto-titulos);
-      transition: background 0.2s;
+      color: var(--yucatan-guinda);
+      transition: all 0.2s;
     }
     .btn-accion:hover {
-      background: var(--borde-suave);
+      background: var(--yucatan-guinda);
+      color: #ffffff;
     }
 
     footer {
       border-top: 1px solid var(--borde-suave);
-      padding: 20px 30px;
+      padding: 18px 24px;
       text-align: center;
       font-size: 0.85rem;
       color: var(--texto-mutado);
+      background-color: var(--bg-tarjeta);
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        padding: 14px 18px;
+      }
+      .main-container {
+        padding: 22px 18px;
+      }
     }
   </style>
 </head>
@@ -198,14 +259,17 @@
 
   <!-- NAVEGACIÓN SUPERIOR -->
   <nav>
-    <a href="index.html" class="brand-badge"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</a>
-    <span style="font-size: 0.85rem; color: var(--texto-mutado);">Módulo de Mantenimientos y Servicios</span>
+    <div class="nav-left">
+      <a href="index.html" class="btn-volver"><i class="fa-solid fa-arrow-left"></i> Inicio</a>
+      <div class="nav-title">Mantenimiento y <span>Servicios</span></div>
+    </div>
+    <span class="modulo-pill">Módulo de Mantenimientos y Servicios</span>
   </nav>
 
   <!-- CONTENEDOR PRINCIPAL -->
   <main class="main-container">
     <div class="header-seccion">
-      <h2>Historial de Mantenimientos</h2>
+      <h2>Historial de <span>Mantenimientos</span></h2>
       <button class="btn-nuevo" onclick="abrirModalNuevoMantenimiento()"><i class="fa-solid fa-plus"></i> Registrar Servicio</button>
     </div>
 
@@ -340,7 +404,7 @@
         confirmButtonText: '<i class="fa-solid fa-qrcode"></i> Escanear Código QR',
         denyButtonText: '<i class="fa-solid fa-keyboard"></i> Ingresar / Seleccionar Manual',
         cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#18181b',
+        confirmButtonColor: '#8A1538',
         denyButtonColor: '#71717a'
       }).then((result) => {
         if (result.isConfirmed) {
@@ -395,11 +459,6 @@
             Swal.close();
             mostrarFormularioMantenimiento("", "");
           };
-        },
-        willClose: () => {
-          try {
-            const scannerElem = Html5Qrcode.getCameras();
-          } catch(e) {}
         }
       });
     }
@@ -428,7 +487,7 @@
             showCancelButton: true,
             confirmButtonText: 'Ingresar Manual',
             cancelButtonText: 'Reintentar Escaneo',
-            confirmButtonColor: '#18181b'
+            confirmButtonColor: '#8A1538'
           }).then((res) => {
             if (res.isConfirmed) {
               mostrarFormularioMantenimiento("", "");
@@ -462,7 +521,7 @@
               </select>
             </p>
             <p><strong>Número de Serie:</strong> 
-              <input id="newSerie" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem; background:#f4f4f6;" value="${seriePrellenada}" readonly placeholder="Se autocompleta automáticamente">
+              <input id="newSerie" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem; background:#f4f3ef;" value="${seriePrellenada}" readonly placeholder="Se autocompleta automáticamente">
             </p>
             <p><strong>Tipo de Servicio:</strong> 
               <select id="newTipo" class="swal2-input" style="margin:5px 0 10px 0; width:100%; font-size:0.9rem;">
@@ -480,9 +539,8 @@
         showCancelButton: true,
         confirmButtonText: 'Guardar y Cambiar a Mantenimiento',
         cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#18181b',
+        confirmButtonColor: '#8A1538',
         didOpen: () => {
-          // Si se seleccionó por QR pero el select no tenía seleccionado el valor exacto
           if (codigoPrellenado) {
             const selectEl = document.getElementById("newCodigo");
             selectEl.value = codigoPrellenado;
@@ -516,7 +574,6 @@
           try {
             Swal.fire({ title: 'Registrando...', text: 'Guardando servicio y actualizando equipo', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-            // 1. Guardar el registro de mantenimiento con código y serie
             await addDoc(collection(db, "mantenimientos"), {
               codigoInterno: data.codigoInterno,
               numeroSerie: data.numeroSerie,
@@ -526,7 +583,6 @@
               descripcion: data.descripcion
             });
 
-            // 2. Actualizar estado del equipo a MANTENIMIENTO en Firestore
             const q = query(collection(db, "equipos"), where("codigoInterno", "==", data.codigoInterno));
             const querySnapshot = await getDocs(q);
 
@@ -535,7 +591,12 @@
               await updateDoc(equipoDocRef, { estado: "MANTENIMIENTO" });
             }
 
-            Swal.fire('¡Registrado y Actualizado!', 'El servicio se guardó y el equipo cambió su estado a MANTENIMIENTO.', 'success');
+            Swal.fire({
+              title: '¡Registrado y Actualizado!',
+              text: 'El servicio se guardó y el equipo cambió su estado a MANTENIMIENTO.',
+              icon: 'success',
+              confirmButtonColor: '#8A1538'
+            });
             cargarDatos();
           } catch (error) {
             console.error("Error al guardar mantenimiento:", error);
@@ -545,10 +606,9 @@
       });
     };
 
-    // Autocompletar la serie si se selecciona manualmente en el menú desplegable
     window.actualizarSerieManual = function(selectEl) {
       const selectedValue = selectEl.value;
-      const eqMatch = listaEquiposCompletos.find(e => e.codigoInterno ===selectedValue);
+      const eqMatch = listaEquiposCompletos.find(e => e.codigoInterno === selectedValue);
       const inputSerie = document.getElementById("newSerie");
       if (eqMatch && inputSerie) {
         inputSerie.value = eqMatch.numeroSerie || "";
@@ -571,7 +631,7 @@
           </div>
         `,
         confirmButtonText: 'Cerrar',
-        confirmButtonColor: '#18181b'
+        confirmButtonColor: '#8A1538'
       });
     };
 

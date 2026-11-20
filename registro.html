@@ -1,279 +1,238 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Registro de Usuario | Jurisdicción Sanitaria No. 2</title>
+  <title>Registro de Personal | Jurisdicción Sanitaria No. 2</title>
   
-  <!-- Tipografía Moderna (Inter) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Íconos FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <!-- SweetAlert2 para alertas elegantes -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- SDK de EmailJS para envío real de correos desde el navegador -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
   <style>
     :root {
-      --bg-principal: #ffffff;
-      --bg-secundario: #f4f4f6;
-      --tarjeta-bg: #f9f9fb;
-      --texto-titulos: #0f0f11;
+      --yucatan-guinda: #8A1538;
+      --yucatan-guinda-hover: #6E102C;
+      --yucatan-guinda-suave: rgba(138, 21, 56, 0.08);
+      --yucatan-dorado: #C59B49;
+      --yucatan-dorado-suave: #FAF6EE;
+      --bg-principal: #f4f3ef;
+      --bg-tarjeta: #ffffff;
+      --texto-titulos: #18181b;
       --texto-cuerpo: #4a4a52;
       --texto-mutado: #71717a;
-      --borde-suave: #e4e4e7;
-      --accent-black: #18181b;
-      --accent-hover: #27272a;
+      --borde-suave: #e5e2dc;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       background-color: var(--bg-principal);
       color: var(--texto-cuerpo);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      -webkit-font-smoothing: antialiased;
     }
 
-    nav {
-      max-width: 1200px;
-      margin: 0 auto;
+    .header-institucional {
       width: 100%;
-      padding: 24px 20px;
+      background-color: var(--bg-principal);
+      border-bottom: 1px solid var(--borde-suave);
+      padding: 16px 24px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      justify-content: center;
     }
 
-    .brand-badge {
-      background-color: var(--bg-secundario);
-      color: var(--texto-titulos);
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      text-decoration: none;
-    }
-
-    .registro-container {
-      max-width: 600px;
-      margin: 20px auto 60px auto;
-      padding: 40px;
-      background-color: var(--tarjeta-bg);
-      border: 1px solid var(--borde-suave);
-      border-radius: 24px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    .header-institucional img {
+      max-width: 900px;
       width: 100%;
+      height: auto;
+      object-fit: contain;
     }
 
-    .registro-container h2 {
-      color: var(--texto-titulos);
-      font-size: 1.8rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      margin-bottom: 8px;
-      text-align: center;
+    .register-card {
+      background-color: var(--bg-tarjeta);
+      border: 1px solid var(--borde-suave);
+      border-top: 5px solid var(--yucatan-guinda);
+      border-radius: 24px;
+      padding: 36px 40px;
+      max-width: 560px;
+      width: 92%;
+      margin: 30px auto;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.04);
     }
 
-    .registro-container p.sub {
-      color: var(--texto-mutado);
-      font-size: 0.95rem;
-      text-align: center;
-      margin-bottom: 30px;
-    }
+    h1 { font-size: 1.9rem; font-weight: 800; color: var(--texto-titulos); margin-bottom: 8px; }
+    h1 span { color: var(--yucatan-guinda); }
+    p.sub { font-size: 0.9rem; color: var(--texto-mutado); margin-bottom: 24px; line-height: 1.5; }
 
-    .form-grid {
+    .grid-apellidos {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      gap: 14px;
     }
 
-    .form-group {
-      margin-bottom: 16px;
-    }
-
-    .form-group.full {
-      grid-column: span 2;
-    }
-
-    label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--texto-titulos);
-      margin-bottom: 6px;
-    }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 0.84rem; font-weight: 600; color: var(--texto-titulos); margin-bottom: 6px; }
 
     input, select {
       width: 100%;
-      padding: 12px 16px;
-      background-color: #ffffff;
+      padding: 12px 14px;
       border: 1px solid var(--borde-suave);
       border-radius: 12px;
       font-family: 'Inter', sans-serif;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
+      background-color: #fff;
       color: var(--texto-titulos);
-      transition: all 0.2s ease;
     }
 
     input:focus, select:focus {
       outline: none;
-      border-color: var(--accent-black);
-      box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.08);
+      border-color: var(--yucatan-guinda);
+      box-shadow: 0 0 0 3px var(--yucatan-guinda-suave);
+    }
+
+    .campo-ayuda {
+      display: block;
+      margin-top: 5px;
+      font-size: 0.78rem;
+      color: var(--texto-mutado);
+    }
+
+    .info-box {
+      background-color: var(--yucatan-dorado-suave);
+      border-left: 4px solid var(--yucatan-dorado);
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      color: var(--texto-cuerpo);
+      margin-bottom: 20px;
     }
 
     .btn-submit {
-      background-color: var(--accent-black);
-      color: #ffffff;
+      background-color: var(--yucatan-guinda);
+      color: #fff;
       border: none;
       width: 100%;
       padding: 14px;
       border-radius: 12px;
-      font-size: 1rem;
+      font-size: 0.98rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background-color 0.2s ease;
-      margin-top: 10px;
+      transition: all 0.2s;
     }
+    .btn-submit:hover { background-color: var(--yucatan-guinda-hover); }
 
-    .btn-submit:hover {
-      background-color: var(--accent-hover);
-    }
-
-    .switch-auth {
+    .back-link {
+      display: block;
       text-align: center;
-      margin-top: 20px;
-      font-size: 0.9rem;
+      margin-top: 18px;
+      font-size: 0.88rem;
       color: var(--texto-mutado);
-    }
-
-    .switch-auth a {
-      color: var(--texto-titulos);
-      font-weight: 700;
       text-decoration: none;
+      font-weight: 600;
     }
-
-    .switch-auth a:hover {
-      text-decoration: underline;
-    }
+    .back-link:hover { color: var(--yucatan-guinda); }
 
     footer {
       border-top: 1px solid var(--borde-suave);
-      padding: 20px 30px;
+      padding: 16px;
       text-align: center;
       font-size: 0.85rem;
       color: var(--texto-mutado);
     }
 
-    @media (max-width: 768px) {
-      .form-grid {
+    @media (max-width: 560px) {
+      .register-card {
+        padding: 26px 20px;
+      }
+      .grid-apellidos {
         grid-template-columns: 1fr;
-      }
-      .form-group.full {
-        grid-column: span 1;
-      }
-      .registro-container {
-        padding: 20px;
-        margin: 10px;
+        gap: 0;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAVEGACIÓN SUPERIOR -->
-  <nav>
-    <a href="login.html" class="brand-badge"><i class="fa-solid fa-arrow-left"></i> Volver al Login</a>
-    <span style="font-size: 0.85rem; color: var(--texto-mutado);">Jurisdicción Sanitaria No. 2</span>
-  </nav>
+  <header class="header-institucional">
+    <img src="C:/Users/djcch/OneDrive/Documentos/Proyecto para Residencia/nuevos logos local/nuevos logos local/encabezados/header_2520.jpg" alt="Secretaría de Salud">
+  </header>
 
-  <!-- CONTENEDOR DEL FORMULARIO DE REGISTRO -->
-  <main class="registro-container">
-    <h2>Crear Nueva Cuenta</h2>
-    <p class="sub">Registra los datos del personal e indica su rol en el sistema.</p>
+  <main class="register-card">
+    <h1>Solicitar <span>Acceso</span></h1>
+    <p class="sub">Completa tus datos (mínimo 4 caracteres por campo) y selecciona al Administrador encargado de autorizar tu rol.</p>
 
-    <form id="formRegistro" onsubmit="manejarRegistro(event)">
-      <div class="form-grid">
-        
-        <div class="form-group">
-          <label for="nombre">Nombre(s)</label>
-          <input type="text" id="nombre" required placeholder="Ej. Juan Carlos">
-        </div>
+    <form id="formRegistro" onsubmit="registrarUsuario(event)">
+      <div class="form-group">
+        <label for="nombres">Nombre(s)</label>
+        <input type="text" id="nombres" required minlength="4" placeholder="Ej. Carlos Alberto">
+      </div>
 
-        <div class="form-group">
-          <label for="nombreUsuario">Nombre de Usuario</label>
-          <input type="text" id="nombreUsuario" required placeholder="Ej. jchan">
-        </div>
-
+      <div class="grid-apellidos">
         <div class="form-group">
           <label for="apellidoPaterno">Apellido Paterno</label>
-          <input type="text" id="apellidoPaterno" required placeholder="Ej. Chan">
+          <input type="text" id="apellidoPaterno" required minlength="4" placeholder="Ej. Hernández">
         </div>
 
         <div class="form-group">
           <label for="apellidoMaterno">Apellido Materno</label>
-          <input type="text" id="apellidoMaterno" required placeholder="Ej. Canul">
+          <input type="text" id="apellidoMaterno" required minlength="4" placeholder="Ej. López">
         </div>
-
-        <div class="form-group">
-          <label for="telefono">Teléfono</label>
-          <input type="text" id="telefono" required placeholder="9851234567">
-        </div>
-
-        <div class="form-group">
-          <label for="rol">Rol en el Sistema</label>
-          <select id="rol" required>
-            <option value="" disabled selected>Selecciona un rol</option>
-            <option value="ADMINISTRADOR">Administrador</option>
-            <option value="TECNICO">Técnico</option>
-            <option value="CONSULTA">Consulta</option>
-          </select>
-        </div>
-
-        <div class="form-group full">
-          <label for="email">Correo Electrónico</label>
-          <input type="email" id="email" required placeholder="correo@ejemplo.com">
-        </div>
-
-        <div class="form-group full">
-          <label for="password">Contraseña</label>
-          <input type="password" id="password" required placeholder="Mínimo 6 caracteres">
-        </div>
-
       </div>
 
-      <button type="submit" class="btn-submit">Registrar Usuario</button>
+      <div class="form-group">
+        <label for="email">Correo Electrónico</label>
+        <input type="email" id="email" required minlength="8" placeholder="usuario@salud.yucatan.gob.mx">
+        <span class="campo-ayuda">Mínimo 4 caracteres antes del @ y dominio activo verificado.</span>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña (mínimo 6 caracteres)</label>
+        <input type="password" id="password" required minlength="6" placeholder="••••••••">
+      </div>
+
+      <div class="form-group">
+        <label for="rolSolicitado">Rol Solicitado</label>
+        <select id="rolSolicitado" required>
+          <option value="">-- Selecciona un rol --</option>
+          <option value="ADMINISTRADOR">ADMINISTRADOR (Altas, QR, Autorización de Bajas y Usuarios)</option>
+          <option value="TÉCNICO">TÉCNICO (Escaneo QR, Mantenimientos y Reporte de Falla)</option>
+          <option value="CONSULTA">CONSULTA (Inventario, Geolocalización y Reportes PDF)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="adminAutorizador">Administrador que autorizará tu cuenta</label>
+        <select id="adminAutorizador" required>
+          <option value="">Cargando lista de administradores...</option>
+        </select>
+      </div>
+
+      <div class="info-box">
+        <i class="fa-solid fa-envelope-circle-check" style="color: var(--yucatan-guinda);"></i>
+        Tu cuenta permanecerá <strong>inactiva</strong> hasta que el Administrador seleccionado apruebe tu solicitud.
+      </div>
+
+      <button type="submit" class="btn-submit">Enviar Solicitud de Registro</button>
     </form>
 
-    <div class="switch-auth">
-      ¿Ya tienes una cuenta? <a href="login.html">Inicia sesión aquí</a>
-    </div>
+    <a href="login.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio de Sesión</a>
   </main>
 
-  <!-- PIE DE PÁGINA -->
   <footer>
-    Servicios de Salud de Yucatán &copy; 2026 | Módulo de Autenticación
+    Servicios de Salud de Yucatán &copy; 2026 | Jurisdicción Sanitaria No. 2
   </footer>
 
-  <!-- SCRIPTS DE FIREBASE Y LÓGICA -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { 
-      getAuth, 
-      createUserWithEmailAndPassword 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, doc, setDoc, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // Credenciales de tu base de datos Firebase[cite: 10]
     const firebaseConfig = {
       apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
       authDomain: "control-de-equipos-762c4.firebaseapp.com",
@@ -288,59 +247,215 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // Función de Registro con Correo y Contraseña
-    window.manejarRegistro = async function(event) {
-      event.preventDefault();
+    const DOMINIOS_BLOQUEADOS = new Set([
+      "ejemplo.com", "example.com", "test.com", "prueba.com", "correo.com",
+      "mailinator.com", "tempmail.com", "10minutemail.com", "guerrillamail.com",
+      "yopmail.com", "sharklasers.com", "throwawaymail.com", "getnada.com",
+      "fakeinbox.com", "dispostable.com"
+    ]);
 
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const nombre = document.getElementById("nombre").value;
-      const apellidoPaterno = document.getElementById("apellidoPaterno").value;
-      const apellidoMaterno = document.getElementById("apellidoMaterno").value;
-      const nombreUsuario = document.getElementById("nombreUsuario").value;
-      const telefono = document.getElementById("telefono").value;
-      const rol = document.getElementById("rol").value;
+    function normalizarTexto(texto) {
+      return texto.trim().replace(/\s+/g, " ");
+    }
+
+    async function validarCorreoReal(email) {
+      const limpio = email.trim().toLowerCase();
+      const regexFormato = /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+$/i;
+
+      if (!regexFormato.test(limpio)) {
+        return { valido: false, motivo: "El formato del correo electrónico no es válido." };
+      }
+
+      const [usuarioCorreo, dominio] = limpio.split("@");
+      if (!usuarioCorreo || usuarioCorreo.length < 4) {
+        return { valido: false, motivo: "El usuario del correo electrónico debe tener al menos 4 caracteres antes del @." };
+      }
+
+      if (!dominio || !dominio.includes(".") || DOMINIOS_BLOQUEADOS.has(dominio)) {
+        return { valido: false, motivo: `El dominio "${dominio}" no está permitido o no corresponde a un correo real.` };
+      }
 
       try {
-        Swal.fire({ title: 'Registrando...', text: 'Por favor espere', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        // Verifica registros MX (servidores de correo) vía DNS over HTTPS
+        const resMx = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(dominio)}&type=MX`);
+        if (resMx.ok) {
+          const dataMx = await resMx.json();
+          if (Array.isArray(dataMx.Answer) && dataMx.Answer.length > 0) {
+            return { valido: true };
+          }
+        }
 
-        // 1. Crear usuario en Firebase Auth[cite: 9]
-        const credenciales = await createUserWithEmailAndPassword(auth, email, password);
-        const uid = credenciales.user.uid;
+        // Respaldo: algunos dominios pequeños usan registro A/AAAA para correo
+        const resA = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(dominio)}&type=A`);
+        if (resA.ok) {
+          const dataA = await resA.json();
+          if (Array.isArray(dataA.Answer) && dataA.Answer.length > 0) {
+            return { valido: true };
+          }
+        }
 
-        // 2. Guardar perfil completo en la colección "usuarios" usando el UID[cite: 8, 9]
-        await setDoc(doc(db, "usuarios", uid), {
-          nombre,
-          apellidoPaterno,
-          apellidoMaterno,
-          nombreUsuario,
-          email,
-          telefono,
-          rol, // "ADMINISTRADOR", "TECNICO" o "CONSULTA"[cite: 8, 9]
-          activo: true,
-          fechaCreacion: new Date()
+        return { valido: false, motivo: `No se encontraron servidores de correo activos para "${dominio}". Verifica que el correo sea real.` };
+      } catch (error) {
+        console.warn("No se pudo consultar DNS en este momento:", error);
+        return { valido: false, motivo: "No se pudo verificar la existencia del dominio de correo. Revisa tu conexión e inténtalo de nuevo." };
+      }
+    }
+
+    // Cargar lista de administradores activos desde Firestore
+    async function cargarAdministradores() {
+      const selectAdmin = document.getElementById("adminAutorizador");
+      try {
+        const snap = await getDocs(collection(db, "usuarios"));
+        let opciones = `<option value="">-- Selecciona un Administrador --</option>`;
+        let encontrados = 0;
+
+        snap.forEach(docSnap => {
+          const u = docSnap.data();
+          const rol = (u.rol || "").toUpperCase();
+          if ((rol === "ADMINISTRADOR" || rol === "ADMIN") && u.activo === true) {
+            encontrados++;
+            const correoAdmin = u.email || u.correo || "";
+            opciones += `<option value="${docSnap.id}" data-email="${correoAdmin}" data-nombre="${u.nombre}">${u.nombre} (${correoAdmin})</option>`;
+          }
         });
 
+        if (encontrados === 0) {
+          opciones = `<option value="ADMIN_GENERAL" data-email="admin.js2@salud.yucatan.gob.mx" data-nombre="Administrador General">Administrador General JS2</option>`;
+        }
+        selectAdmin.innerHTML = opciones;
+      } catch (error) {
+        console.error("Error cargando administradores:", error);
+        selectAdmin.innerHTML = `<option value="ADMIN_GENERAL" data-email="admin.js2@salud.yucatan.gob.mx">Administrador General JS2</option>`;
+      }
+    }
+
+    window.registrarUsuario = async function(event) {
+      event.preventDefault();
+      const nombres = normalizarTexto(document.getElementById("nombres").value);
+      const apellidoPaterno = normalizarTexto(document.getElementById("apellidoPaterno").value);
+      const apellidoMaterno = normalizarTexto(document.getElementById("apellidoMaterno").value);
+      const nombreCompleto = `${nombres} ${apellidoPaterno} ${apellidoMaterno}`.trim();
+
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const password = document.getElementById("password").value;
+      const rol = document.getElementById("rolSolicitado").value;
+      
+      const selectAdmin = document.getElementById("adminAutorizador");
+      const opcionSeleccionada = selectAdmin.options[selectAdmin.selectedIndex];
+      const adminUid = selectAdmin.value;
+      const adminEmail = opcionSeleccionada.getAttribute("data-email");
+      const adminNombre = opcionSeleccionada.getAttribute("data-nombre");
+
+      // Validación estricta de longitud mínima de 4 caracteres en todos los datos personales
+      if (nombres.length < 4 || apellidoPaterno.length < 4 || apellidoMaterno.length < 4) {
         Swal.fire({
-          title: '¡Registro Exitoso!',
-          text: 'El usuario se ha registrado correctamente en la base de datos.',
+          title: 'Datos incompletos',
+          text: 'Nombre(s), Apellido Paterno y Apellido Materno deben tener al menos 4 caracteres cada uno.',
+          icon: 'warning',
+          confirmButtonColor: '#8A1538'
+        });
+        return;
+      }
+
+      if (password.trim().length < 6) {
+        Swal.fire({
+          title: 'Contraseña muy corta',
+          text: 'La contraseña debe tener al menos 6 caracteres.',
+          icon: 'warning',
+          confirmButtonColor: '#8A1538'
+        });
+        return;
+      }
+
+      if (!rol || !adminUid) {
+        Swal.fire({
+          title: 'Selección requerida',
+          text: 'Selecciona un rol y al administrador que autorizará tu cuenta.',
+          icon: 'warning',
+          confirmButtonColor: '#8A1538'
+        });
+        return;
+      }
+
+      try {
+        Swal.fire({
+          title: 'Verificando correo...',
+          text: 'Comprobando validez del correo electrónico',
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading()
+        });
+
+        const validacionCorreo = await validarCorreoReal(email);
+        if (!validacionCorreo.valido) {
+          Swal.fire({
+            title: 'Correo no válido',
+            text: validacionCorreo.motivo,
+            icon: 'error',
+            confirmButtonColor: '#8A1538'
+          });
+          return;
+        }
+
+        Swal.update({
+          title: 'Procesando solicitud...',
+          text: 'Registrando usuario y notificando al administrador'
+        });
+
+        // 1. Crear credenciales en Firebase Auth
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        const uid = cred.user.uid;
+
+        // 2. Guardar en Firestore con activo: false (en espera de aprobación)
+        await setDoc(doc(db, "usuarios", uid), {
+          uid: uid,
+          nombres: nombres,
+          apellidoPaterno: apellidoPaterno,
+          apellidoMaterno: apellidoMaterno,
+          nombre: nombreCompleto,
+          email: email,
+          rol: rol,
+          activo: false,
+          estadoSolicitud: "PENDIENTE",
+          adminAsignadoUid: adminUid,
+          adminAsignadoNombre: adminNombre,
+          adminAsignadoEmail: adminEmail,
+          fechaSolicitud: Timestamp.now()
+        });
+
+        // 3. Cerrar sesión automática para que no entre hasta ser aprobado
+        await signOut(auth);
+
+        // 4. Preparar notificación por correo al administrador seleccionado
+        const asunto = encodeURIComponent(`Solicitud de Acceso al Sistema JS2 - ${nombreCompleto}`);
+        const cuerpo = encodeURIComponent(
+          `Hola ${adminNombre},\n\n` +
+          `El usuario ${nombreCompleto} (${email}) ha solicitado acceso al Sistema de Gestión de Inventarios de la Jurisdicción Sanitaria No. 2.\n\n` +
+          `Rol solicitado: ${rol}\n\n` +
+          `Por favor ingresa al panel de Administración del sistema para aprobar o rechazar esta solicitud.`
+        );
+
+        Swal.fire({
+          title: '¡Solicitud Enviada!',
+          html: `Tu cuenta para <b>${nombreCompleto}</b> fue creada en estado <b>Pendiente de Aprobación</b>.<br><br>Se notificará a <b>${adminNombre}</b> (${adminEmail}) para que autorice tu rol de <b>${rol}</b>.`,
           icon: 'success',
-          confirmButtonColor: '#18181b'
+          iconColor: '#8A1538',
+          confirmButtonText: 'Notificar por Correo y Volver',
+          confirmButtonColor: '#8A1538'
         }).then(() => {
+          window.open(`mailto:${adminEmail}?subject=${asunto}&body=${cuerpo}`, '_blank');
           window.location.href = "login.html";
         });
 
       } catch (error) {
-        console.error("Error al registrar:", error);
-        Swal.fire({
-          title: 'Error de Registro',
-          text: error.message,
-          icon: 'error',
-          confirmButtonColor: '#18181b'
-        });
+        console.error("Error en registro:", error);
+        let msg = "No se pudo completar el registro.";
+        if (error.code === "auth/email-already-in-use") msg = "Este correo electrónico ya está registrado en el sistema.";
+        else if (error.code === "auth/invalid-email") msg = "El correo electrónico no tiene un formato válido.";
+        Swal.fire({ title: 'Error', text: msg, icon: 'error', confirmButtonColor: '#8A1538' });
       }
     };
+
+    cargarAdministradores();
   </script>
-  
 </body>
 </html>

@@ -16,15 +16,17 @@
 
   <style>
     :root {
-      --bg-principal: #ffffff;
-      --bg-secundario: #f4f4f6;
-      --tarjeta-bg: #f9f9fb;
-      --texto-titulos: #0f0f11;
+      --yucatan-guinda: #8A1538;
+      --yucatan-guinda-hover: #6E102C;
+      --yucatan-guinda-suave: rgba(138, 21, 56, 0.08);
+      --yucatan-dorado: #C59B49;
+      --yucatan-dorado-suave: #FAF6EE;
+      --bg-principal: #f4f3ef;
+      --bg-tarjeta: #ffffff;
+      --texto-titulos: #18181b;
       --texto-cuerpo: #4a4a52;
       --texto-mutado: #71717a;
-      --borde-suave: #e4e4e7;
-      --accent-black: #18181b;
-      --accent-hover: #27272a;
+      --borde-suave: #e5e2dc;
     }
 
     * {
@@ -44,49 +46,93 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* BARRA SUPERIOR ESTILO REPORTES_ACCESOS */
     nav {
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 100%;
-      padding: 24px 20px;
+      background-color: var(--bg-tarjeta);
+      border-bottom: 1px solid var(--borde-suave);
+      padding: 16px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .brand-badge {
-      background-color: var(--bg-secundario);
-      color: var(--texto-titulos);
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-volver {
+      background-color: var(--yucatan-guinda-suave);
+      color: var(--yucatan-guinda);
       padding: 8px 16px;
-      border-radius: 20px;
+      border-radius: 12px;
       font-size: 0.85rem;
-      font-weight: 600;
+      font-weight: 700;
       text-decoration: none;
+      transition: all 0.2s ease;
     }
 
+    .btn-volver:hover {
+      background-color: var(--yucatan-guinda);
+      color: #ffffff;
+    }
+
+    .nav-title {
+      font-weight: 800;
+      color: var(--texto-titulos);
+      font-size: 1.1rem;
+    }
+
+    .nav-title span {
+      color: var(--yucatan-guinda);
+    }
+
+    .rol-pill {
+      background-color: var(--yucatan-dorado-suave);
+      color: var(--yucatan-guinda);
+      border: 1px solid rgba(197, 155, 73, 0.45);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    /* CONTENEDOR PRINCIPAL */
     .main-container {
-      max-width: 800px;
-      margin: 20px auto 60px auto;
-      padding: 40px;
-      background-color: var(--tarjeta-bg);
+      max-width: 860px;
+      margin: 32px auto 60px auto;
+      padding: 36px 40px;
+      background-color: var(--bg-tarjeta);
       border: 1px solid var(--borde-suave);
+      border-top: 5px solid var(--yucatan-guinda);
       border-radius: 24px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-      width: 100%;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.04);
+      width: 94%;
     }
 
     .main-container h2 {
       color: var(--texto-titulos);
-      font-size: 1.8rem;
+      font-size: 1.85rem;
       font-weight: 800;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.6px;
       margin-bottom: 8px;
+    }
+
+    .main-container h2 span {
+      color: var(--yucatan-guinda);
     }
 
     .main-container p.sub {
       color: var(--texto-mutado);
       font-size: 0.95rem;
-      margin-bottom: 30px;
+      margin-bottom: 28px;
+      line-height: 1.5;
     }
 
     .form-grid {
@@ -98,7 +144,7 @@
     .form-group {
       display: flex;
       flex-direction: column;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .form-group.full-width {
@@ -106,79 +152,97 @@
     }
 
     label {
-      font-size: 0.85rem;
-      font-weight: 600;
+      font-size: 0.84rem;
+      font-weight: 700;
       color: var(--texto-titulos);
       margin-bottom: 6px;
     }
 
     input, select, textarea {
-      padding: 12px 16px;
+      padding: 12px 15px;
       background-color: #ffffff;
       border: 1px solid var(--borde-suave);
       border-radius: 12px;
       font-family: 'Inter', sans-serif;
-      font-size: 0.95rem;
+      font-size: 0.94rem;
       color: var(--texto-titulos);
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     input:focus, select:focus, textarea:focus {
-      border-color: var(--accent-black);
-      box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.08);
+      border-color: var(--yucatan-guinda);
+      box-shadow: 0 0 0 3px var(--yucatan-guinda-suave);
     }
 
     textarea {
       resize: vertical;
-      height: 90px;
+      height: 92px;
     }
 
     .seccion-titulo {
       grid-column: span 2;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 700;
-      color: var(--texto-titulos);
-      border-bottom: 1px solid var(--borde-suave);
+      color: var(--yucatan-guinda);
+      border-bottom: 2px solid var(--yucatan-dorado-suave);
       padding-bottom: 8px;
       margin-top: 10px;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .seccion-titulo i {
+      color: var(--yucatan-dorado);
     }
 
     .btn-submit {
       grid-column: span 2;
-      background-color: var(--accent-black);
+      background-color: var(--yucatan-guinda);
       color: #ffffff;
       border: none;
-      padding: 14px;
+      padding: 15px;
       border-radius: 12px;
       font-size: 1rem;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
-      transition: background-color 0.2s;
-      margin-top: 15px;
+      transition: background-color 0.2s, transform 0.15s;
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
     .btn-submit:hover {
-      background-color: var(--accent-hover);
+      background-color: var(--yucatan-guinda-hover);
+      transform: translateY(-1px);
     }
 
     footer {
       border-top: 1px solid var(--borde-suave);
-      padding: 20px 30px;
+      padding: 18px 24px;
       text-align: center;
       font-size: 0.85rem;
       color: var(--texto-mutado);
+      background-color: var(--bg-tarjeta);
     }
 
     @media (max-width: 768px) {
+      nav {
+        padding: 14px 18px;
+      }
+      .main-container {
+        padding: 24px 20px;
+      }
       .form-grid {
         grid-template-columns: 1fr;
       }
-      .form-group.full-width {
-        grid-column: span 1;
-      }
-      .btn-submit, .seccion-titulo {
+      .form-group.full-width,
+      .btn-submit,
+      .seccion-titulo {
         grid-column: span 1;
       }
     }
@@ -188,19 +252,22 @@
 
   <!-- NAVEGACIÓN SUPERIOR -->
   <nav>
-    <a href="index.html" class="brand-badge"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</a>
-    <span style="font-size: 0.85rem; color: var(--texto-mutado);">Módulo de Registro de Equipos</span>
+    <div class="nav-left">
+      <a href="index.html" class="btn-volver"><i class="fa-solid fa-arrow-left"></i> Inicio</a>
+      <div class="nav-title">Alta de <span>Equipos</span></div>
+    </div>
+    <span id="indicadorRolAlta" class="rol-pill">Verificando rol...</span>
   </nav>
 
   <!-- CONTENEDOR DEL FORMULARIO -->
   <main class="main-container">
-    <h2>Alta de Nuevo Equipo</h2>
-    <p class="sub">Complete los campos institucionales para registrar el activo y generar su código QR automático.</p>
+    <h2>Registro de Nuevo <span>Equipo</span></h2>
+    <p class="sub">Complete los campos institucionales para registrar el activo y generar su etiqueta QR automáticamente.</p>
 
     <form id="formAltaEquipo" class="form-grid" onsubmit="registrarEquipo(event)">
       
       <!-- Información General -->
-      <div class="seccion-titulo">Información General</div>
+      <div class="seccion-titulo"><i class="fa-solid fa-circle-info"></i> Información General</div>
       
       <div class="form-group">
         <label for="codigoInterno">Código Interno</label>
@@ -244,7 +311,7 @@
       </div>
 
       <!-- Especificaciones Técnicas -->
-      <div class="seccion-titulo">Especificaciones Técnicas</div>
+      <div class="seccion-titulo"><i class="fa-solid fa-microchip"></i> Especificaciones Técnicas</div>
 
       <div class="form-group">
         <label for="procesador">Procesador</label>
@@ -272,7 +339,7 @@
       </div>
 
       <!-- Fechas y Garantía -->
-      <div class="seccion-titulo">Fechas y Garantía</div>
+      <div class="seccion-titulo"><i class="fa-solid fa-calendar-check"></i> Fechas y Garantía</div>
 
       <div class="form-group">
         <label for="fechaAdquisicion">Fecha de Adquisición</label>
@@ -285,7 +352,7 @@
       </div>
 
       <!-- Ubicación y Referencias -->
-      <div class="seccion-titulo">Ubicación Institucional</div>
+      <div class="seccion-titulo"><i class="fa-solid fa-location-dot"></i> Ubicación Institucional</div>
 
       <div class="form-group full-width">
         <label for="area">Área / Departamento Asignado</label>
@@ -293,7 +360,7 @@
       </div>
 
       <!-- Observaciones -->
-      <div class="seccion-titulo">Observaciones</div>
+      <div class="seccion-titulo"><i class="fa-solid fa-note-sticky"></i> Observaciones</div>
       <div class="form-group full-width">
         <textarea id="observaciones" placeholder="Detalles adicionales del equipo..."></textarea>
       </div>
@@ -309,10 +376,11 @@
     Servicios de Salud de Yucatán &copy; 2026 | Jurisdicción Sanitaria No. 2
   </footer>
 
-  <!-- SCRIPT DE FIREBASE Y LÓGICA DE REGISTRO CON LECTURA SEGURA -->
+  <!-- SCRIPT DE FIREBASE, ROL Y LÓGICA DE REGISTRO -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, doc, getDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
@@ -325,12 +393,48 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
+
+    let nombreResponsable = "Administrador";
+    let rolResponsable = "ADMINISTRADOR";
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      try {
+        const snap = await getDoc(doc(db, "usuarios", user.uid));
+        const data = snap.exists() ? snap.data() : {};
+        rolResponsable = data.activo ? (data.rol || "CONSULTA").toUpperCase() : "CONSULTA";
+        nombreResponsable = data.nombre || user.email;
+        document.getElementById("indicadorRolAlta").innerText = `Rol: ${rolResponsable}`;
+
+        if (rolResponsable !== "ADMINISTRADOR") {
+          Swal.fire({
+            title: "Acceso restringido",
+            text: "El registro de nuevos equipos corresponde al rol ADMINISTRADOR.",
+            icon: "warning",
+            confirmButtonColor: "#8A1538"
+          }).then(() => {
+            window.location.href = "index.html";
+          });
+        }
+      } catch (error) {
+        console.error("Error verificando rol en alta:", error);
+      }
+    });
 
     window.registrarEquipo = async function(event) {
       event.preventDefault();
 
-      // Función auxiliar segura para extraer valores sin riesgo de errores null
+      if (rolResponsable !== "ADMINISTRADOR") {
+        Swal.fire("Sin permiso", "Solo un ADMINISTRADOR puede dar de alta equipos.", "error");
+        return;
+      }
+
       const getVal = (id) => document.getElementById(id)?.value?.trim() || "";
 
       const codigoInterno = getVal("codigoInterno");
@@ -351,14 +455,18 @@
       try {
         const fAdq = getVal("fechaAdquisicion");
         const fGar = getVal("fechaFinGarantia");
+        const tipoEquipo = getVal("tipoEquipo");
+        const marca = getVal("marca");
+        const modelo = getVal("modelo");
+        const area = getVal("area");
 
         const nuevoEquipo = {
           activo: true,
           codigoInterno: codigoInterno,
           codigoQr: codigoQr,
-          tipoEquipo: getVal("tipoEquipo"),
-          marca: getVal("marca"),
-          modelo: getVal("modelo"),
+          tipoEquipo: tipoEquipo,
+          marca: marca,
+          modelo: modelo,
           numeroSerie: getVal("numeroSerie"),
           estado: getVal("estado"),
           especificaciones: {
@@ -372,24 +480,30 @@
           fechaAlta: Timestamp.now(),
           fechaFinGarantia: fGar ? Timestamp.fromDate(new Date(fGar + "T00:00:00")) : null,
           ubicacionRef: {
-            area: getVal("area"),
-            idSede: "",       // Campo omitido de forma segura
-            idUbicacion: ""   // Campo omitido de forma segura
+            area: area,
+            idSede: "",
+            idUbicacion: ""
           },
           observaciones: getVal("observaciones")
         };
 
-        // Guardar en Firestore
         await addDoc(collection(db, "equipos"), nuevoEquipo);
 
-        // Generar y descargar el Código QR automáticamente
+        await addDoc(collection(db, "historial_movimientos"), {
+          fecha: Timestamp.now(),
+          tipo: "ALTA",
+          codigoInterno: codigoInterno,
+          detalle: `Alta de ${tipoEquipo} ${marca} ${modelo} en área ${area}`,
+          usuario: nombreResponsable
+        });
+
         generarYDescargarQR(codigoQr);
 
         Swal.fire({
           title: '¡Registro Exitoso!',
           text: `El equipo ${codigoInterno} se ha guardado correctamente y su etiqueta QR se ha descargado.`,
           icon: 'success',
-          confirmButtonColor: '#18181b'
+          confirmButtonColor: '#8A1538'
         }).then(() => {
           document.getElementById("formAltaEquipo").reset();
         });

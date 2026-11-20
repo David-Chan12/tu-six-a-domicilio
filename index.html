@@ -15,17 +15,22 @@
 
   <style>
     :root {
-      --bg-principal: #ffffff;        /* Fondo blanco puro */
-      --bg-secundario: #f4f4f6;       /* Gris claro */
-      --tarjeta-bg: #f9f9fb;          /* Fondo de tarjetas gris ultra suave */
-      --tarjeta-hover: #ffffff;       /* Fondo al pasar el cursor */
-      --texto-titulos: #0f0f11;       /* Negro intenso para títulos */
-      --texto-cuerpo: #4a4a52;        /* Gris oscuro para textos */
-      --texto-mutado: #71717a;        /* Gris medio para subtítulos */
-      --borde-suave: #e4e4e7;         /* Borde delicado */
-      --linea-separadora: #d4d4d8;    /* Línea separadora vertical estilo portal */
-      --accent-black: #18181b;        /* Negro botón principal */
-      --accent-hover: #27272a;        /* Hover botón negro */
+      --yucatan-guinda: #8A1538;
+      --yucatan-guinda-hover: #6E102C;
+      --yucatan-guinda-suave: rgba(138, 21, 56, 0.08);
+      --yucatan-dorado: #C59B49;
+      --yucatan-dorado-suave: #FAF6EE;
+      --agua-marina: #148F8B;
+      --agua-marina-hover: #0F716E;
+      --agua-marina-suave: rgba(20, 143, 139, 0.10);
+      --bg-principal: #f4f3ef;
+      --bg-tarjeta: #ffffff;
+      --tarjeta-hover: #ffffff;
+      --texto-titulos: #18181b;
+      --texto-cuerpo: #4a4a52;
+      --texto-mutado: #71717a;
+      --borde-suave: #e5e2dc;
+      --linea-separadora: #dcd7ce;
     }
 
     * {
@@ -47,78 +52,123 @@
 
     /* BARRA SUPERIOR DE NAVEGACIÓN Y SESIÓN */
     nav {
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 100%;
-      padding: 24px 20px;
+      background-color: var(--bg-tarjeta);
+      border-bottom: 1px solid var(--borde-suave);
+      padding: 16px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
     .brand-badge {
-      background-color: var(--bg-secundario);
-      color: var(--texto-titulos);
+      background-color: var(--yucatan-guinda-suave);
+      color: var(--yucatan-guinda);
       padding: 8px 16px;
       border-radius: 20px;
       font-size: 0.85rem;
-      font-weight: 600;
+      font-weight: 700;
+    }
+
+    .session-panel {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .user-info {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--texto-titulos);
+      background-color: var(--bg-principal);
+      border: 1px solid var(--borde-suave);
+      padding: 7px 14px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rol-tag {
+      background-color: var(--yucatan-guinda);
+      color: #ffffff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      letter-spacing: 0.4px;
     }
 
     .btn-pill-primary {
-      background-color: var(--accent-black);
+      background-color: var(--yucatan-guinda);
       color: #ffffff;
-      border: none;
-      padding: 10px 22px;
+      border: 2px solid var(--agua-marina);
+      padding: 9px 22px;
       border-radius: 30px;
       font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background-color 0.2s ease;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 0 3px var(--agua-marina-suave);
     }
 
     .btn-pill-primary:hover {
-      background-color: var(--accent-hover);
+      background-color: var(--yucatan-guinda-hover);
+      border-color: var(--agua-marina-hover);
     }
 
     /* ENCABEZADO INSTITUCIONAL */
     header {
       text-align: center;
       max-width: 900px;
-      margin: 30px auto 20px auto;
+      margin: 34px auto 16px auto;
       padding: 0 20px;
     }
 
     .header-subtítulo {
-      color: var(--texto-mutado);
-      font-size: 0.85rem;
+      color: var(--yucatan-guinda);
+      font-size: 0.82rem;
       text-transform: uppercase;
-      letter-spacing: 1.5px;
-      font-weight: 600;
+      letter-spacing: 1.6px;
+      font-weight: 700;
       margin-bottom: 10px;
     }
 
     header h1 {
       color: var(--texto-titulos);
-      font-size: 2.5rem;
+      font-size: 2.45rem;
       font-weight: 800;
       letter-spacing: -1px;
       line-height: 1.2;
       margin-bottom: 12px;
     }
 
+    header h1 span {
+      color: var(--yucatan-guinda);
+    }
+
     header p {
       color: var(--texto-mutado);
-      font-size: 1.05rem;
+      font-size: 1.02rem;
       font-weight: 400;
     }
 
-    /* PORTAL DE OPCIONES / DASHBOARD (ESTRUCTURA DEL MODELO 1 CON COLORES DEL MODELO 2) */
+    /* PORTAL DE OPCIONES / DASHBOARD */
     .portal-container {
-      max-width: 1100px;
-      margin: 30px auto 60px auto;
-      padding: 0 20px;
-      width: 100%;
+      max-width: 1220px;
+      margin: 28px auto 60px auto;
+      padding: 30px 24px;
+      background-color: var(--bg-tarjeta);
+      border: 1px solid var(--borde-suave);
+      border-top: 5px solid var(--yucatan-guinda);
+      border-radius: 24px;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.04);
+      width: 94%;
     }
 
     .grid-portal {
@@ -126,7 +176,7 @@
       justify-content: center;
       align-items: center;
       flex-wrap: wrap;
-      gap: 0; 
+      gap: 14px 0;
     }
 
     .opcion-wrapper {
@@ -135,12 +185,12 @@
     }
 
     .tarjeta-opcion {
-      background-color: var(--tarjeta-bg);
+      background-color: var(--bg-principal);
       color: var(--texto-titulos);
-      width: 170px;
-      height: 170px;
+      width: 165px;
+      height: 165px;
       border-radius: 20px;
-      padding: 20px 15px;
+      padding: 18px 14px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -150,59 +200,93 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
       transition: all 0.25s ease;
       cursor: pointer;
-      border: 1px solid var(--borde-suave);
+      border: 2px solid var(--agua-marina);
+      position: relative;
     }
 
     .tarjeta-opcion:hover {
       background-color: var(--tarjeta-hover);
       transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-      border-color: #d1d1d6;
+      box-shadow: 0 10px 25px rgba(20, 143, 139, 0.16);
+      border-color: var(--agua-marina-hover);
     }
 
     .tarjeta-opcion i {
-      font-size: 2.5rem;
-      color: var(--texto-titulos);
-      margin-bottom: 14px;
-      transition: transform 0.2s ease;
+      font-size: 2.2rem;
+      color: var(--yucatan-guinda);
+      margin-bottom: 12px;
+      transition: transform 0.2s ease, color 0.2s ease;
     }
 
     .tarjeta-opcion:hover i {
       transform: scale(1.1);
+      color: var(--agua-marina-hover);
     }
 
     .tarjeta-opcion span {
-      font-size: 0.9rem;
-      font-weight: 600;
+      font-size: 0.86rem;
+      font-weight: 700;
       line-height: 1.25;
       letter-spacing: -0.2px;
     }
 
-    /* LÍNEA SEPARADORA VERTICAL (CARACTERÍSTICA DEL MODELO 1) */
+    /* LÍNEA SEPARADORA VERTICAL */
     .separador-vertical {
       width: 1px;
-      height: 90px;
+      height: 85px;
       background-color: var(--linea-separadora);
-      margin: 0 22px;
-      opacity: 0.8;
+      margin: 0 14px;
+      opacity: 0.9;
+    }
+
+    /* ESTADO DESHABILITADO / APAGADO PARA OPCIONES NO PERMITIDAS POR EL ROL */
+    .modulo-deshabilitado {
+      filter: grayscale(100%) !important;
+      opacity: 0.42 !important;
+      pointer-events: none !important;
+      cursor: not-allowed !important;
+      background-color: #e5e5e5 !important;
+      border: 1px solid #cccccc !important;
+      box-shadow: none !important;
+    }
+
+    .modulo-deshabilitado i {
+      color: #52525b !important;
+    }
+
+    .modulo-deshabilitado::after {
+      content: "Bloqueado";
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #3f3f46;
+      color: #ffffff;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 10px;
     }
 
     /* PIE DE PÁGINA */
     footer {
       border-top: 1px solid var(--borde-suave);
-      padding: 20px 30px;
+      padding: 18px 24px;
       text-align: center;
       font-size: 0.85rem;
       color: var(--texto-mutado);
+      background-color: var(--bg-tarjeta);
     }
 
     /* ADAPTABILIDAD EN MÓVILES */
     @media (max-width: 900px) {
+      nav {
+        padding: 14px 18px;
+      }
       .grid-portal {
-        gap: 16px;
+        gap: 14px;
       }
       .separador-vertical {
-        display: none; /* Se ocultan las líneas verticales en pantallas pequeñas para apilar las tarjetas */
+        display: none;
       }
       .tarjeta-opcion {
         width: 150px;
@@ -219,8 +303,12 @@
   <!-- BARRA SUPERIOR -->
   <nav>
     <div class="brand-badge">Jurisdicción Sanitaria No. 2</div>
-    <div style="display: flex; align-items: center; gap: 12px;">
-      <span style="font-size: 0.9rem; font-weight: 500; color: var(--texto-mutado);">Técnico de Informática</span>
+    <div class="session-panel">
+      <div class="user-info">
+        <i class="fa-solid fa-user-shield"></i>
+        <span id="nombreUsuario">Verificando sesión...</span>
+        <span class="rol-tag" id="etiquetaRol">CARGANDO</span>
+      </div>
       <button class="btn-pill-primary" onclick="cerrarSesion()">Cerrar sesión</button>
     </div>
   </nav>
@@ -229,37 +317,17 @@
     <!-- ENCABEZADO -->
     <header>
       <div class="header-subtítulo">Servicios de Salud de Yucatán</div>
-      <h1>Plataforma de Inventarios y Control de Equipos</h1>
-      <p>Selecciona el módulo correspondiente para gestionar los activos tecnológicos de la institución.</p>
+      <h1><span>Plataforma de Inventarios y Control de Equipos</span></h1>
+      <p>Selecciona el módulo correspondiente para empezar a trabajar.</p>
     </header>
 
-    <!-- DASHBOARD PRINCIPAL (ESTRUCTURA DE LÍNEA CON SEPARADORES VERTICALES) -->
+    <!-- DASHBOARD PRINCIPAL -->
     <section class="portal-container">
       <div class="grid-portal">
 
-        <!-- Opción 1: Escanear QR -->
+        <!-- Opción 1: Registro de Equipos (Administrador) -->
         <div class="opcion-wrapper">
-          <a href="escaner.html" class="tarjeta-opcion">
-  <i class="fa-solid fa-qrcode"></i>
-  <span>Escanear Código QR</span>
-</a>
-        </div>
-
-        <div class="separador-vertical"></div>
-
-        <!-- Opción 2: Inventario General -->
-        <div class="opcion-wrapper">
-          <a href="inventario.html" class="tarjeta-opcion">
-            <i class="fa-solid fa-desktop"></i>
-            <span>Inventario General</span>
-          </a>
-        </div>
-
-        <div class="separador-vertical"></div>
-
-        <!-- Opción 3: Registro de Equipos -->
-        <div class="opcion-wrapper">
-          <a href="alta.html" class="tarjeta-opcion">
+          <a href="alta.html" id="card-alta-equipos" class="tarjeta-opcion">
             <i class="fa-solid fa-folder-plus"></i>
             <span>Registro de Equipos</span>
           </a>
@@ -267,9 +335,29 @@
 
         <div class="separador-vertical"></div>
 
-        <!-- Opción 4: Servicios y Mantenimiento -->
+        <!-- Opción 2: Escanear QR (Técnico y Consulta) -->
         <div class="opcion-wrapper">
-          <a href="mantenimientos.html" class="tarjeta-opcion">
+          <a href="escaner.html" id="card-escaner-qr" class="tarjeta-opcion">
+            <i class="fa-solid fa-qrcode"></i>
+            <span>Escanear Código QR</span>
+          </a>
+        </div>
+
+        <div class="separador-vertical"></div>
+
+        <!-- Opción 3: Inventario General (Consulta / Seguimiento / Técnico) -->
+        <div class="opcion-wrapper">
+          <a href="inventario.html" id="card-consulta-inventario" class="tarjeta-opcion">
+            <i class="fa-solid fa-desktop"></i>
+            <span>Inventario y Ubicación</span>
+          </a>
+        </div>
+
+        <div class="separador-vertical"></div>
+
+        <!-- Opción 4: Servicios y Mantenimiento (Técnico) -->
+        <div class="opcion-wrapper">
+          <a href="mantenimientos.html" id="card-mantenimiento" class="tarjeta-opcion">
             <i class="fa-solid fa-screwdriver-wrench"></i>
             <span>Mantenimiento y Servicios</span>
           </a>
@@ -277,12 +365,42 @@
 
         <div class="separador-vertical"></div>
 
-        <!-- Opción 5: Bajas de Equipos -->
+        <!-- Opción 5: Bajas de Equipos (Administrador / Técnico) -->
         <div class="opcion-wrapper">
-          <a href="bajas.html" class="tarjeta-opcion">
-  <i class="fa-solid fa-ban"></i>
-  <span>Bajas de Equipos</span>
-</a>
+          <a href="bajas.html" id="card-bajas-equipos" class="tarjeta-opcion">
+            <i class="fa-solid fa-ban"></i>
+            <span>Bajas de Equipos</span>
+          </a>
+        </div>
+
+        <div class="separador-vertical"></div>
+
+        <!-- Opción 6: Dashboard Reportes de Equipos -->
+        <div class="opcion-wrapper">
+          <a href="reportes_equipos.html" id="card-reportes-equipos" class="tarjeta-opcion">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Reportes de Equipos</span>
+          </a>
+        </div>
+
+        <div class="separador-vertical"></div>
+
+        <!-- Opción 7: Auditoría de Accesos y Roles -->
+        <div class="opcion-wrapper">
+          <a href="reportes_accesos.html" id="card-reportes-accesos" class="tarjeta-opcion">
+            <i class="fa-solid fa-user-clock"></i>
+            <span>Auditoría de Accesos</span>
+          </a>
+        </div>
+
+        <div class="separador-vertical"></div>
+
+        <!-- Opción 8: Aprobación de Usuarios y Roles (Administrador) -->
+        <div class="opcion-wrapper">
+          <a href="gestion_usuarios.html" id="card-gestion-usuarios" class="tarjeta-opcion">
+            <i class="fa-solid fa-users-gear"></i>
+            <span>Usuarios y Roles</span>
+          </a>
         </div>
 
       </div>
@@ -291,13 +409,14 @@
 
   <!-- PIE DE PÁGINA -->
   <footer>
-    Beta de proyecto | Sistema de Control prototipo
+    Servicios de Salud de Yucatán &copy; 2026 | Jurisdicción Sanitaria No. 2
   </footer>
 
-  <!-- SCRIPT DE FIREBASE Y FUNCIONES DE NAVEGACIÓN -->
+  <!-- SCRIPT DE FIREBASE, SESIÓN Y CONTROL DE ROLES -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
@@ -311,25 +430,106 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    window.abrirModulo = function(nombreModulo) {
-      Swal.fire({
-        title: nombreModulo,
-        text: `Accediendo al módulo de ${nombreModulo}...`,
-        icon: 'info',
-        timer: 1500,
-        showConfirmButton: false
+    function obtenerSoloNombres(data, emailFallback) {
+      if (data?.nombres && data.nombres.trim()) {
+        return data.nombres.trim();
+      }
+      if (data?.nombre && data.nombre.trim()) {
+        const partes = data.nombre.trim().split(/\s+/);
+        // Si tiene 3 o más palabras (ej. Nombre + Ap. Paterno + Ap. Materno), toma solo los nombres
+        if (partes.length >= 3) {
+          return partes.slice(0, -2).join(" ");
+        }
+        return partes[0];
+      }
+      return emailFallback || "Usuario";
+    }
+
+    function aplicarPermisosPorRol(rolRaw) {
+      const rol = (rolRaw || "CONSULTA").toUpperCase();
+
+      const tarjetas = {
+        altaEquipos: document.getElementById("card-alta-equipos"),
+        escanerQR: document.getElementById("card-escaner-qr"),
+        consultaInventario: document.getElementById("card-consulta-inventario"),
+        mantenimiento: document.getElementById("card-mantenimiento"),
+        bajasEquipos: document.getElementById("card-bajas-equipos"),
+        reportesEquipos: document.getElementById("card-reportes-equipos"),
+        reportesAccesos: document.getElementById("card-reportes-accesos"),
+        gestionUsuarios: document.getElementById("card-gestion-usuarios")
+      };
+
+      const matrizPermisos = {
+        "ADMINISTRADOR": [
+          "altaEquipos",
+          "bajasEquipos",
+          "reportesEquipos",
+          "reportesAccesos",
+          "gestionUsuarios"
+        ],
+        "TÉCNICO": [
+          "escanerQR",
+          "consultaInventario",
+          "mantenimiento",
+          "bajasEquipos",
+          "reportesEquipos"
+        ],
+        "CONSULTA": [
+          "escanerQR",
+          "consultaInventario",
+          "reportesEquipos"
+        ]
+      };
+
+      const habilitados = matrizPermisos[rol] || matrizPermisos["CONSULTA"];
+
+      Object.entries(tarjetas).forEach(([clave, elemento]) => {
+        if (!elemento) return;
+        if (habilitados.includes(clave)) {
+          elemento.classList.remove("modulo-deshabilitado");
+        } else {
+          elemento.classList.add("modulo-deshabilitado");
+        }
       });
-    };
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      try {
+        const docSnap = await getDoc(doc(db, "usuarios", user.uid));
+        if (docSnap.exists() && docSnap.data().activo) {
+          const data = docSnap.data();
+          const rolActual = (data.rol || "CONSULTA").toUpperCase();
+
+          document.getElementById("nombreUsuario").innerText = obtenerSoloNombres(data, user.email);
+          document.getElementById("etiquetaRol").innerText = rolActual;
+          aplicarPermisosPorRol(rolActual);
+        } else {
+          await signOut(auth);
+          window.location.href = "login.html";
+        }
+      } catch (err) {
+        console.error("Error obteniendo rol de usuario:", err);
+        document.getElementById("nombreUsuario").innerText = user.email;
+        document.getElementById("etiquetaRol").innerText = "CONSULTA";
+        aplicarPermisosPorRol("CONSULTA");
+      }
+    });
 
     window.cerrarSesion = function() {
-          signOut(auth).then(() => {
-            window.location.href = "login.html"; // Redirige al login correctamente
-          }).catch((error) => {
-            console.error("Error al cerrar sesión:", error);
-            window.location.href = "login.html"; // Redirige de todos modos por seguridad
-          });
-        };
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      }).catch((error) => {
+        console.error("Error al cerrar sesión:", error);
+        window.location.href = "login.html";
+      });
+    };
   </script>
 </body>
 </html>

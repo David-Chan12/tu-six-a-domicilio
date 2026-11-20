@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aprobación de Usuarios y Roles | Jurisdicción Sanitaria No. 2</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    :root {
+      --yucatan-guinda: #8A1538;
+      --yucatan-guinda-hover: #6E102C;
+      --yucatan-guinda-suave: rgba(138, 21, 56, 0.08);
+      --yucatan-dorado: #C59B49;
+      --yucatan-dorado-suave: #FAF6EE;
+      --bg-principal: #f4f3ef;
+      --bg-tarjeta: #ffffff;
+      --texto-titulos: #18181b;
+      --texto-cuerpo: #4a4a52;
+      --texto-mutado: #71717a;
+      --borde-suave: #e5e2dc;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: var(--bg-principal);
+      color: var(--texto-cuerpo);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    nav {
+      background-color: var(--bg-tarjeta);
+      border-bottom: 1px solid var(--borde-suave);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-left { display: flex; align-items: center; gap: 16px; }
+    .btn-volver {
+      background-color: var(--yucatan-guinda-suave);
+      color: var(--yucatan-guinda);
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .btn-volver:hover { background-color: var(--yucatan-guinda); color: #fff; }
+    .nav-title { font-weight: 800; color: var(--texto-titulos); font-size: 1.1rem; }
+    .nav-title span { color: var(--yucatan-guinda); }
+
+    .container { max-width: 1200px; margin: 30px auto; padding: 0 24px; width: 100%; flex: 1; }
+
+    .card-panel {
+      background-color: var(--bg-tarjeta);
+      border: 1px solid var(--borde-suave);
+      border-radius: 24px;
+      padding: 28px;
+      margin-bottom: 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    }
+
+    .card-panel h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--texto-titulos);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+    th { background-color: var(--bg-principal); padding: 12px 16px; border-bottom: 2px solid var(--borde-suave); color: var(--texto-titulos); }
+    td { padding: 14px 16px; border-bottom: 1px solid var(--borde-suave); }
+
+    select.rol-select {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--borde-suave);
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-aprobar {
+      background-color: #16a34a;
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.82rem;
+    }
+    .btn-aprobar:hover { background-color: #15803d; }
+
+    .btn-desactivar {
+      background-color: #dc2626;
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.82rem;
+    }
+    .btn-desactivar:hover { background-color: #b91c1c; }
+
+    .badge-pendiente {
+      background-color: #fef3c7;
+      color: #92400e;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .badge-activo {
+      background-color: #dcfce7;
+      color: #166534;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-left">
+      <a href="index.html" class="btn-volver"><i class="fa-solid fa-arrow-left"></i> Inicio</a>
+      <div class="nav-title">Autorización de <span>Usuarios y Roles</span></div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- SOLICITUDES PENDIENTES -->
+    <div class="card-panel" style="border-top: 5px solid var(--yucatan-dorado);">
+      <h2><i class="fa-solid fa-user-clock" style="color: var(--yucatan-dorado);"></i> Solicitudes Pendientes de Autorización</h2>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Rol Solicitado (Editable)</th>
+              <th>Admin Asignado</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tablaPendientes">
+            <tr><td colspan="5" style="text-align:center;">Cargando solicitudes...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- USUARIOS ACTIVOS -->
+    <div class="card-panel" style="border-top: 5px solid var(--yucatan-guinda);">
+      <h2><i class="fa-solid fa-users-gear" style="color: var(--yucatan-guinda);"></i> Personal Autorizado en el Sistema</h2>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Rol Actual</th>
+              <th>Estado</th>
+              <th>Control</th>
+            </tr>
+          </thead>
+          <tbody id="tablaActivos">
+            <tr><td colspan="5" style="text-align:center;">Cargando personal...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
+      authDomain: "control-de-equipos-762c4.firebaseapp.com",
+      projectId: "control-de-equipos-762c4",
+      storageBucket: "control-de-equipos-762c4.firebasestorage.app",
+      messagingSenderId: "711982599026",
+      appId: "1:711982599026:web:ba92c737011b38f882abeb",
+      measurementId: "G-X1M2R00M55"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function cargarUsuarios() {
+      const snap = await getDocs(collection(db, "usuarios"));
+      let htmlPendientes = "";
+      let htmlActivos = "";
+
+      snap.forEach(docSnap => {
+        const u = docSnap.data();
+        const uid = docSnap.id;
+        const rolActual = (u.rol || "CONSULTA").toUpperCase();
+
+        if (!u.activo) {
+          htmlPendientes += `
+            <tr>
+              <td><strong>${u.nombre}</strong></td>
+              <td>${u.email}</td>
+              <td>
+                <select id="rol-${uid}" class="rol-select">
+                  <option value="ADMINISTRADOR" ${rolActual === 'ADMINISTRADOR' ? 'selected' : ''}>ADMINISTRADOR</option>
+                  <option value="TÉCNICO" ${rolActual === 'TÉCNICO' ? 'selected' : ''}>TÉCNICO</option>
+                  <option value="CONSULTA" ${rolActual === 'CONSULTA' ? 'selected' : ''}>CONSULTA</option>
+                </select>
+              </td>
+              <td>${u.adminAsignadoNombre || 'Cualquier Admin'}</td>
+              <td>
+                <button class="btn-aprobar" onclick="aprobarUsuario('${uid}', '${u.nombre}', '${u.email}')">
+                  <i class="fa-solid fa-check"></i> Aceptar y Activar
+                </button>
+              </td>
+            </tr>
+          `;
+        } else {
+          htmlActivos += `
+            <tr>
+              <td><strong>${u.nombre}</strong></td>
+              <td>${u.email}</td>
+              <td>
+                <select id="rol-activo-${uid}" class="rol-select" onchange="cambiarRolActivo('${uid}', this.value)">
+                  <option value="ADMINISTRADOR" ${rolActual === 'ADMINISTRADOR' ? 'selected' : ''}>ADMINISTRADOR</option>
+                  <option value="TÉCNICO" ${rolActual === 'TÉCNICO' ? 'selected' : ''}>TÉCNICO</option>
+                  <option value="CONSULTA" ${rolActual === 'CONSULTA' ? 'selected' : ''}>CONSULTA</option>
+                </select>
+              </td>
+              <td><span class="badge-activo">ACTIVO</span></td>
+              <td>
+                <button class="btn-desactivar" onclick="desactivarUsuario('${uid}', '${u.nombre}')">
+                  <i class="fa-solid fa-ban"></i> Revocar Acceso
+                </button>
+              </td>
+            </tr>
+          `;
+        }
+      });
+
+      document.getElementById("tablaPendientes").innerHTML = htmlPendientes || `<tr><td colspan="5" style="text-align:center;">No hay solicitudes pendientes.</td></tr>`;
+      document.getElementById("tablaActivos").innerHTML = htmlActivos || `<tr><td colspan="5" style="text-align:center;">No hay usuarios activos.</td></tr>`;
+    }
+
+    window.aprobarUsuario = async function(uid, nombre, email) {
+      const rolElegido = document.getElementById(`rol-${uid}`).value;
+      try {
+        await updateDoc(doc(db, "usuarios", uid), {
+          activo: true,
+          rol: rolElegido,
+          estadoSolicitud: "APROBADO"
+        });
+
+        Swal.fire({
+          title: '¡Usuario Autorizado!',
+          text: `${nombre} ahora puede iniciar sesión con el rol de ${rolElegido}.`,
+          icon: 'success',
+          confirmButtonColor: '#8A1538'
+        });
+        cargarUsuarios();
+      } catch (e) {
+        Swal.fire('Error', 'No se pudo actualizar el usuario.', 'error');
+      }
+    };
+
+    window.cambiarRolActivo = async function(uid, nuevoRol) {
+      await updateDoc(doc(db, "usuarios", uid), { rol: nuevoRol });
+      Swal.fire({ title: 'Rol actualizado', text: `Nuevo rol asignado: ${nuevoRol}`, icon: 'success', timer: 1200, showConfirmButton: false });
+    };
+
+    window.desactivarUsuario = async function(uid, nombre) {
+      await updateDoc(doc(db, "usuarios", uid), { activo: false, estadoSolicitud: "REVOCADO" });
+      Swal.fire('Acceso revocado', `Se desactivó la cuenta de ${nombre}.`, 'info');
+      cargarUsuarios();
+    };
+
+    cargarUsuarios();
+  </script>
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Auditoría de Accesos y Roles | Jurisdicción Sanitaria No. 2</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --yucatan-guinda: #8A1538;
+      --yucatan-guinda-hover: #6E102C;
+      --yucatan-guinda-suave: rgba(138, 21, 56, 0.08);
+      --yucatan-dorado: #C59B49;
+      --yucatan-dorado-suave: #FAF6EE;
+      --bg-principal: #f4f3ef;
+      --bg-tarjeta: #ffffff;
+      --texto-titulos: #18181b;
+      --texto-cuerpo: #4a4a52;
+      --texto-mutado: #71717a;
+      --borde-suave: #e5e2dc;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: var(--bg-principal);
+      color: var(--texto-cuerpo);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    nav {
+      background-color: var(--bg-tarjeta);
+      border-bottom: 1px solid var(--borde-suave);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-left { display: flex; align-items: center; gap: 16px; }
+
+    .btn-volver {
+      background-color: var(--yucatan-guinda-suave);
+      color: var(--yucatan-guinda);
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .btn-volver:hover { background-color: var(--yucatan-guinda); color: #fff; }
+
+    .nav-title { font-weight: 800; color: var(--texto-titulos); font-size: 1.1rem; }
+    .nav-title span { color: var(--yucatan-guinda); }
+
+    .container {
+      max-width: 1280px;
+      margin: 30px auto;
+      padding: 0 24px;
+      width: 100%;
+      flex: 1;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    .kpi-card {
+      background-color: var(--bg-tarjeta);
+      border: 1px solid var(--borde-suave);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.02);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .kpi-info h3 { font-size: 0.8rem; color: var(--texto-mutado); text-transform: uppercase; margin-bottom: 6px; }
+    .kpi-info .number { font-size: 2rem; font-weight: 800; color: var(--texto-titulos); }
+
+    .kpi-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+
+    .layout-2col {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .card-panel {
+      background-color: var(--bg-tarjeta);
+      border: 1px solid var(--borde-suave);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    }
+
+    .card-panel h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--texto-titulos);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-panel h2 i { color: var(--yucatan-dorado); }
+
+    .table-wrapper { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background-color: var(--bg-principal);
+      color: var(--texto-titulos);
+      font-weight: 700;
+      padding: 12px 16px;
+      border-bottom: 2px solid var(--borde-suave);
+    }
+
+    td {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--borde-suave);
+    }
+
+    .role-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background-color: var(--yucatan-dorado-suave);
+      color: var(--yucatan-guinda);
+      border: 1px solid rgba(197, 155, 73, 0.4);
+    }
+
+    .status-dot {
+      height: 9px;
+      width: 9px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    .status-active { background-color: #16a34a; }
+    .status-inactive { background-color: #dc2626; }
+
+    footer {
+      border-top: 1px solid var(--borde-suave);
+      padding: 18px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--texto-mutado);
+      background-color: var(--bg-tarjeta);
+    }
+
+    @media (max-width: 900px) {
+      .layout-2col { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-left">
+      <a href="index.html" class="btn-volver"><i class="fa-solid fa-arrow-left"></i> Inicio</a>
+      <div class="nav-title">Auditoría de <span>Usuarios y Accesos</span></div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- TARJETAS KPI -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <h3>Usuarios Registrados</h3>
+          <div class="number" id="kpiUsuarios">0</div>
+        </div>
+        <div class="kpi-icon" style="background: var(--yucatan-guinda-suave); color: var(--yucatan-guinda);">
+          <i class="fa-solid fa-users"></i>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <h3>Cuentas Activas</h3>
+          <div class="number" id="kpiActivos">0</div>
+        </div>
+        <div class="kpi-icon" style="background: #dcfce7; color: #166534;">
+          <i class="fa-solid fa-user-check"></i>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <h3>Accesos Registrados</h3>
+          <div class="number" id="kpiTotalAccesos">0</div>
+        </div>
+        <div class="kpi-icon" style="background: var(--yucatan-dorado-suave); color: var(--yucatan-dorado);">
+          <i class="fa-solid fa-right-to-bracket"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRÁFICA DE ROLES Y DIRECTORIO DE USUARIOS -->
+    <div class="layout-2col">
+      <div class="card-panel">
+        <h2><i class="fa-solid fa-id-badge"></i> Distribución de Roles</h2>
+        <div style="height: 250px; display: flex; justify-content: center;">
+          <canvas id="chartRoles"></canvas>
+        </div>
+      </div>
+
+      <div class="card-panel">
+        <h2><i class="fa-solid fa-address-book"></i> Directorio de Personal y Permisos</h2>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Correo Institucional</th>
+                <th>Rol Asignado</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tablaUsuarios">
+              <tr><td colspan="4" style="text-align:center;">Cargando usuarios...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- BITÁCORA DE ENTRADAS AL SISTEMA -->
+    <div class="card-panel">
+      <h2><i class="fa-solid fa-shield-halved"></i> Historial de Inicios de Sesión (Entradas al Sistema)</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha y Hora de Acceso</th>
+              <th>Usuario</th>
+              <th>Correo</th>
+              <th>Rol con el que ingresó</th>
+              <th>Dispositivo / Navegador</th>
+            </tr>
+          </thead>
+          <tbody id="tablaAccesos">
+            <tr><td colspan="5" style="text-align:center;">Cargando historial de accesos...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Servicios de Salud de Yucatán &copy; 2026 | Control de Seguridad y Auditoría
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
+      authDomain: "control-de-equipos-762c4.firebaseapp.com",
+      projectId: "control-de-equipos-762c4",
+      storageBucket: "control-de-equipos-762c4.firebasestorage.app",
+      messagingSenderId: "711982599026",
+      appId: "1:711982599026:web:ba92c737011b38f882abeb",
+      measurementId: "G-X1M2R00M55"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function cargarAuditoria() {
+      try {
+        // 1. Cargar Usuarios y Roles
+        const snapUsuarios = await getDocs(collection(db, "usuarios"));
+        let totalUsuarios = 0, activos = 0;
+        let conteoRoles = {};
+        let filasUsuarios = "";
+
+        snapUsuarios.forEach(doc => {
+          const u = doc.data();
+          totalUsuarios++;
+          if (u.activo) activos++;
+
+          const rol = (u.rol || "Sin Rol").toUpperCase();
+          conteoRoles[rol] = (conteoRoles[rol] || 0) + 1;
+
+          const estadoHtml = u.activo 
+            ? `<span class="status-dot status-active"></span>Activo` 
+            : `<span class="status-dot status-inactive"></span>Inactivo`;
+
+          filasUsuarios += `
+            <tr>
+              <td><strong>${u.nombre || 'Usuario'}</strong></td>
+              <td>${u.email || u.correo || '—'}</td>
+              <td><span class="role-badge">${rol}</span></td>
+              <td>${estadoHtml}</td>
+            </tr>
+          `;
+        });
+
+        document.getElementById("kpiUsuarios").innerText = totalUsuarios;
+        document.getElementById("kpiActivos").innerText = activos;
+        document.getElementById("tablaUsuarios").innerHTML = filasUsuarios || `<tr><td colspan="4" style="text-align:center;">No hay usuarios registrados.</td></tr>`;
+
+        // Gráfica de Roles
+        new Chart(document.getElementById('chartRoles'), {
+          type: 'pie',
+          data: {
+            labels: Object.keys(conteoRoles),
+            datasets: [{
+              data: Object.values(conteoRoles),
+              backgroundColor: ['#8A1538', '#C59B49', '#2563eb', '#16a34a', '#71717a'],
+              borderWidth: 2,
+              borderColor: '#ffffff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+          }
+        });
+
+        // 2. Cargar Historial de Accesos (colección historial_accesos)
+        const snapAccesos = await getDocs(collection(db, "historial_accesos"));
+        let listaAccesos = [];
+
+        snapAccesos.forEach(doc => {
+          const a = doc.data();
+          const fecha = a.fecha?.toDate ? a.fecha.toDate() : new Date();
+          listaAccesos.push({ ...a, fechaObj: fecha });
+        });
+
+        // Ordenar por más reciente
+        listaAccesos.sort((a, b) => b.fechaObj - a.fechaObj);
+        document.getElementById("kpiTotalAccesos").innerText = listaAccesos.length;
+
+        const tbodyAccesos = document.getElementById("tablaAccesos");
+        if (listaAccesos.length === 0) {
+          tbodyAccesos.innerHTML = `<tr><td colspan="5" style="text-align:center;">Aún no se han registrado inicios de sesión desde la actualización.</td></tr>`;
+        } else {
+          tbodyAccesos.innerHTML = listaAccesos.map(acc => {
+            const fechaStr = acc.fechaObj.toLocaleDateString('es-MX', {
+              year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+            return `
+              <tr>
+                <td>${fechaStr}</td>
+                <td><strong>${acc.nombre || 'Usuario'}</strong></td>
+                <td>${acc.email || '—'}</td>
+                <td><span class="role-badge">${(acc.rol || 'USUARIO').toUpperCase()}</span></td>
+                <td style="font-size: 0.8rem; color: var(--texto-mutado);">${acc.navegador || 'Web Browser'}</td>
+              </tr>
+            `;
+          }).join('');
+        }
+
+      } catch (error) {
+        console.error("Error cargando auditoría:", error);
+      }
+    }
+
+    cargarAuditoria();
+  </script>
+</body>
+</html>

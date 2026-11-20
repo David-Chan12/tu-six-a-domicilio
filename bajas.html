@@ -16,15 +16,17 @@
 
   <style>
     :root {
-      --bg-principal: #ffffff;
-      --bg-secundario: #f4f4f6;
-      --tarjeta-bg: #f9f9fb;
-      --texto-titulos: #0f0f11;
+      --yucatan-guinda: #8A1538;
+      --yucatan-guinda-hover: #6E102C;
+      --yucatan-guinda-suave: rgba(138, 21, 56, 0.08);
+      --yucatan-dorado: #C59B49;
+      --yucatan-dorado-suave: #FAF6EE;
+      --bg-principal: #f4f3ef;
+      --bg-tarjeta: #ffffff;
+      --texto-titulos: #18181b;
       --texto-cuerpo: #4a4a52;
       --texto-mutado: #71717a;
-      --borde-suave: #e4e4e7;
-      --accent-black: #18181b;
-      --accent-hover: #27272a;
+      --borde-suave: #e5e2dc;
     }
 
     * {
@@ -44,35 +46,63 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* BARRA SUPERIOR */
     nav {
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 100%;
-      padding: 24px 20px;
+      background-color: var(--bg-tarjeta);
+      border-bottom: 1px solid var(--borde-suave);
+      padding: 16px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .brand-badge {
-      background-color: var(--bg-secundario);
-      color: var(--texto-titulos);
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-volver {
+      background-color: var(--yucatan-guinda-suave);
+      color: var(--yucatan-guinda);
       padding: 8px 16px;
-      border-radius: 20px;
+      border-radius: 12px;
       font-size: 0.85rem;
-      font-weight: 600;
+      font-weight: 700;
       text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-volver:hover {
+      background-color: var(--yucatan-guinda);
+      color: #ffffff;
+    }
+
+    .nav-title {
+      font-weight: 800;
+      color: var(--texto-titulos);
+      font-size: 1.1rem;
+    }
+
+    .nav-title span {
+      color: var(--yucatan-guinda);
     }
 
     .main-container {
-      max-width: 1100px;
-      margin: 20px auto 60px auto;
-      padding: 30px;
-      background-color: var(--tarjeta-bg);
+      max-width: 1140px;
+      margin: 32px auto 60px auto;
+      padding: 32px;
+      background-color: var(--bg-tarjeta);
       border: 1px solid var(--borde-suave);
+      border-top: 5px solid var(--yucatan-guinda);
       border-radius: 24px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-      width: 100%;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.04);
+      width: 94%;
     }
 
     .header-seccion {
@@ -91,6 +121,20 @@
       letter-spacing: -0.5px;
     }
 
+    .header-seccion h2 span {
+      color: var(--yucatan-guinda);
+    }
+
+    .contador-pill {
+      background-color: var(--yucatan-dorado-suave);
+      color: var(--yucatan-guinda);
+      border: 1px solid rgba(197, 155, 73, 0.45);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
     .controles-barra {
       display: flex;
       gap: 12px;
@@ -107,6 +151,7 @@
       font-size: 0.95rem;
       color: var(--texto-titulos);
       outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .controles-barra input {
@@ -115,8 +160,8 @@
     }
 
     .controles-barra input:focus, .controles-barra select:focus {
-      border-color: var(--accent-black);
-      box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.08);
+      border-color: var(--yucatan-guinda);
+      box-shadow: 0 0 0 3px var(--yucatan-guinda-suave);
     }
 
     .tabla-wrapper {
@@ -139,9 +184,13 @@
     }
 
     th {
-      background-color: #fafafa;
+      background-color: var(--bg-principal);
       color: var(--texto-titulos);
       font-weight: 700;
+    }
+
+    tr:hover td {
+      background-color: #faf9f7;
     }
 
     tr:last-child td {
@@ -149,7 +198,7 @@
     }
 
     .link-codigo {
-      color: #2563eb;
+      color: var(--yucatan-guinda);
       font-weight: 700;
       text-decoration: none;
       cursor: pointer;
@@ -170,25 +219,36 @@
     }
 
     .btn-accion {
-      background: var(--bg-secundario);
+      background: var(--yucatan-guinda-suave);
       border: none;
-      padding: 6px 12px;
+      padding: 7px 12px;
       border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
-      color: var(--texto-titulos);
-      transition: background 0.2s;
+      color: var(--yucatan-guinda);
+      transition: all 0.2s;
     }
     .btn-accion:hover {
-      background: var(--borde-suave);
+      background: var(--yucatan-guinda);
+      color: #ffffff;
     }
 
     footer {
       border-top: 1px solid var(--borde-suave);
-      padding: 20px 30px;
+      padding: 18px 24px;
       text-align: center;
       font-size: 0.85rem;
       color: var(--texto-mutado);
+      background-color: var(--bg-tarjeta);
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        padding: 14px 18px;
+      }
+      .main-container {
+        padding: 22px 18px;
+      }
     }
   </style>
 </head>
@@ -196,15 +256,18 @@
 
   <!-- NAVEGACIÓN SUPERIOR -->
   <nav>
-    <a href="index.html" class="brand-badge"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</a>
+    <div class="nav-left">
+      <a href="index.html" class="btn-volver"><i class="fa-solid fa-arrow-left"></i> Inicio</a>
+      <div class="nav-title">Bajas y Desincorporación de <span>Equipos</span></div>
+    </div>
     <span style="font-size: 0.85rem; color: var(--texto-mutado);">Módulo de Bajas de Equipos</span>
   </nav>
 
   <!-- CONTENEDOR PRINCIPAL -->
   <main class="main-container">
     <div class="header-seccion">
-      <h2>Historial de Equipos Dados de Baja</h2>
-      <span id="contadorBajas" style="font-size: 0.9rem; color: var(--texto-mutado);">Cargando registros...</span>
+      <h2>Historial de Equipos Dados de <span>Baja</span></h2>
+      <span id="contadorBajas" class="contador-pill">Cargando registros...</span>
     </div>
 
     <!-- BUSCADOR Y FILTROS -->
@@ -271,7 +334,6 @@
       return fecha.toISOString().split("T")[0];
     }
 
-    // Escuchar únicamente equipos con estado "BAJA" en tiempo real
     function escucharBajasEnTiempoReal() {
       onSnapshot(collection(db, "equipos"), (querySnapshot) => {
         listaBajas = [];
@@ -389,7 +451,6 @@
             <p><strong>ID Ubicación:</strong> <input id="editIdUbicacion" class="swal2-input" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem;" value="${eq.ubicacionRef?.idUbicacion || ''}"></p>
 
             <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
-            <!-- OBSERVACIONES / MOTIVO DE BAJA COLOCADAS AL FINAL -->
             <p><strong>Observaciones / Motivo de Baja:</strong> <textarea id="editObs" class="swal2-textarea" style="margin:2px 0 10px 0; width:100%; font-size:0.9rem; height:80px; resize:vertical;">${eq.observaciones || ''}</textarea></p>
           </div>
         `,
@@ -397,7 +458,7 @@
         showCancelButton: true,
         confirmButtonText: 'Guardar Cambios',
         cancelButtonText: 'Cerrar',
-        confirmButtonColor: '#18181b',
+        confirmButtonColor: '#8A1538',
         preConfirm: () => {
           const getVal = (fieldId) => {
             const el = document.getElementById(fieldId);
@@ -446,7 +507,12 @@
             const eqRef = doc(db, "equipos", id);
             await updateDoc(eqRef, result.value);
 
-            Swal.fire('¡Actualizado!', 'La información del equipo se ha actualizado correctamente.', 'success');
+            Swal.fire({
+              title: '¡Actualizado!',
+              text: 'La información del equipo se ha actualizado correctamente.',
+              icon: 'success',
+              confirmButtonColor: '#8A1538'
+            });
           } catch (error) {
             console.error("Error al actualizar baja:", error);
             Swal.fire('Error', `No se pudieron guardar los cambios: ${error.message}`, 'error');
@@ -455,7 +521,6 @@
       });
     };
 
-    // Inicializar la escucha en tiempo real de bajas
     escucharBajasEnTiempoReal();
   </script>
 </body>
