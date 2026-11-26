@@ -415,7 +415,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, collection, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
@@ -431,8 +431,35 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
+    // 🔒 Seguridad: llegar al login (aunque sea con "Atrás") SIEMPRE cierra la sesión anterior.
+    //    Así, para volver a entrar hay que escribir correo y contraseña de nuevo.
+    let iniciandoSesion = false;
+    try { localStorage.removeItem("js2_ultimaActividad"); } catch {}
+    const dejarDeEscuchar = onAuthStateChanged(auth, (user) => {
+      dejarDeEscuchar();
+      if (user && !iniciandoSesion) signOut(auth);
+    });
+
+    // Si la página se muestra desde la caché del navegador, se recarga para repetir el cierre
+    window.addEventListener("pageshow", (e) => { if (e.persisted) window.location.reload(); });
+
+    // Mensaje cuando la sesión se cerró por inactividad
+    try {
+      const motivo = sessionStorage.getItem("js2_motivoSalida");
+      sessionStorage.removeItem("js2_motivoSalida");
+      if (motivo === "inactividad") {
+        Swal.fire({
+          title: "Sesión cerrada",
+          text: "Tu sesión se cerró por inactividad. Inicia sesión de nuevo para continuar.",
+          icon: "info",
+          confirmButtonColor: "#8A1538"
+        });
+      }
+    } catch {}
+
     window.manejarLogin = async function(event) {
       event.preventDefault();
+      iniciandoSesion = true;
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
 
@@ -469,9 +496,13 @@
             timer: 1800,
             showConfirmButton: false
           }).then(() => {
-            window.location.href = "index.html";
+            // Marca el inicio de actividad (lo usa seguridad.js) y entra sin dejar el login en el historial
+            try { localStorage.setItem("js2_ultimaActividad", String(Date.now())); } catch {}
+            window.location.replace("index.html");
           });
         } else {
+          await signOut(auth);
+          iniciandoSesion = false;
           Swal.fire({
             title: 'Acceso denegado',
             text: 'El usuario no existe o se encuentra desactivado en la base de datos.',
@@ -482,6 +513,7 @@
 
       } catch (error) {
         console.error("Error en login:", error);
+        iniciandoSesion = false;
         Swal.fire({
           title: 'Error de Acceso',
           text: 'Correo o contraseña incorrectos.',

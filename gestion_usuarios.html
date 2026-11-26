@@ -133,6 +133,12 @@
       font-weight: 700;
     }
   </style>
+  <!-- 🔒 Guardia de sesión: login obligatorio, permisos por rol (ADMINISTRADOR) y cierre por inactividad -->
+  <style id="guardia-sesion">body{visibility:hidden}</style>
+  <script type="module">
+    import { protegerPagina } from "./seguridad.js";
+    protegerPagina(["ADMINISTRADOR"]);
+  </script>
 </head>
 <body>
 

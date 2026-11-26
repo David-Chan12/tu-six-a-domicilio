@@ -251,6 +251,12 @@
       }
     }
   </style>
+  <!-- 🔒 Guardia de sesión: login obligatorio, permisos por rol (ADMINISTRADOR, TECNICO) y cierre por inactividad -->
+  <style id="guardia-sesion">body{visibility:hidden}</style>
+  <script type="module">
+    import { protegerPagina } from "./seguridad.js";
+    protegerPagina(["ADMINISTRADOR", "TECNICO"]);
+  </script>
 </head>
 <body>
 

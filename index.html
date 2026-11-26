@@ -297,6 +297,12 @@
       }
     }
   </style>
+  <!-- 🔒 Guardia de sesión: login obligatorio, permisos por rol (cualquier rol activo) y cierre por inactividad -->
+  <style id="guardia-sesion">body{visibility:hidden}</style>
+  <script type="module">
+    import { protegerPagina } from "./seguridad.js";
+    protegerPagina([]);
+  </script>
 </head>
 <body>
 
@@ -523,12 +529,9 @@
     });
 
     window.cerrarSesion = function() {
-      signOut(auth).then(() => {
-        window.location.href = "login.html";
-      }).catch((error) => {
-        console.error("Error al cerrar sesión:", error);
-        window.location.href = "login.html";
-      });
+      // Cierra sesión y reemplaza la página en el historial (no se puede volver con "Atrás")
+      if (window.cerrarSesionSegura) return window.cerrarSesionSegura("manual");
+      signOut(auth).finally(() => window.location.replace("login.html"));
     };
   </script>
 </body>
