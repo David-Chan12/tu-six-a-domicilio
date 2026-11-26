@@ -156,6 +156,30 @@
       }
     }
   </style>
+  <!-- 🦅 Fondo institucional (ala) -->
+  <style>
+    /* Tamaño del ala: igual en el fondo, el banner y el pie, para que se vea como una sola imagen */
+    :root { --ala-ancho: min(48vw, 640px, calc(100vh * 0.852)); }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: var(--ala-ancho);
+      height: 100vh;
+      background: url("img/fondo_ala.png") left top / 100% auto no-repeat;
+      pointer-events: none;
+      z-index: -1;
+    }
+    /* El banner y el pie conservan su color, pero muestran el ala alineada con el fondo */
+    nav, footer, .header-institucional {
+      background-image: url("img/fondo_ala.png");
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-position: left top;
+      background-size: var(--ala-ancho) auto;
+    }
+  </style>
 </head>
 <body>
 
