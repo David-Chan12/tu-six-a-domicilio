@@ -149,7 +149,7 @@
 
     .glitch-image {
       max-width: 100%;
-      width: 320px;
+      width: 420px;
       height: auto;
       object-fit: contain;
     }
@@ -380,7 +380,11 @@
 
   <!-- ENCABEZADO SUPERIOR INSTITUCIONAL -->
   <header class="header-institucional">
-    <img src="nuevos logos local/nuevos logos local/encabezados/header_2520.jpg" alt="Gobierno del Estado de Yucatán - Secretaría de Salud">
+    <!-- Encabezado institucional sin fondo, en colores del plano; abarca todo el ancho -->
+    <div class="encabezado-plano">
+      <img src="img/encabezado_plano_izq.png" alt="Gobierno del Estado de Yucatán - Servicios de Salud de Yucatán">
+      <img src="img/encabezado_plano_der.png" alt="Plataforma de Salud Yucatán">
+    </div>
   </header>
 
   <!-- CONTENEDOR PRINCIPAL -->
@@ -389,15 +393,9 @@
     <!-- COLUMNA IZQUIERDA: TARJETA VISUAL CON TIEMPOS ESTABLES -->
     <section class="visual-column">
       <div class="logo-showcase-card">
+        <!-- Logotipo de la Secretaría de Salud (versión sin fondo con los colores del plano) -->
         <div class="glitch-container">
-          <!-- Letrero de Bienvenida (Estático 5 segundos) -->
-          <div class="glitch-element show-welcome">
-            <span class="pixel-sign">BIENVENIDO</span>
-          </div>
-          <!-- Imagen de la Secretaría de Salud (Estática y completa 5 segundos) -->
-          <div class="glitch-element show-logo">
-            <img src="nuevos logos local/nuevos logos local/logos/logo_secretaria_salud.jpg" alt="Secretaría de Salud" class="glitch-image">
-          </div>
+          <img src="img/logo_salud_plano.png" alt="Secretaría de Salud" class="glitch-image logo-plano">
         </div>
       </div>
       <p class="visual-caption">

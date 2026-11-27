@@ -552,3 +552,28 @@ footer { padding: 14px 20px !important; }
   text-align: center !important;
   text-decoration: none !important;
 }
+
+/* ---------- 17. ENCABEZADO INSTITUCIONAL (login y registro) ---------- */
+.header-institucional {
+  padding: 16px 4% !important;
+}
+.encabezado-plano {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
+.header-institucional .encabezado-plano img {
+  width: auto !important;
+  max-width: 48% !important;
+  height: 74px !important;
+  object-fit: contain;
+  transform: none !important;
+  background: none !important;
+  padding: 0 !important;
+}
+@media (max-width: 760px) {
+  .encabezado-plano { gap: 12px; }
+  .header-institucional .encabezado-plano img { height: 34px !important; }
+}
