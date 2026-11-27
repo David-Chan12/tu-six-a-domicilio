@@ -1,0 +1,554 @@
+/* =====================================================================
+   plano.css — Tema "PLANO TÉCNICO" (blueprint) para todo el sistema
+   Jurisdicción Sanitaria No. 2 · Control de Equipos
+   ---------------------------------------------------------------------
+   Se carga DESPUÉS de los estilos de cada página, así que solo
+   "repinta" lo existente: no cambia la estructura ni la lógica.
+   Para quitar el tema basta con borrar el <link> a este archivo.
+   ===================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
+/* ---------- 1. PALETA ---------- */
+:root {
+  --papel: #0a3460;
+  --papel-2: #0c3a6a;
+  --papel-hondo: #072546;
+  --tinta: #eaf4ff;
+  --tinta-2: rgba(234, 244, 255, 0.74);
+  --tinta-3: rgba(234, 244, 255, 0.46);
+  --tinta-4: rgba(234, 244, 255, 0.18);
+  --linea: rgba(234, 244, 255, 0.55);
+  --cian: #7fdcff;
+  --ambar: #ffc163;
+  --rojo: #ff7d7d;
+  --verde: #8ff0b6;
+
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  --condensada: "Barlow Condensed", "Arial Narrow", sans-serif;
+
+  /* Las variables originales de cada página se reasignan al plano */
+  --yucatan-guinda: var(--cian);
+  --yucatan-guinda-hover: #b5ebff;
+  --yucatan-guinda-suave: rgba(127, 220, 255, 0.12);
+  --yucatan-dorado: var(--ambar);
+  --yucatan-dorado-suave: rgba(255, 193, 99, 0.10);
+  --agua-marina: var(--cian);
+  --agua-marina-hover: #b5ebff;
+  --agua-marina-suave: rgba(127, 220, 255, 0.12);
+  --bg-principal: var(--papel);
+  --bg-tarjeta: var(--papel-2);
+  --tarjeta-hover: #0f4479;
+  --texto-titulos: var(--tinta);
+  --texto-cuerpo: var(--tinta-2);
+  --texto-mutado: var(--tinta-3);
+  --borde-suave: var(--tinta-4);
+  --linea-separadora: var(--tinta-4);
+
+  color-scheme: dark;
+}
+
+/* ---------- 2. PAPEL CUADRICULADO ---------- */
+html { background-color: var(--papel); }
+
+body {
+  background-color: var(--papel) !important;
+  background-image:
+    linear-gradient(rgba(234, 244, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(234, 244, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(rgba(234, 244, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(234, 244, 255, 0.03) 1px, transparent 1px) !important;
+  background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px !important;
+  background-position: -1px -1px !important;
+  color: var(--tinta-2);
+}
+
+/* El ala institucional ahora se dibuja en "tinta" blanca muy tenue */
+body::before {
+  background-image: url("img/fondo_ala_plano.png") !important;
+}
+nav, footer, .header-institucional {
+  background-image: url("img/fondo_ala_plano.png") !important;
+  background-color: var(--papel-hondo) !important;
+}
+
+::selection { background: var(--cian); color: var(--papel-hondo); }
+
+/* ---------- 3. TIPOGRAFÍA ---------- */
+h1, h2, h3, .nav-title, header h1, .seccion-head h2 {
+  font-family: var(--condensada) !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.01em !important;
+  color: var(--tinta) !important;
+  line-height: 1.02 !important;
+}
+h1 span, h2 span, h3 span, .nav-title span, header h1 span {
+  color: var(--cian) !important;
+  font-family: var(--condensada) !important;
+}
+h1 { font-size: clamp(2.2rem, 4.4vw, 3.6rem) !important; }
+/* Si todo el título es un solo <span>, va en tinta blanca (como el plano de referencia) */
+h1 > span:only-child { color: var(--tinta) !important; }
+/* Títulos dentro de tarjetas y paneles: más compactos */
+.card-panel h2, .card-panel h3, .filter-card h2, .filter-card h3 { font-size: 1.35rem !important; }
+h2 { font-size: clamp(1.7rem, 3vw, 2.4rem) !important; }
+.nav-title { font-size: 1.35rem !important; }
+
+/* etiquetas, subtítulos y datos pequeños en tipografía de máquina */
+label, th, .header-subtítulo, .seccion-titulo, .campo-ayuda,
+.detalle-selector-title, .kpi-info h3, .table-header {
+  font-family: var(--mono) !important;
+  letter-spacing: 0.08em;
+}
+label, th, .header-subtítulo, .kpi-info h3 {
+  text-transform: uppercase;
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+  color: var(--cian) !important;
+}
+.header-subtítulo { letter-spacing: 0.22em !important; }
+header p, .sub { color: var(--tinta-2) !important; }
+
+/* ---------- 4. BARRA SUPERIOR Y PIE ---------- */
+nav {
+  border-bottom: 1px solid var(--linea) !important;
+  box-shadow: 0 1px 0 var(--papel-hondo), 0 4px 0 -2px var(--tinta-4) !important;
+}
+footer {
+  border-top: 1px solid var(--linea) !important;
+  color: var(--tinta-3) !important;
+  font-family: var(--mono) !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ---------- 5. HOJAS (contenedores principales) ---------- */
+.main-container, .container > .card-panel, .card-panel, .filter-card,
+.portal-container, .register-card, .auth-column, .logo-showcase-card,
+.scanner-container, .tabla-wrapper, .table-wrapper, .kpi-card, .info-box {
+  background-color: rgba(7, 37, 70, 0.55) !important;
+  border: 1px solid var(--linea) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.main-container, .card-panel, .filter-card, .portal-container, .register-card, .auth-column {
+  position: relative;
+  outline: 1px solid var(--tinta-4);
+  outline-offset: 5px;
+}
+
+/* Barra de hoja insertada por plano.js:  01 │ TÍTULO ........ JS2-001 · HOJA 01 / 11 */
+.hoja-barra {
+  display: flex;
+  align-items: stretch;
+  margin: -1px -1px 22px -1px;
+  border-bottom: 1px solid var(--linea);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tinta-2);
+}
+.hoja-barra > span { padding: 9px 14px; display: flex; align-items: center; }
+.hoja-barra__num { border-right: 1px solid var(--linea); color: var(--tinta); font-weight: 700; }
+.hoja-barra__titulo { flex: 1; }
+.hoja-barra__clave { border-left: 1px solid var(--linea); white-space: nowrap; }
+.hoja-marca {                         /* marca de registro ⊕ */
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--tinta-3);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hoja-marca::before, .hoja-marca::after {
+  content: "";
+  position: absolute;
+  background: var(--tinta-3);
+}
+.hoja-marca::before { left: -5px; right: -5px; top: 7px; height: 1px; }
+.hoja-marca::after { top: -5px; bottom: -5px; left: 7px; width: 1px; }
+
+/* ---------- 6. BOTONES ---------- */
+button, .btn-submit, .btn-accion, .btn-nuevo, .btn-aprobar, .btn-desactivar,
+.btn-control, .btn-pill-primary, .btn-volver, .btn-link-registro, .back-link {
+  font-family: var(--mono) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transition: background-color .2s, color .2s, border-color .2s !important;
+}
+
+/* Principal: relleno en tinta clara */
+.btn-submit, .btn-nuevo, .btn-aprobar, .btn-pill-primary,
+.btn-accion:not(.btn-secundario):not(.btn-editar-fila) {
+  background: var(--tinta) !important;
+  color: var(--papel-hondo) !important;
+  border: 1px solid var(--tinta) !important;
+}
+.btn-submit:hover, .btn-nuevo:hover, .btn-aprobar:hover, .btn-pill-primary:hover,
+.btn-accion:not(.btn-secundario):not(.btn-editar-fila):hover {
+  background: var(--cian) !important;
+  border-color: var(--cian) !important;
+  color: var(--papel-hondo) !important;
+  transform: none !important;
+}
+
+/* Secundario: solo contorno */
+.btn-volver, .btn-link-registro, .back-link, .btn-secundario, .btn-control,
+.btn-editar-fila {
+  background: transparent !important;
+  color: var(--tinta) !important;
+  border: 1px solid var(--linea) !important;
+}
+.btn-volver:hover, .btn-link-registro:hover, .back-link:hover, .btn-secundario:hover,
+.btn-control:hover, .btn-editar-fila:hover {
+  background: var(--tinta-4) !important;
+  border-color: var(--tinta) !important;
+  color: var(--tinta) !important;
+}
+
+/* Peligro */
+.btn-desactivar, .btn-danger {
+  background: transparent !important;
+  color: var(--rojo) !important;
+  border: 1px solid var(--rojo) !important;
+}
+.btn-desactivar:hover, .btn-danger:hover {
+  background: var(--rojo) !important;
+  color: var(--papel-hondo) !important;
+}
+
+/* ---------- 7. CAMPOS DE FORMULARIO ---------- */
+input, select, textarea, .rol-select {
+  background-color: rgba(7, 37, 70, 0.7) !important;
+  color: var(--tinta) !important;
+  border: 1px solid var(--tinta-3) !important;
+  border-radius: 0 !important;
+  font-family: var(--mono) !important;
+  font-size: 0.85rem !important;
+  box-shadow: none !important;
+}
+input::placeholder, textarea::placeholder { color: var(--tinta-3) !important; }
+input:focus, select:focus, textarea:focus {
+  outline: none !important;
+  border-color: var(--cian) !important;
+  box-shadow: 0 0 0 3px rgba(127, 220, 255, 0.18) !important;
+}
+select option { background: var(--papel-hondo); color: var(--tinta); }
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="month"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+
+.seccion-titulo {
+  color: var(--ambar) !important;
+  border-bottom: 1px dashed var(--tinta-3) !important;
+  text-transform: uppercase;
+  font-size: 0.75rem !important;
+}
+.seccion-titulo i { color: var(--ambar) !important; }
+
+/* ---------- 8. TABLAS (estilo cajetín de plano) ---------- */
+table {
+  border-collapse: collapse !important;
+  background: transparent !important;
+}
+th {
+  background: var(--papel-hondo) !important;
+  border-bottom: 1px solid var(--linea) !important;
+  border-right: 1px solid var(--tinta-4);
+  text-align: left;
+}
+td {
+  color: var(--tinta-2) !important;
+  border-bottom: 1px solid var(--tinta-4) !important;
+  border-right: 1px solid var(--tinta-4);
+  background: transparent !important;
+}
+th:last-child, td:last-child { border-right: none; }
+tbody tr:hover td { background: rgba(127, 220, 255, 0.06) !important; }
+td strong, .link-codigo { color: var(--tinta) !important; font-family: var(--mono); }
+.link-codigo { white-space: nowrap; text-decoration: underline dotted var(--cian) !important; text-underline-offset: 3px; }
+.link-codigo:hover { color: var(--cian) !important; }
+
+/* ---------- 9. PÍLDORAS / ETIQUETAS ---------- */
+.rol-pill, .rol-tag, .contador-pill, .modulo-pill, .brand-badge, .role-badge,
+.badge, .badge-estado, .badge-tipo, .badge-activo, .user-info, .pill-option {
+  font-family: var(--mono) !important;
+  font-size: 0.66rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--tinta) !important;
+  border: 1px solid var(--linea) !important;
+}
+.rol-tag, .brand-badge { background: var(--cian) !important; color: var(--papel-hondo) !important; border-color: var(--cian) !important; }
+.user-info { background: rgba(7, 37, 70, 0.6) !important; }
+
+/* Estados con colores del plano */
+.estado-disponible, .badge-alta, .status-active, .tipo-preventivo, .badge-activo {
+  color: var(--verde) !important; border-color: var(--verde) !important; background: rgba(143, 240, 182, 0.08) !important;
+}
+.estado-en-uso, .badge-cambio, .tipo-soporte {
+  color: var(--cian) !important; border-color: var(--cian) !important; background: rgba(127, 220, 255, 0.08) !important;
+}
+.estado-mantenimiento, .badge-mant, .tipo-correctivo {
+  color: var(--ambar) !important; border-color: var(--ambar) !important; background: rgba(255, 193, 99, 0.08) !important;
+}
+.estado-baja, .badge-baja, .status-inactive {
+  color: var(--rojo) !important; border-color: var(--rojo) !important; background: rgba(255, 125, 125, 0.08) !important;
+}
+
+/* Píldoras de filtros dinámicos (reportes) */
+.pill-option { cursor: pointer; }
+.pill-option.activo, .pill-option.active, .pill-option.seleccionado,
+.pill-option[class*="activ"] {
+  background: var(--cian) !important;
+  color: var(--papel-hondo) !important;
+  border-color: var(--cian) !important;
+}
+
+/* ---------- 10. AVISOS ---------- */
+.aviso-solo-lectura, .aviso-rol, .info-box, .detalle-selector-box {
+  background: transparent !important;
+  border: 1px dashed var(--tinta-3) !important;
+  border-radius: 0 !important;
+  color: var(--tinta-2) !important;
+}
+.aviso-solo-lectura i, .aviso-rol i { color: var(--ambar) !important; }
+
+/* ---------- 11. KPIs DE REPORTES ---------- */
+.kpi-icon {
+  border-radius: 0 !important;
+  background: transparent !important;
+  border: 1px solid var(--linea) !important;
+  color: var(--cian) !important;
+}
+.kpi-info .number {
+  font-family: var(--condensada) !important;
+  font-weight: 800 !important;
+  color: var(--tinta) !important;
+}
+
+/* ---------- 12. MENÚ PRINCIPAL (index) ---------- */
+.portal-container { border-top: 1px solid var(--linea) !important; }
+.grid-portal {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+  gap: 0 !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
+  border-top: 1px solid var(--linea);
+  border-left: 1px solid var(--linea);
+  counter-reset: modulo;
+}
+.separador-vertical { display: none !important; }
+.opcion-wrapper { display: flex !important; align-items: stretch !important; }
+.tarjeta-opcion {
+  counter-increment: modulo;
+  flex: 1 1 auto;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 190px;
+  padding: 44px 18px 22px !important;
+  background: transparent !important;
+  border: none !important;
+  border-right: 1px solid var(--linea) !important;
+  border-bottom: 1px solid var(--linea) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  justify-content: flex-start !important;
+  gap: 14px;
+}
+.tarjeta-opcion::before {               /* número del módulo:  01 · MÓDULO */
+  content: counter(modulo, decimal-leading-zero) "  ·  MÓDULO";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--tinta-4);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-align: left;
+  color: var(--tinta-3);
+}
+.tarjeta-opcion i {
+  width: 74px;
+  height: 74px;
+  display: grid;
+  place-items: center;
+  margin: 0 !important;
+  font-size: 1.9rem !important;
+  color: var(--cian) !important;
+  border: 1px dashed var(--tinta-3);
+  border-radius: 50%;
+  outline: 1px solid var(--tinta-4);
+  outline-offset: 6px;
+}
+.tarjeta-opcion span {
+  font-family: var(--condensada) !important;
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.02em !important;
+  color: var(--tinta) !important;
+}
+.tarjeta-opcion:hover {
+  background: rgba(127, 220, 255, 0.07) !important;
+  transform: none !important;
+}
+.tarjeta-opcion:hover i { color: var(--papel-hondo) !important; background: var(--cian); border-style: solid; transform: none !important; }
+.tarjeta-opcion:hover::before { color: var(--cian); }
+
+/* Bloqueado: rayado diagonal como en los planos */
+.tarjeta-opcion.modulo-deshabilitado {
+  filter: none !important;
+  opacity: 1 !important;
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 125, 125, 0.16) 0 2px, transparent 2px 9px) !important;
+  border: none !important;
+  border-right: 1px solid var(--linea) !important;
+  border-bottom: 1px solid var(--linea) !important;
+}
+.tarjeta-opcion.modulo-deshabilitado i { color: var(--tinta-3) !important; border-color: var(--tinta-4); }
+.tarjeta-opcion.modulo-deshabilitado span { color: var(--tinta-3) !important; }
+.tarjeta-opcion.modulo-deshabilitado::after {
+  content: "BLOQUEADO" !important;
+  top: 6px !important;
+  right: 8px !important;
+  background: transparent !important;
+  color: var(--rojo) !important;
+  border: 1px solid var(--rojo);
+  border-radius: 0 !important;
+  font-family: var(--mono);
+  font-size: 0.58rem !important;
+  letter-spacing: 0.14em;
+  padding: 2px 6px !important;
+}
+
+/* ---------- 13. LOGIN Y REGISTRO ---------- */
+.logo-showcase-card { outline: 1px solid var(--tinta-4); outline-offset: 5px; }
+.separator, .separator::before, .separator::after { border-color: var(--tinta-4) !important; color: var(--tinta-3) !important; }
+
+/* ---------- 14. VENTANAS EMERGENTES (SweetAlert2) ---------- */
+.swal2-popup {
+  background: var(--papel-2) !important;
+  background-image:
+    linear-gradient(rgba(234, 244, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(234, 244, 255, 0.05) 1px, transparent 1px) !important;
+  background-size: 20px 20px !important;
+  color: var(--tinta-2) !important;
+  border: 1px solid var(--linea) !important;
+  border-radius: 0 !important;
+  outline: 1px solid var(--tinta-4);
+  outline-offset: 5px;
+}
+.swal2-title {
+  font-family: var(--condensada) !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  color: var(--tinta) !important;
+}
+.swal2-html-container { color: var(--tinta-2) !important; }
+.swal2-styled.swal2-confirm {
+  background: var(--tinta) !important;
+  color: var(--papel-hondo) !important;
+  border: 1px solid var(--tinta) !important;
+}
+.swal2-styled.swal2-cancel, .swal2-styled.swal2-deny {
+  background: transparent !important;
+  color: var(--tinta) !important;
+  border: 1px solid var(--linea) !important;
+}
+.swal2-styled { border-radius: 0 !important; }
+.swal2-timer-progress-bar { background: var(--cian) !important; }
+.swal2-validation-message { background: var(--papel-hondo) !important; color: var(--ambar) !important; }
+
+/* Estilos escritos directo en el HTML de las ventanas (colores fijos) */
+[style*="color:#8A1538"], [style*="color: #8A1538"] { color: var(--cian) !important; }
+[style*="color:#18181b"], [style*="color: #18181b"] { color: var(--tinta) !important; }
+[style*="color:#71717a"], [style*="color: #71717a"] { color: var(--tinta-3) !important; }
+[style*="solid #ddd"] { border-top-color: var(--tinta-4) !important; }
+[style*="background:#f4f3ef"] { background: var(--papel-hondo) !important; }
+[style*="background-color:#71717a"] { background: transparent !important; border: 1px solid var(--linea) !important; }
+[style*="background: #dcfce7"] { background: rgba(143, 240, 182, 0.1) !important; color: var(--verde) !important; }
+[style*="background: #fef3c7"] { background: rgba(255, 193, 99, 0.1) !important; color: var(--ambar) !important; }
+[style*="background: #fee2e2"] { background: rgba(255, 125, 125, 0.1) !important; color: var(--rojo) !important; }
+
+/* Los códigos QR siempre en blanco para que se puedan escanear */
+#qrcode, #qrcode img, #qrcode canvas, .swal2-popup img[src^="data:image"],
+.swal2-popup canvas, [id*="qr"] img, [id*="qr"] canvas, [id*="Qr"] img, [id*="Qr"] canvas {
+  background: #ffffff !important;
+}
+[id*="qr"] img, [id*="Qr"] img, .swal2-popup img[src^="data:image"] { padding: 8px; }
+
+/* ---------- 15. BARRAS DE DESPLAZAMIENTO ---------- */
+* { scrollbar-color: var(--tinta-3) var(--papel-hondo); }
+
+/* ---------- 16. HOJA GENÉRICA Y CAJETÍN DEL PIE (los inserta plano.js) ---------- */
+.hoja {
+  background-color: rgba(7, 37, 70, 0.45) !important;
+  border: 1px solid var(--linea) !important;
+  border-radius: 0 !important;
+  outline: 1px solid var(--tinta-4);
+  outline-offset: 5px;
+  box-shadow: none !important;
+}
+body > .container.hoja { padding: 24px !important; margin-top: 28px !important; margin-bottom: 40px !important; }
+
+footer { padding: 14px 20px !important; }
+.cajetin {
+  display: grid;
+  grid-template-columns: 2fr 2fr 0.7fr 0.9fr 0.5fr;
+  max-width: 1220px;
+  margin: 0 auto;
+  border: 1px solid var(--linea);
+  text-align: left;
+}
+.cajetin__celda {
+  padding: 7px 10px;
+  border-right: 1px solid var(--tinta-4);
+  min-width: 0;
+}
+.cajetin__celda:last-child { border-right: none; }
+.cajetin__celda small {
+  display: block;
+  font-size: 0.56rem;
+  letter-spacing: 0.16em;
+  color: var(--tinta-3);
+}
+.cajetin__celda b {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--tinta);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cajetin__copy { margin-top: 8px; font-size: 0.6rem; color: var(--tinta-3); text-align: center; }
+
+@media (max-width: 760px) {
+  .cajetin { grid-template-columns: 1fr 1fr 1fr; }
+  .cajetin__celda--ancha { grid-column: span 3; border-right: none; border-bottom: 1px solid var(--tinta-4); }
+  .hoja-barra > .hoja-barra__clave { display: none; }
+}
+
+/* Enlace "volver" del registro como botón de contorno completo */
+.back-link {
+  display: block !important;
+  padding: 11px 14px !important;
+  text-align: center !important;
+  text-decoration: none !important;
+}
