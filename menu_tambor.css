@@ -1,0 +1,444 @@
+/* =====================================================================
+   menu_tambor.css — Menú principal en "tambor" 3D (carrusel vertical)
+   Estilo plano técnico. Lo mueve menu_tambor.js.
+   ===================================================================== */
+
+.menu-tambor {
+  --tambor-alto: 560px;
+  --resorte: cubic-bezier(0.22, 1, 0.36, 1);
+  padding: 24px 28px 22px !important;
+  overflow: hidden;
+}
+
+.micro {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  line-height: 1.85;
+  text-transform: uppercase;
+  color: var(--tinta-3);
+}
+
+/* ---------- Distribución: columna izq · escenario · columna der ---------- */
+.tambor-layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(300px, 1.35fr) minmax(150px, 0.7fr);
+  align-items: center;
+  gap: 18px;
+  min-height: var(--tambor-alto);
+}
+
+/* Columna izquierda (índice grande, título, subtítulo, botón) */
+.tambor-izq { position: relative; z-index: 20; }
+.tambor-indice {
+  font-family: var(--condensada);
+  font-weight: 700;
+  font-size: clamp(4.5rem, 7vw, 6.6rem);
+  line-height: 0.84;
+  color: var(--tinta-3);
+}
+.tambor-progreso {
+  position: relative;
+  width: 56px;
+  height: 1px;
+  margin: 16px 0;
+  background: var(--tinta-4);
+  overflow: hidden;
+}
+.tambor-progreso > div {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 12.5%;
+  background: var(--cian);
+  transition: width .5s ease-out;
+}
+.tambor-titulo {
+  margin: 0;
+  font-family: var(--condensada) !important;
+  font-size: clamp(2.4rem, 3.9vw, 3.7rem) !important;
+  line-height: 0.93 !important;
+  color: var(--tinta) !important;
+}
+.tambor-sub { margin-top: 14px; color: var(--tinta-2); }
+
+.tambor-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 3px 10px;
+  border: 1px solid var(--verde);
+  color: var(--verde);
+}
+.tambor-estado::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: tamborLatido 1.6s ease-in-out infinite;
+}
+.tambor-estado.bloqueado { border-color: var(--rojo); color: var(--rojo); }
+.tambor-estado.bloqueado::before { animation: none; border-radius: 0; }
+@keyframes tamborLatido { 50% { opacity: .25; } }
+
+.btn-tambor {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 10px 18px !important;
+  background: var(--tinta) !important;
+  color: var(--papel-hondo) !important;
+  border: 1px solid var(--tinta) !important;
+  cursor: pointer;
+}
+.btn-tambor:hover { background: var(--cian) !important; border-color: var(--cian) !important; }
+.btn-tambor[disabled] {
+  background: transparent !important;
+  color: var(--tinta-3) !important;
+  border-color: var(--tinta-4) !important;
+  cursor: not-allowed;
+}
+
+/* Columna derecha (línea vertical + manifiesto) */
+.tambor-der {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 22px;
+}
+.tambor-linea-v {
+  width: 1px;
+  height: 150px;
+  background: var(--tinta-4);
+  transform-origin: top;
+  animation: tamborLineaY .95s var(--resorte) .2s both;
+}
+@keyframes tamborLineaY { from { transform: scaleY(0); } }
+
+/* ---------- Texto con máscara (entra desde abajo, sale hacia arriba) ---------- */
+.mask-line { display: block; overflow: hidden; }
+.mask-inner {
+  display: block;
+  transform: translateY(0);
+  opacity: 1;
+  transition: transform .56s var(--resorte), opacity .42s ease;
+}
+.mask-inner.saliendo { transform: translateY(-112%); opacity: 0; }
+.mask-inner.entrando { transform: translateY(112%); opacity: 0; transition: none; }
+
+/* ---------- Escenario 3D ---------- */
+.tambor-escenario {
+  position: relative;
+  height: var(--tambor-alto);
+  perspective: 1180px;
+  perspective-origin: 50% 50%;
+  transform-style: preserve-3d;
+  touch-action: none;
+  outline: none;
+  cursor: grab;
+}
+.tambor-escenario.arrastrando { cursor: grabbing; }
+.tambor-escenario:focus-visible { outline: 1px dashed var(--cian); outline-offset: 6px; }
+
+/* Ejes de referencia del plano detrás de las cartas */
+.tambor-escenario::before,
+.tambor-escenario::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  border-color: var(--tinta-4);
+  border-style: dashed;
+  border-width: 0;
+}
+.tambor-escenario::before { left: 50%; top: 0; bottom: 0; border-left-width: 1px; }
+.tambor-escenario::after { top: 50%; left: 0; right: 0; border-top-width: 1px; }
+
+/* ---------- Carta del tambor ---------- */
+.carta-tambor {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(250px, 25vw, 340px);
+  height: clamp(220px, 21vw, 280px);
+  display: block;
+  overflow: hidden;
+  text-decoration: none !important;
+  color: var(--tinta);
+  background-color: var(--papel-hondo);
+  background-image:
+    linear-gradient(rgba(234, 244, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(234, 244, 255, 0.06) 1px, transparent 1px);
+  background-size: 20px 20px;
+  border: 1px solid var(--linea);
+  transform-origin: center center;
+  backface-visibility: hidden;
+  will-change: transform, opacity, filter;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.carta-tambor * { pointer-events: none; }
+
+/* Marcas de esquina */
+.carta-tambor::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--tinta-3), var(--tinta-3)) top left / 12px 1px,
+    linear-gradient(var(--tinta-3), var(--tinta-3)) top left / 1px 12px,
+    linear-gradient(var(--tinta-3), var(--tinta-3)) top right / 12px 1px,
+    linear-gradient(var(--tinta-3), var(--tinta-3)) top right / 1px 12px,
+    linear-gradient(var(--tinta-3), var(--tinta-3)) bottom left / 12px 1px,
+    linear-gradient(var(--tinta-3), var(--tinta-3)) bottom left / 1px 12px,
+    linear-gradient(var(--tinta-3), var(--tinta-3)) bottom right / 12px 1px,
+    linear-gradient(var(--tinta-3), var(--tinta-3)) bottom right / 1px 12px;
+  background-repeat: no-repeat;
+}
+
+/* Brillo que sigue al mouse en la carta activa */
+.ct-brillo {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity .35s ease;
+  background: radial-gradient(circle at var(--brillo-x, 50%) var(--brillo-y, 50%),
+    rgba(127, 220, 255, 0.22) 0%, rgba(127, 220, 255, 0.05) 38%, transparent 70%);
+  mix-blend-mode: screen;
+}
+.carta-tambor.activa:hover .ct-brillo { opacity: 1; }
+
+.ct-sombra { position: absolute; inset: 0; background: var(--papel-hondo); opacity: 0; }
+
+.ct-arriba {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ct-chip {
+  padding: 3px 9px;
+  border: 1px solid var(--linea);
+  background: rgba(7, 37, 70, 0.75);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--tinta-2);
+}
+.ct-chip--rol { color: var(--cian); border-color: rgba(127, 220, 255, 0.5); }
+
+/* Ícono dentro de un círculo acotado como en un plano */
+.ct-centro {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 92px;
+  height: 92px;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--tinta-3);
+  border-radius: 50%;
+  outline: 1px solid var(--tinta-4);
+  outline-offset: 9px;
+}
+.ct-centro::before,
+.ct-centro::after {
+  content: "";
+  position: absolute;
+  background: var(--tinta-4);
+}
+.ct-centro::before { left: -28px; right: -28px; top: 50%; height: 1px; }
+.ct-centro::after { top: -28px; bottom: -28px; left: 50%; width: 1px; }
+.ct-centro i {
+  position: relative;
+  z-index: 1;
+  font-size: 2.1rem;
+  color: var(--cian);
+  transition: transform .3s var(--resorte);
+}
+.carta-tambor.activa:hover .ct-centro i { transform: scale(1.1); }
+
+.ct-abajo {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 14px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--tinta-4);
+}
+.ct-kicker {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--tinta-3);
+}
+.ct-nombre {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--condensada);
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--tinta);
+}
+.ct-flecha {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  background: var(--tinta);
+  color: var(--papel-hondo);
+  font-family: var(--mono);
+  font-weight: 700;
+}
+
+/* ---------- Módulo bloqueado (lo marca el script de roles) ---------- */
+.carta-tambor.modulo-deshabilitado {
+  pointer-events: auto !important;     /* se puede enfocar, pero no abrir */
+  filter: none;
+  opacity: 1;
+  cursor: not-allowed !important;
+  background-color: var(--papel-hondo) !important;
+  border: 1px solid var(--linea) !important;
+  box-shadow: none;
+}
+.carta-tambor.modulo-deshabilitado::after { display: none !important; }
+.carta-tambor .ct-rayado {
+  position: absolute;
+  inset: 0;
+  display: none;
+  background: repeating-linear-gradient(45deg, rgba(255, 125, 125, 0.18) 0 2px, transparent 2px 10px);
+}
+.carta-tambor.modulo-deshabilitado .ct-rayado { display: block; }
+.carta-tambor.modulo-deshabilitado .ct-centro i { color: var(--tinta-3) !important; }
+.carta-tambor.modulo-deshabilitado .ct-flecha { background: transparent; color: var(--rojo); border: 1px solid var(--rojo); }
+.carta-tambor.modulo-deshabilitado .ct-flecha::before { content: "×"; }
+.carta-tambor .ct-flecha::before { content: "↗"; }
+.carta-tambor.modulo-deshabilitado .ct-chip--rol { color: var(--rojo); border-color: var(--rojo); }
+
+.carta-tambor.sacudir { animation: tamborSacudir .4s; }
+@keyframes tamborSacudir {
+  20%, 60% { margin-left: -6px; }
+  40%, 80% { margin-left: 6px; }
+}
+
+/* ---------- Pie: píldoras 01..08 + anterior/siguiente ---------- */
+.tambor-pie {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top: 1px solid var(--tinta-4);
+}
+.tambor-pildoras { display: flex; flex-wrap: wrap; gap: 6px; }
+.tambor-pildoras button {
+  height: 24px;
+  padding: 0 9px !important;
+  background: transparent !important;
+  color: var(--tinta-3) !important;
+  border: 1px solid var(--tinta-4) !important;
+  font-size: 0.62rem !important;
+  letter-spacing: 0.16em !important;
+  cursor: pointer;
+}
+.tambor-pildoras button:hover { color: var(--tinta) !important; border-color: var(--linea) !important; }
+.tambor-pildoras button.activa {
+  background: var(--tinta) !important;
+  color: var(--papel-hondo) !important;
+  border-color: var(--tinta) !important;
+}
+.tambor-pildoras button.bloqueada { text-decoration: line-through; text-decoration-color: var(--rojo); }
+.tambor-controles { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.tambor-controles button {
+  padding: 2px 0 !important;
+  background: none !important;
+  border: none !important;
+  color: var(--tinta-3) !important;
+  font-size: 0.62rem !important;
+  cursor: pointer;
+}
+.tambor-controles button:hover { color: var(--tinta) !important; }
+.tambor-pie-der { text-align: right; }
+
+/* ---------- Entrada escalonada ---------- */
+.tambor-intro { opacity: 0; transform: translateY(10px); transition: opacity .85s var(--resorte), transform .85s var(--resorte); }
+.menu-tambor.listo .tambor-intro { opacity: 1; transform: none; }
+
+/* ---------- Celular y tableta ---------- */
+.tambor-dock { display: none; }
+
+@media (max-width: 1024px) {
+  .tambor-layout { grid-template-columns: minmax(200px, 1fr) minmax(280px, 1.3fr); }
+  .tambor-der { display: none; }
+}
+
+@media (max-width: 767px) {
+  .menu-tambor { --tambor-alto: 360px; padding: 16px 14px !important; }
+  .tambor-layout { display: block; min-height: 0; }
+  .tambor-izq { display: none; }
+  .carta-tambor { width: min(80vw, 320px); height: min(54vw, 220px); }
+  .ct-centro { width: 66px; height: 66px; }
+  .ct-centro i { font-size: 1.6rem; }
+  .ct-nombre { font-size: 1.25rem; }
+  .tambor-dock {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--tinta-4);
+  }
+  .tambor-dock .tambor-indice { font-size: 3.2rem; }
+  .tambor-dock-titulo {
+    font-family: var(--condensada);
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: .95;
+    text-transform: uppercase;
+    color: var(--tinta);
+  }
+  .tambor-dock .btn-tambor { margin-top: 0; padding: 9px 12px !important; flex-shrink: 0; }
+  .tambor-pie-der { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mask-inner, .tambor-intro, .tambor-linea-v { transition: none !important; animation: none !important; }
+}
+
+/* El título grande va en tinta blanca (los <span> de la máscara no se pintan de cian) */
+.tambor-titulo span, .tambor-indice span { color: inherit !important; font-family: inherit !important; }
+.tambor-controles button { white-space: nowrap; }
+@media (max-width: 767px) {
+  .tambor-ayuda { display: none; }
+}
+/* La barra de hoja siempre de orilla a orilla, aunque cambie el tamaño de la ventana */
+.menu-tambor > .hoja-barra { margin: -25px -29px 18px !important; }
+@media (max-width: 767px) {
+  .menu-tambor > .hoja-barra { margin: -17px -15px 12px !important; }
+}

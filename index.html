@@ -322,8 +322,11 @@
     }
   </style>
   <!-- 📐 Tema "plano técnico" (colores, botones, tablas, hojas y cajetín) -->
-  <link rel="stylesheet" href="plano.css">
-  <script src="plano.js" defer></script>
+  <link rel="stylesheet" href="plano.css?v=3">
+  <script src="plano.js?v=3" defer></script>
+  <!-- 🎡 Menú en tambor 3D -->
+  <link rel="stylesheet" href="menu_tambor.css?v=1">
+  <script src="menu_tambor.js?v=1" defer></script>
   <!-- 🔒 Guardia de sesión: login obligatorio, permisos por rol (cualquier rol activo) y cierre por inactividad -->
   <style id="guardia-sesion">body{visibility:hidden}</style>
   <script type="module">
@@ -355,87 +358,133 @@
     </header>
 
     <!-- DASHBOARD PRINCIPAL -->
-    <section class="portal-container">
-      <div class="grid-portal">
+    <!-- ===================================================================
+         MENÚ PRINCIPAL EN "TAMBOR" 3D  (mecánica en menu_tambor.js)
+         Cada carta conserva su id para que el script de roles la bloquee.
+         data-titulo / data-sub / data-manifiesto: líneas separadas por "|"
+    ==================================================================== -->
+    <section class="portal-container menu-tambor" id="menuTambor" aria-label="Módulos del sistema">
+      <div class="tambor-layout">
 
-        <!-- Opción 1: Registro de Equipos (Administrador) -->
-        <div class="opcion-wrapper">
-          <a href="alta.html" id="card-alta-equipos" class="tarjeta-opcion">
-            <i class="fa-solid fa-folder-plus"></i>
-            <span>Registro de Equipos</span>
-          </a>
+        <!-- Columna izquierda: número, título y descripción del módulo activo -->
+        <div class="tambor-izq tambor-intro">
+          <div class="tambor-indice" id="tamborIndice"></div>
+          <div class="tambor-progreso"><div id="tamborProgreso"></div></div>
+          <h2 class="tambor-titulo" id="tamborTitulo"></h2>
+          <div class="micro tambor-sub" id="tamborSub"></div>
+          <div class="micro tambor-estado" id="tamborEstado">Disponible</div>
+          <div><button type="button" class="btn-tambor" id="tamborAbrir">Abrir módulo <span aria-hidden="true">&nearr;</span></button></div>
         </div>
 
-        <div class="separador-vertical"></div>
+        <!-- Escenario 3D con las cartas -->
+        <div class="tambor-escenario" id="tamborEscenario" tabindex="0"
+             aria-label="Carrusel de módulos: usa la rueda, arrastra o las flechas arriba/abajo; Enter para abrir">
 
-        <!-- Opción 2: Escanear QR (Técnico y Consulta) -->
-        <div class="opcion-wrapper">
-          <a href="escaner.html" id="card-escaner-qr" class="tarjeta-opcion">
-            <i class="fa-solid fa-qrcode"></i>
-            <span>Escanear Código QR</span>
+          <a href="alta.html" id="card-alta-equipos" class="carta-tambor" data-titulo="Registro|de equipos" data-sub="Alta de equipos nuevos|Generación de código QR|Ficha técnica completa" data-manifiesto="Alta|Etiqueta|Resguarda">
+            <span class="ct-rayado"></span>
+            <span class="ct-arriba"><span class="ct-chip">01 / 08</span><span class="ct-chip ct-chip--rol">Admin</span></span>
+            <span class="ct-centro"><i class="fa-solid fa-folder-plus"></i></span>
+            <span class="ct-abajo"><span><span class="ct-kicker">Módulo 01</span><span class="ct-nombre">Registro de Equipos</span></span><span class="ct-flecha" aria-hidden="true"></span></span>
+            <span class="ct-sombra"></span>
+            <span class="ct-brillo"></span>
           </a>
+
+          <a href="escaner.html" id="card-escaner-qr" class="carta-tambor" data-titulo="Escanear|código QR" data-sub="Identificación inmediata|Cámara del dispositivo|Abre la ficha del equipo" data-manifiesto="Apunta|Escanea|Consulta">
+            <span class="ct-rayado"></span>
+            <span class="ct-arriba"><span class="ct-chip">02 / 08</span><span class="ct-chip ct-chip--rol">Técnico · Consulta</span></span>
+            <span class="ct-centro"><i class="fa-solid fa-qrcode"></i></span>
+            <span class="ct-abajo"><span><span class="ct-kicker">Módulo 02</span><span class="ct-nombre">Escanear QR</span></span><span class="ct-flecha" aria-hidden="true"></span></span>
+            <span class="ct-sombra"></span>
+            <span class="ct-brillo"></span>
+          </a>
+
+          <a href="inventario.html" id="card-consulta-inventario" class="carta-tambor" data-titulo="Inventario y|ubicación" data-sub="Equipos por código interno|Búsqueda y ordenamiento|Estado y área asignada" data-manifiesto="Cada|equipo|en su|lugar">
+            <span class="ct-rayado"></span>
+            <span class="ct-arriba"><span class="ct-chip">03 / 08</span><span class="ct-chip ct-chip--rol">Técnico · Consulta</span></span>
+            <span class="ct-centro"><i class="fa-solid fa-desktop"></i></span>
+            <span class="ct-abajo"><span><span class="ct-kicker">Módulo 03</span><span class="ct-nombre">Inventario</span></span><span class="ct-flecha" aria-hidden="true"></span></span>
+            <span class="ct-sombra"></span>
+            <span class="ct-brillo"></span>
+          </a>
+
+          <a href="mantenimientos.html" id="card-mantenimiento" class="carta-tambor" data-titulo="Mantenimiento|y servicios" data-sub="Preventivo y correctivo|Soporte técnico|Historial por equipo" data-manifiesto="Revisa|Repara|Registra">
+            <span class="ct-rayado"></span>
+            <span class="ct-arriba"><span class="ct-chip">04 / 08</span><span class="ct-chip ct-chip--rol">Técnico</span></span>
+            <span class="ct-centro"><i class="fa-solid fa-screwdriver-wrench"></i></span>
+            <span class="ct-abajo"><span><span class="ct-kicker">Módulo 04</span><span class="ct-nombre">Mantenimiento</span></span><span class="ct-flecha" aria-hidden="true"></span></span>
+            <span class="ct-sombra"></span>
+            <span class="ct-brillo"></span>
+          </a>
+
+          <a href="bajas.html" id="card-bajas-equipos" class="carta-tambor" data-titulo="Bajas de|equipos" data-sub="Equipos retirados|Motivo y fecha de baja|Trazabilidad completa" data-manifiesto="Retira|con|orden">
+            <span class="ct-rayado"></span>
+            <span class="ct-arriba"><span class="ct-chip">05 / 08</span><span class="ct-chip ct-chip--rol">Admin · Técnico</span></span>
+            <span class="ct-centro"><i class="fa-solid fa-ban"></i></span>
+            <span class="ct-abajo"><span><span class="ct-kicker">Módulo 05</span><span class="ct-nombre">Bajas de Equipos</span></span><span class="ct-flecha" aria-hidden="true"></span></span>
+            <span class="ct-sombra"></span>
+            <span class="ct-brillo"></span>
+          </a>
+
+          <a href="reportes_equipos.html" id="card-reportes-equipos" class="carta-tambor" data-titulo="Reportes de|equipos" data-sub="Indicadores del inventario|Filtros por fecha y mes|Gráficas por estado" data-manifiesto="Mide|Compara|Decide">
+            <span class="ct-rayado"></span>
+            <span class="ct-arriba"><span class="ct-chip">06 / 08</span><span class="ct-chip ct-chip--rol">Todos</span></span>
+            <span class="ct-centro"><i class="fa-solid fa-chart-line"></i></span>
+            <span class="ct-abajo"><span><span class="ct-kicker">Módulo 06</span><span class="ct-nombre">Reportes</span></span><span class="ct-flecha" aria-hidden="true"></span></span>
+            <span class="ct-sombra"></span>
+            <span class="ct-brillo"></span>
+          </a>
+
+          <a href="reportes_accesos.html" id="card-reportes-accesos" class="carta-tambor" data-titulo="Auditoría de|accesos" data-sub="Historial de sesiones|Quién entró y cuándo|Registro por usuario" data-manifiesto="Cada|acceso|queda|registrado">
+            <span class="ct-rayado"></span>
+            <span class="ct-arriba"><span class="ct-chip">07 / 08</span><span class="ct-chip ct-chip--rol">Admin</span></span>
+            <span class="ct-centro"><i class="fa-solid fa-user-clock"></i></span>
+            <span class="ct-abajo"><span><span class="ct-kicker">Módulo 07</span><span class="ct-nombre">Auditoría</span></span><span class="ct-flecha" aria-hidden="true"></span></span>
+            <span class="ct-sombra"></span>
+            <span class="ct-brillo"></span>
+          </a>
+
+          <a href="gestion_usuarios.html" id="card-gestion-usuarios" class="carta-tambor" data-titulo="Usuarios|y roles" data-sub="Aprobación de cuentas|Asignación de permisos|Activar o desactivar" data-manifiesto="Control|de|acceso">
+            <span class="ct-rayado"></span>
+            <span class="ct-arriba"><span class="ct-chip">08 / 08</span><span class="ct-chip ct-chip--rol">Admin</span></span>
+            <span class="ct-centro"><i class="fa-solid fa-users-gear"></i></span>
+            <span class="ct-abajo"><span><span class="ct-kicker">Módulo 08</span><span class="ct-nombre">Usuarios y Roles</span></span><span class="ct-flecha" aria-hidden="true"></span></span>
+            <span class="ct-sombra"></span>
+            <span class="ct-brillo"></span>
+          </a>
+
         </div>
 
-        <div class="separador-vertical"></div>
-
-        <!-- Opción 3: Inventario General (Consulta / Seguimiento / Técnico) -->
-        <div class="opcion-wrapper">
-          <a href="inventario.html" id="card-consulta-inventario" class="tarjeta-opcion">
-            <i class="fa-solid fa-desktop"></i>
-            <span>Inventario y Ubicación</span>
-          </a>
+        <!-- Columna derecha: línea vertical y lema del módulo -->
+        <div class="tambor-der tambor-intro">
+          <div class="tambor-linea-v"></div>
+          <div class="micro" id="tamborManifiesto"></div>
         </div>
+      </div>
 
-        <div class="separador-vertical"></div>
-
-        <!-- Opción 4: Servicios y Mantenimiento (Técnico) -->
-        <div class="opcion-wrapper">
-          <a href="mantenimientos.html" id="card-mantenimiento" class="tarjeta-opcion">
-            <i class="fa-solid fa-screwdriver-wrench"></i>
-            <span>Mantenimiento y Servicios</span>
-          </a>
+      <!-- Celular: resumen del módulo activo debajo del tambor -->
+      <div class="tambor-dock">
+        <div style="display:flex;align-items:baseline;gap:12px;min-width:0">
+          <div class="tambor-indice" id="tamborDockIndice"></div>
+          <div class="tambor-dock-titulo" id="tamborDockTitulo"></div>
         </div>
+        <button type="button" class="btn-tambor" id="tamborDockAbrir">Abrir <span aria-hidden="true">&nearr;</span></button>
+      </div>
 
-        <div class="separador-vertical"></div>
-
-        <!-- Opción 5: Bajas de Equipos (Administrador / Técnico) -->
-        <div class="opcion-wrapper">
-          <a href="bajas.html" id="card-bajas-equipos" class="tarjeta-opcion">
-            <i class="fa-solid fa-ban"></i>
-            <span>Bajas de Equipos</span>
-          </a>
+      <!-- Pie: píldoras y controles -->
+      <div class="tambor-pie tambor-intro">
+        <div>
+          <div class="tambor-pildoras" id="tamborPildoras" role="tablist" aria-label="Módulos"></div>
+          <div class="micro tambor-controles">
+            <button type="button" id="tamborAnterior">&uarr; Anterior</button>
+            <span>/</span>
+            <button type="button" id="tamborSiguiente">Siguiente &darr;</button>
+            <span class="tambor-ayuda">&middot; Rueda, arrastra o flechas</span>
+          </div>
         </div>
-
-        <div class="separador-vertical"></div>
-
-        <!-- Opción 6: Dashboard Reportes de Equipos -->
-        <div class="opcion-wrapper">
-          <a href="reportes_equipos.html" id="card-reportes-equipos" class="tarjeta-opcion">
-            <i class="fa-solid fa-chart-line"></i>
-            <span>Reportes de Equipos</span>
-          </a>
-        </div>
-
-        <div class="separador-vertical"></div>
-
-        <!-- Opción 7: Auditoría de Accesos y Roles -->
-        <div class="opcion-wrapper">
-          <a href="reportes_accesos.html" id="card-reportes-accesos" class="tarjeta-opcion">
-            <i class="fa-solid fa-user-clock"></i>
-            <span>Auditoría de Accesos</span>
-          </a>
-        </div>
-
-        <div class="separador-vertical"></div>
-
-        <!-- Opción 8: Aprobación de Usuarios y Roles (Administrador) -->
-        <div class="opcion-wrapper">
-          <a href="gestion_usuarios.html" id="card-gestion-usuarios" class="tarjeta-opcion">
-            <i class="fa-solid fa-users-gear"></i>
-            <span>Usuarios y Roles</span>
-          </a>
-        </div>
-
+        <ul class="micro tambor-pie-der" style="list-style:none;margin:0;padding:0">
+          <li>Jurisdicción Sanitaria No. 2</li>
+          <li>Control de equipos</li>
+        </ul>
       </div>
     </section>
   </main>
