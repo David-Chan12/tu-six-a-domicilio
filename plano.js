@@ -70,7 +70,28 @@
       <div class="cajetin__copy">${original}</div>`;
   }
 
+  // Encabezado institucional permanente: se adelgaza al bajar y la barra de
+  // navegación se acomoda justo debajo de él (variable --alto-encabezado)
+  function encabezadoPermanente() {
+    const enc = document.querySelector(".header-institucional");
+    if (!enc) return;
+    const medir = () =>
+      document.documentElement.style.setProperty("--alto-encabezado", enc.offsetHeight + "px");
+    const alBajar = () => enc.classList.toggle("compacto", window.scrollY > 40);
+    if (window.ResizeObserver) new ResizeObserver(medir).observe(enc);
+    window.addEventListener("resize", medir);
+    enc.addEventListener("transitionend", medir);
+    enc.querySelectorAll("img").forEach((img) => {
+      img.addEventListener("transitionend", medir);
+      img.addEventListener("load", medir);
+    });
+    window.addEventListener("scroll", alBajar, { passive: true });
+    medir();
+    alBajar();
+  }
+
   function aplicar() {
+    encabezadoPermanente();
     const contenedor = document.querySelector(
       ".main-container, .portal-container, body > .container, .scanner-container, .register-card, .auth-column"
     );

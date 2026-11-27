@@ -49,9 +49,9 @@
 }
 
 /* ---------- 2. PAPEL CUADRICULADO ---------- */
-html { background-color: var(--papel); }
-
-body {
+/* La cuadrícula se dibuja en <html> y <body> queda transparente:
+   así el ala institucional (body::before) queda ENCIMA de la cuadrícula. */
+html {
   background-color: var(--papel) !important;
   background-image:
     linear-gradient(rgba(234, 244, 255, 0.07) 1px, transparent 1px),
@@ -60,15 +60,20 @@ body {
     linear-gradient(90deg, rgba(234, 244, 255, 0.03) 1px, transparent 1px) !important;
   background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px !important;
   background-position: -1px -1px !important;
+  background-attachment: fixed !important;
+}
+
+body {
+  background: transparent !important;
   color: var(--tinta-2);
 }
 
 /* El ala institucional ahora se dibuja en "tinta" blanca muy tenue */
 body::before {
-  background-image: url("img/fondo_ala_plano.png") !important;
+  background-image: url("img/fondo_ala_plano.png?v=2") !important;
 }
 nav, footer, .header-institucional {
-  background-image: url("img/fondo_ala_plano.png") !important;
+  background-image: url("img/fondo_ala_plano.png?v=2") !important;
   background-color: var(--papel-hondo) !important;
 }
 
@@ -553,9 +558,19 @@ footer { padding: 14px 20px !important; }
   text-decoration: none !important;
 }
 
-/* ---------- 17. ENCABEZADO INSTITUCIONAL (login y registro) ---------- */
+/* ---------- 17. ENCABEZADO INSTITUCIONAL PERMANENTE (todas las páginas) ---------- */
 .header-institucional {
+  position: sticky !important;
+  top: 0;
+  z-index: 1100 !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  text-align: left !important;
+  display: block !important;
   padding: 16px 4% !important;
+  border-bottom: 1px solid var(--linea) !important;
+  transition: padding .3s ease;
 }
 .encabezado-plano {
   display: flex;
@@ -572,8 +587,29 @@ footer { padding: 14px 20px !important; }
   transform: none !important;
   background: none !important;
   padding: 0 !important;
+  transition: height .3s ease;
 }
+/* Al bajar en la página el encabezado se hace más delgado (lo activa plano.js) */
+.header-institucional.compacto { padding-top: 7px !important; padding-bottom: 7px !important; }
+.header-institucional.compacto .encabezado-plano img { height: 40px !important; }
+
+/* La barra de navegación queda fija justo debajo del encabezado */
+nav {
+  position: sticky !important;
+  top: var(--alto-encabezado, 0px) !important;
+  z-index: 1050 !important;
+}
+
 @media (max-width: 760px) {
+  .header-institucional { padding: 10px 4% !important; }
   .encabezado-plano { gap: 12px; }
   .header-institucional .encabezado-plano img { height: 34px !important; }
+  .header-institucional.compacto .encabezado-plano img { height: 26px !important; }
+  /* En celular la barra de navegación no se queda fija, para no tapar la pantalla */
+  nav { position: relative !important; top: 0 !important; }
 }
+
+/* Con el encabezado arriba, el contenido empieza justo debajo de la barra
+   y el pie se queda abajo (algunas páginas repartían el espacio) */
+body { justify-content: flex-start !important; }
+body > footer { margin-top: auto !important; }
