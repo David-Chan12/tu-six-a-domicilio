@@ -312,13 +312,13 @@
     }
   </style>
   <!-- 📐 Tema "plano técnico" (colores, botones, tablas, hojas y cajetín) -->
-  <link rel="stylesheet" href="plano.css?v=4">
-  <script src="plano.js?v=4" defer></script>
-  <!-- 🔒 Guardia de sesión: login obligatorio, permisos por rol (ADMINISTRADOR, TECNICO, CONSULTA) y cierre por inactividad -->
+  <link rel="stylesheet" href="plano.css?v=5">
+  <script src="plano.js?v=5" defer></script>
+  <!-- 🔒 Guardia de sesión: solo correos autorizados (acceso completo), bitácora y cierre por inactividad -->
   <style id="guardia-sesion">body{visibility:hidden}</style>
   <script type="module">
     import { protegerPagina } from "./seguridad.js";
-    protegerPagina(["ADMINISTRADOR", "TECNICO", "CONSULTA"]);
+    protegerPagina();
   </script>
 </head>
 <body>
@@ -409,7 +409,8 @@
     const db = getFirestore(app);
 
     let listaEquipos = [];
-    let puedeEditar = false;
+    // Ya no hay roles: toda cuenta autorizada puede consultar y editar
+    let puedeEditar = true;
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -417,20 +418,8 @@
         return;
       }
 
-      try {
-        const snapUsuario = await getDoc(doc(db, "usuarios", user.uid));
-        const rol = snapUsuario.exists() && snapUsuario.data().activo
-          ? (snapUsuario.data().rol || "CONSULTA").toUpperCase()
-          : "CONSULTA";
-
-        puedeEditar = ["ADMINISTRADOR", "TÉCNICO"].includes(rol);
-        document.body.classList.toggle("solo-lectura", !puedeEditar);
-        document.getElementById("badgeRolActual").innerText = `Rol: ${rol} ${puedeEditar ? "(Edición habilitada)" : "(Solo lectura)"}`;
-      } catch (error) {
-        console.error("Error verificando rol:", error);
-        puedeEditar = false;
-        document.body.classList.add("solo-lectura");
-      }
+      document.body.classList.remove("solo-lectura");
+      document.getElementById("badgeRolActual").innerText = "Acceso completo · Edición habilitada";
 
       cargarInventario();
     });
@@ -628,6 +617,7 @@
 
             const eqRef = doc(db, "equipos", id);
             await updateDoc(eqRef, result.value);
+            window.registrarActividad?.("EDICION", `Editó la ficha del equipo ${result.value.codigoInterno || eq.codigoInterno || id} desde el inventario`);
 
             Swal.fire({
               title: '¡Actualizado!',

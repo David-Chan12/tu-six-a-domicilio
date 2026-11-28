@@ -9,19 +9,19 @@
 (function () {
   const HOJAS = {
     "login.html":            ["01", "Acceso al sistema"],
-    "registro.html":         ["02", "Registro de usuario"],
-    "index.html":            ["03", "Menú principal"],
-    "":                      ["03", "Menú principal"],
-    "alta.html":             ["04", "Alta de equipos"],
-    "escaner.html":          ["05", "Escáner de código QR"],
-    "inventario.html":       ["06", "Inventario y ubicación"],
-    "mantenimientos.html":   ["07", "Mantenimiento y servicios"],
-    "bajas.html":            ["08", "Bajas de equipos"],
-    "reportes_equipos.html": ["09", "Reportes de equipos"],
-    "reportes_accesos.html": ["10", "Auditoría de accesos"],
-    "gestion_usuarios.html": ["11", "Usuarios y roles"]
+    "registro.html":         ["--", "Registro deshabilitado"],
+    "index.html":            ["02", "Menú principal"],
+    "":                      ["02", "Menú principal"],
+    "alta.html":             ["03", "Alta de equipos"],
+    "escaner.html":          ["04", "Escáner de código QR"],
+    "inventario.html":       ["05", "Inventario y ubicación"],
+    "mantenimientos.html":   ["06", "Mantenimiento y servicios"],
+    "bajas.html":            ["07", "Bajas de equipos"],
+    "reportes_equipos.html": ["08", "Reportes de equipos"],
+    "reportes_accesos.html": ["09", "Auditoría de accesos"],
+    "gestion_usuarios.html": ["10", "Bitácora de cuentas"]
   };
-  const TOTAL = "11";
+  const TOTAL = "10";
   const archivo = (location.pathname.split("/").pop() || "").toLowerCase();
   const [num, titulo] = HOJAS[archivo] || ["--", document.title];
 

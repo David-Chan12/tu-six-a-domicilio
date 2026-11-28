@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Aprobación de Usuarios y Roles | Jurisdicción Sanitaria No. 2</title>
+  <title>Bitácora de Cuentas y Actividad | Jurisdicción Sanitaria No. 2</title>
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     :root {
@@ -158,14 +159,44 @@
     }
   </style>
   <!-- 📐 Tema "plano técnico" (colores, botones, tablas, hojas y cajetín) -->
-  <link rel="stylesheet" href="plano.css?v=4">
-  <script src="plano.js?v=4" defer></script>
-  <!-- 🔒 Guardia de sesión: login obligatorio, permisos por rol (ADMINISTRADOR) y cierre por inactividad -->
+  <link rel="stylesheet" href="plano.css?v=5">
+  <script src="plano.js?v=5" defer></script>
+  <!-- 🔒 Guardia de sesión: solo correos autorizados (acceso completo), bitácora y cierre por inactividad -->
   <style id="guardia-sesion">body{visibility:hidden}</style>
   <script type="module">
     import { protegerPagina } from "./seguridad.js";
-    protegerPagina(["ADMINISTRADOR"]);
+    protegerPagina();
   </script>
+  <!-- Estilos propios de la bitácora -->
+  <style>
+    .nav-acciones { display: flex; gap: 10px; flex-wrap: wrap; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .kpi-card { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; }
+    .kpi-info h3 { margin: 0 0 6px; }
+    .kpi-info .number { font-size: 2.2rem; line-height: 1; }
+    .kpi-info .number.chico { font-size: 1.25rem; }
+    .kpi-icon { width: 46px; height: 46px; display: grid; place-items: center; font-size: 1.2rem; }
+    .layout-2col { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .card-panel { padding: 22px; margin-bottom: 24px; }
+    .card-panel h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; }
+    .table-wrapper { overflow-x: auto; }
+    table { width: 100%; }
+    th, td { padding: 10px 12px; white-space: nowrap; }
+    td.detalle { white-space: normal; min-width: 260px; }
+    .cuenta-nombre { display: block; color: var(--tinta, #18181b); font-weight: 600; }
+    .cuenta-correo { display: block; font-size: 0.78rem; opacity: .7; }
+    .punto { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; background: var(--tinta-3, #999); }
+    .punto.en-linea { background: var(--verde, #16a34a); box-shadow: 0 0 0 3px rgba(143, 240, 182, .18); animation: latido 1.6s infinite; }
+    @keyframes latido { 50% { opacity: .35; } }
+    .filtros { display: grid; grid-template-columns: 1.4fr 1fr 1fr 0.8fr 0.8fr auto; gap: 10px; margin-bottom: 14px; align-items: end; }
+    .filtros label { display: block; margin-bottom: 4px; }
+    .filtros input, .filtros select { width: 100%; padding: 9px 10px; }
+    @media (max-width: 980px) { .filtros { grid-template-columns: 1fr 1fr; } }
+    .badge-estado { display: inline-block; padding: 3px 8px; }
+    .pie-tabla { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 12px; font-size: 0.8rem; opacity: .85; }
+    .btn-mini { padding: 6px 10px; cursor: pointer; }
+    .vacio { text-align: center; padding: 22px !important; opacity: .7; }
+  </style>
 </head>
 <body>
   <!-- 🏛️ Encabezado institucional permanente (igual en todas las páginas) -->
@@ -179,57 +210,145 @@
   <nav>
     <div class="nav-left">
       <a href="index.html" class="btn-volver"><i class="fa-solid fa-arrow-left"></i> Inicio</a>
-      <div class="nav-title">Autorización de <span>Usuarios y Roles</span></div>
+      <div class="nav-title">Bitácora de <span>Cuentas y Actividad</span></div>
+    </div>
+    <div class="nav-acciones">
+      <button class="btn-volver" onclick="exportarCSV()"><i class="fa-solid fa-file-arrow-down"></i> Exportar CSV</button>
     </div>
   </nav>
 
+  <!--
+    BITÁCORA DE CUENTAS
+    Ya no se registran ni aprueban usuarios: solo entran los correos de acceso.js
+    con acceso completo. Esta página muestra qué cuentas han iniciado sesión y
+    todo lo que han hecho (colección "actividad_usuarios", la llena seguridad.js).
+    Los registros anteriores a la bitácora se toman de "historial_accesos" y
+    "historial_movimientos".
+  -->
   <div class="container">
-    <!-- SOLICITUDES PENDIENTES -->
-    <div class="card-panel" style="border-top: 5px solid var(--yucatan-dorado);">
-      <h2><i class="fa-solid fa-user-clock" style="color: var(--yucatan-dorado);"></i> Solicitudes Pendientes de Autorización</h2>
-      <div style="overflow-x: auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Correo</th>
-              <th>Rol Solicitado (Editable)</th>
-              <th>Admin Asignado</th>
-              <th>Acción</th>
-            </tr>
-          </thead>
-          <tbody id="tablaPendientes">
-            <tr><td colspan="5" style="text-align:center;">Cargando solicitudes...</td></tr>
-          </tbody>
-        </table>
+
+    <!-- INDICADORES -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-info"><h3>Cuentas con actividad</h3><div class="number" id="kpiCuentas">0</div></div>
+        <div class="kpi-icon"><i class="fa-solid fa-users"></i></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-info"><h3>Sesiones hoy</h3><div class="number" id="kpiSesionesHoy">0</div></div>
+        <div class="kpi-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-info"><h3>Movimientos (7 días)</h3><div class="number" id="kpiMovimientos">0</div></div>
+        <div class="kpi-icon"><i class="fa-solid fa-wave-square"></i></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-info"><h3>Última actividad</h3><div class="number chico" id="kpiUltima">—</div></div>
+        <div class="kpi-icon"><i class="fa-solid fa-clock"></i></div>
       </div>
     </div>
 
-    <!-- USUARIOS ACTIVOS -->
-    <div class="card-panel" style="border-top: 5px solid var(--yucatan-guinda);">
-      <h2><i class="fa-solid fa-users-gear" style="color: var(--yucatan-guinda);"></i> Personal Autorizado en el Sistema</h2>
-      <div style="overflow-x: auto;">
+    <!-- CUENTAS + GRÁFICA -->
+    <div class="layout-2col">
+      <div class="card-panel">
+        <h2><i class="fa-solid fa-id-card"></i> Cuentas que han iniciado sesión</h2>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Cuenta</th>
+                <th>Estado</th>
+                <th>Primer registro</th>
+                <th>Último movimiento</th>
+                <th>Sesiones</th>
+                <th>Páginas</th>
+                <th>Acciones</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tablaCuentas">
+              <tr><td colspan="8" class="vacio">Cargando cuentas...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card-panel">
+        <h2><i class="fa-solid fa-chart-column"></i> Actividad de los últimos 14 días</h2>
+        <div style="height: 240px;"><canvas id="graficaActividad"></canvas></div>
+      </div>
+    </div>
+
+    <!-- LÍNEA DE TIEMPO -->
+    <div class="card-panel">
+      <h2><i class="fa-solid fa-list-check"></i> Registro de actividad</h2>
+
+      <div class="filtros">
+        <div>
+          <label for="fBuscar">Buscar</label>
+          <input id="fBuscar" type="search" placeholder="Detalle, página o código de equipo...">
+        </div>
+        <div>
+          <label for="fCuenta">Cuenta</label>
+          <select id="fCuenta"><option value="">Todas las cuentas</option></select>
+        </div>
+        <div>
+          <label for="fTipo">Tipo</label>
+          <select id="fTipo">
+            <option value="">Todos los tipos</option>
+            <option value="INICIO_SESION">Inicio de sesión</option>
+            <option value="VISITA">Visita a página</option>
+            <option value="CIERRE_SESION">Cierre de sesión</option>
+            <option value="INACTIVIDAD">Cierre por inactividad</option>
+            <option value="ALTA">Alta de equipo</option>
+            <option value="EDICION">Edición de equipo</option>
+            <option value="BAJA">Baja de equipo</option>
+            <option value="MANTENIMIENTO">Mantenimiento</option>
+          </select>
+        </div>
+        <div>
+          <label for="fDesde">Desde</label>
+          <input id="fDesde" type="date">
+        </div>
+        <div>
+          <label for="fHasta">Hasta</label>
+          <input id="fHasta" type="date">
+        </div>
+        <div>
+          <button class="btn-volver btn-mini" onclick="limpiarFiltros()">Limpiar</button>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
         <table>
           <thead>
             <tr>
-              <th>Nombre</th>
-              <th>Correo</th>
-              <th>Rol Actual</th>
-              <th>Estado</th>
-              <th>Control</th>
+              <th>Fecha y hora</th>
+              <th>Cuenta</th>
+              <th>Tipo</th>
+              <th>Detalle</th>
+              <th>Página</th>
+              <th>Dispositivo</th>
             </tr>
           </thead>
-          <tbody id="tablaActivos">
-            <tr><td colspan="5" style="text-align:center;">Cargando personal...</td></tr>
+          <tbody id="tablaActividad">
+            <tr><td colspan="6" class="vacio">Cargando actividad...</td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="pie-tabla">
+        <span id="contadorActividad">—</span>
+        <button class="btn-volver btn-mini" id="btnMas" onclick="mostrarMas()" style="display:none;">Mostrar más</button>
       </div>
     </div>
   </div>
 
+  <footer>
+    Servicios de Salud de Yucatán &copy; 2026 | Bitácora de cuentas y actividad
+  </footer>
+
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
@@ -240,100 +359,255 @@
       appId: "1:711982599026:web:ba92c737011b38f882abeb",
       measurementId: "G-X1M2R00M55"
     };
-
-    const app = initializeApp(firebaseConfig);
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    async function cargarUsuarios() {
-      const snap = await getDocs(collection(db, "usuarios"));
-      let htmlPendientes = "";
-      let htmlActivos = "";
+    const MINUTOS_EN_LINEA = 15;          // igual que el cierre por inactividad
+    const POR_PAGINA = 50;
 
-      snap.forEach(docSnap => {
-        const u = docSnap.data();
-        const uid = docSnap.id;
-        const rolActual = (u.rol || "CONSULTA").toUpperCase();
+    const TIPOS = {
+      INICIO_SESION: ["Inicio de sesión", "estado-disponible"],
+      VISITA:        ["Visita", "estado-en-uso"],
+      CIERRE_SESION: ["Cierre de sesión", ""],
+      INACTIVIDAD:   ["Inactividad", "estado-mantenimiento"],
+      ALTA:          ["Alta de equipo", "estado-disponible"],
+      EDICION:       ["Edición", "estado-en-uso"],
+      CAMBIO:        ["Edición", "estado-en-uso"],
+      BAJA:          ["Baja", "estado-baja"],
+      MANTENIMIENTO: ["Mantenimiento", "estado-mantenimiento"]
+    };
+    const ACCIONES = ["ALTA", "EDICION", "CAMBIO", "BAJA", "MANTENIMIENTO"];
 
-        if (!u.activo) {
-          htmlPendientes += `
-            <tr>
-              <td><strong>${u.nombre}</strong></td>
-              <td>${u.email}</td>
-              <td>
-                <select id="rol-${uid}" class="rol-select">
-                  <option value="ADMINISTRADOR" ${rolActual === 'ADMINISTRADOR' ? 'selected' : ''}>ADMINISTRADOR</option>
-                  <option value="TÉCNICO" ${rolActual === 'TÉCNICO' ? 'selected' : ''}>TÉCNICO</option>
-                  <option value="CONSULTA" ${rolActual === 'CONSULTA' ? 'selected' : ''}>CONSULTA</option>
-                </select>
-              </td>
-              <td>${u.adminAsignadoNombre || 'Cualquier Admin'}</td>
-              <td>
-                <button class="btn-aprobar" onclick="aprobarUsuario('${uid}', '${u.nombre}', '${u.email}')">
-                  <i class="fa-solid fa-check"></i> Aceptar y Activar
-                </button>
-              </td>
-            </tr>
-          `;
-        } else {
-          htmlActivos += `
-            <tr>
-              <td><strong>${u.nombre}</strong></td>
-              <td>${u.email}</td>
-              <td>
-                <select id="rol-activo-${uid}" class="rol-select" onchange="cambiarRolActivo('${uid}', this.value)">
-                  <option value="ADMINISTRADOR" ${rolActual === 'ADMINISTRADOR' ? 'selected' : ''}>ADMINISTRADOR</option>
-                  <option value="TÉCNICO" ${rolActual === 'TÉCNICO' ? 'selected' : ''}>TÉCNICO</option>
-                  <option value="CONSULTA" ${rolActual === 'CONSULTA' ? 'selected' : ''}>CONSULTA</option>
-                </select>
-              </td>
-              <td><span class="badge-activo">ACTIVO</span></td>
-              <td>
-                <button class="btn-desactivar" onclick="desactivarUsuario('${uid}', '${u.nombre}')">
-                  <i class="fa-solid fa-ban"></i> Revocar Acceso
-                </button>
-              </td>
-            </tr>
-          `;
-        }
-      });
+    let actividad = [];      // bitácora nueva (en vivo)
+    let historico = [];      // registros anteriores a la bitácora
+    let visibles = POR_PAGINA;
+    let grafica = null;
 
-      document.getElementById("tablaPendientes").innerHTML = htmlPendientes || `<tr><td colspan="5" style="text-align:center;">No hay solicitudes pendientes.</td></tr>`;
-      document.getElementById("tablaActivos").innerHTML = htmlActivos || `<tr><td colspan="5" style="text-align:center;">No hay usuarios activos.</td></tr>`;
+    const $ = (id) => document.getElementById(id);
+    const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const aFecha = (f) => (f?.toDate ? f.toDate() : f instanceof Date ? f : null);
+    const fmt = (d) => d ? d.toLocaleString("es-MX", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "—";
+    const hace = (d) => {
+      if (!d) return "—";
+      const min = Math.round((Date.now() - d) / 60000);
+      if (min < 1) return "Justo ahora";
+      if (min < 60) return `Hace ${min} min`;
+      const h = Math.round(min / 60);
+      if (h < 24) return `Hace ${h} h`;
+      return `Hace ${Math.round(h / 24)} días`;
+    };
+
+    // ---------- 1. Registros anteriores a la bitácora (solo se leen una vez) ----------
+    async function cargarHistorico() {
+      try {
+        const [acc, mov] = await Promise.all([
+          getDocs(collection(db, "historial_accesos")),
+          getDocs(collection(db, "historial_movimientos"))
+        ]);
+        acc.forEach((d) => {
+          const a = d.data();
+          historico.push({
+            fecha: aFecha(a.fecha), email: (a.email || "").toLowerCase(), nombre: a.nombre || a.email,
+            tipo: "INICIO_SESION", detalle: "Inició sesión", pagina: "Acceso al sistema",
+            dispositivo: a.navegador || "—", origen: "historial_accesos"
+          });
+        });
+        mov.forEach((d) => {
+          const m = d.data();
+          historico.push({
+            fecha: aFecha(m.fecha), email: "", nombre: m.usuario || "—",
+            tipo: (m.tipo || "CAMBIO").toUpperCase(), detalle: `${m.codigoInterno ? m.codigoInterno + " · " : ""}${m.detalle || ""}`,
+            pagina: "—", dispositivo: "—", origen: "historial_movimientos"
+          });
+        });
+      } catch (e) {
+        console.warn("No se pudieron leer los registros anteriores:", e);
+      }
+      pintar();
     }
 
-    window.aprobarUsuario = async function(uid, nombre, email) {
-      const rolElegido = document.getElementById(`rol-${uid}`).value;
-      try {
-        await updateDoc(doc(db, "usuarios", uid), {
-          activo: true,
-          rol: rolElegido,
-          estadoSolicitud: "APROBADO"
+    // ---------- 2. Bitácora nueva en tiempo real ----------
+    onSnapshot(
+      query(collection(db, "actividad_usuarios"), orderBy("fecha", "desc"), limit(3000)),
+      (snap) => {
+        actividad = snap.docs.map((d) => {
+          const a = d.data({ serverTimestamps: "estimate" });
+          return {
+            fecha: aFecha(a.fecha), email: (a.email || "").toLowerCase(), nombre: a.nombre || a.email,
+            tipo: (a.tipo || "").toUpperCase(), detalle: a.detalle || "", pagina: a.pagina || "—",
+            dispositivo: a.dispositivo || "—", origen: "actividad_usuarios"
+          };
         });
-
-        Swal.fire({
-          title: '¡Usuario Autorizado!',
-          text: `${nombre} ahora puede iniciar sesión con el rol de ${rolElegido}.`,
-          icon: 'success',
-          confirmButtonColor: '#8A1538'
-        });
-        cargarUsuarios();
-      } catch (e) {
-        Swal.fire('Error', 'No se pudo actualizar el usuario.', 'error');
+        pintar();
+      },
+      (error) => {
+        console.error("Error leyendo la bitácora:", error);
+        $("tablaActividad").innerHTML = `<tr><td colspan="6" class="vacio">No se pudo leer la bitácora (${esc(error.code || error.message)}). Revisa las reglas de Firestore para la colección "actividad_usuarios".</td></tr>`;
       }
+    );
+
+    // Une la bitácora con los registros viejos SIN duplicar:
+    // del histórico solo se toma lo anterior al primer registro de la bitácora.
+    function todos() {
+      const fechas = actividad.map((a) => a.fecha).filter(Boolean);
+      const inicioBitacora = fechas.length ? Math.min(...fechas.map(Number)) : Infinity;
+      const viejos = historico.filter((h) => h.fecha && Number(h.fecha) < inicioBitacora);
+      const lista = [...actividad, ...viejos];
+      // Los movimientos viejos solo guardaban el nombre: se les asigna el correo de esa persona
+      const correoDe = {};
+      lista.forEach((r) => { if (r.email && r.nombre) correoDe[r.nombre.toLowerCase()] = r.email; });
+      lista.forEach((r) => { if (!r.email && r.nombre && correoDe[r.nombre.toLowerCase()]) r.email = correoDe[r.nombre.toLowerCase()]; });
+      return lista.sort((a, b) => (b.fecha || 0) - (a.fecha || 0));
+    }
+
+    // ---------- 3. Pintar todo ----------
+    function pintar() {
+      const lista = todos();
+      pintarIndicadores(lista);
+      pintarCuentas(lista);
+      pintarGrafica(lista);
+      pintarActividad(lista);
+    }
+
+    function claveCuenta(r) { return r.email || `nombre:${r.nombre}`; }
+
+    function pintarIndicadores(lista) {
+      const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+      const semana = Date.now() - 7 * 864e5;
+      $("kpiCuentas").textContent = new Set(lista.map(claveCuenta)).size;
+      $("kpiSesionesHoy").textContent = lista.filter((r) => r.tipo === "INICIO_SESION" && r.fecha >= hoy).length;
+      $("kpiMovimientos").textContent = lista.filter((r) => r.fecha && r.fecha >= semana).length;
+      $("kpiUltima").textContent = lista[0] ? hace(lista[0].fecha) : "—";
+    }
+
+    function pintarCuentas(lista) {
+      const cuentas = new Map();
+      // la lista viene de más reciente a más antigua
+      lista.forEach((r) => {
+        const k = claveCuenta(r);
+        const c = cuentas.get(k) || { email: r.email, nombre: r.nombre, ultimo: r, primero: r, sesiones: 0, paginas: 0, acciones: 0 };
+        c.primero = r;
+        if (r.tipo === "INICIO_SESION") c.sesiones++;
+        if (r.tipo === "VISITA") c.paginas++;
+        if (ACCIONES.includes(r.tipo)) c.acciones++;
+        if (!c.email && r.email) c.email = r.email;
+        cuentas.set(k, c);
+      });
+
+      $("fCuenta").innerHTML = '<option value="">Todas las cuentas</option>' +
+        [...cuentas.entries()].map(([k, c]) => `<option value="${esc(k)}">${esc(c.nombre)}${c.email ? " · " + esc(c.email) : ""}</option>`).join("");
+      $("fCuenta").value = filtroCuenta;
+
+      if (!cuentas.size) {
+        $("tablaCuentas").innerHTML = '<tr><td colspan="8" class="vacio">Todavía no hay cuentas con actividad registrada.</td></tr>';
+        return;
+      }
+      $("tablaCuentas").innerHTML = [...cuentas.entries()].map(([k, c]) => {
+        const recien = c.ultimo.fecha && (Date.now() - c.ultimo.fecha) < MINUTOS_EN_LINEA * 60000;
+        const enLinea = recien && !["CIERRE_SESION", "INACTIVIDAD"].includes(c.ultimo.tipo) && c.ultimo.origen === "actividad_usuarios";
+        return `
+          <tr>
+            <td><span class="cuenta-nombre">${esc(c.nombre)}</span><span class="cuenta-correo">${esc(c.email || "Registro anterior")}</span></td>
+            <td><span class="punto ${enLinea ? "en-linea" : ""}"></span>${enLinea ? "En línea" : "Desconectado"}</td>
+            <td>${fmt(c.primero.fecha)}</td>
+            <td>${hace(c.ultimo.fecha)}<br><small style="opacity:.7">${esc(TIPOS[c.ultimo.tipo]?.[0] || c.ultimo.tipo)}</small></td>
+            <td>${c.sesiones}</td>
+            <td>${c.paginas}</td>
+            <td>${c.acciones}</td>
+            <td><button class="btn-volver btn-mini" onclick="verCuenta('${esc(k)}')">Ver actividad</button></td>
+          </tr>`;
+      }).join("");
+    }
+
+    function pintarGrafica(lista) {
+      const dias = [...Array(14)].map((_, i) => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - (13 - i)); return d; });
+      const etiquetas = dias.map((d) => d.toLocaleDateString("es-MX", { day: "2-digit", month: "short" }));
+      const contar = (filtro) => dias.map((d) => lista.filter((r) => r.fecha && r.fecha >= d && r.fecha < new Date(d.getTime() + 864e5) && filtro(r)).length);
+      const series = [
+        { label: "Sesiones", data: contar((r) => r.tipo === "INICIO_SESION"), backgroundColor: "rgba(143, 240, 182, 0.55)" },
+        { label: "Visitas", data: contar((r) => r.tipo === "VISITA"), backgroundColor: "rgba(127, 220, 255, 0.45)" },
+        { label: "Acciones", data: contar((r) => ACCIONES.includes(r.tipo)), backgroundColor: "rgba(255, 193, 99, 0.6)" }
+      ];
+      if (!window.Chart) return;
+      if (grafica) { grafica.data.labels = etiquetas; grafica.data.datasets.forEach((d, i) => d.data = series[i].data); grafica.update(); return; }
+      grafica = new Chart($("graficaActividad"), {
+        type: "bar",
+        data: { labels: etiquetas, datasets: series },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { position: "bottom" } },
+          scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } } }
+        }
+      });
+    }
+
+    // ---------- 4. Filtros y tabla de actividad ----------
+    let filtroCuenta = "";
+    function filtrada(lista) {
+      const texto = $("fBuscar").value.trim().toLowerCase();
+      const tipo = $("fTipo").value;
+      const desde = $("fDesde").value ? new Date($("fDesde").value + "T00:00:00") : null;
+      const hasta = $("fHasta").value ? new Date($("fHasta").value + "T23:59:59") : null;
+      return lista.filter((r) =>
+        (!filtroCuenta || claveCuenta(r) === filtroCuenta) &&
+        (!tipo || r.tipo === tipo || (tipo === "EDICION" && r.tipo === "CAMBIO")) &&
+        (!desde || (r.fecha && r.fecha >= desde)) &&
+        (!hasta || (r.fecha && r.fecha <= hasta)) &&
+        (!texto || `${r.detalle} ${r.pagina} ${r.nombre} ${r.email}`.toLowerCase().includes(texto))
+      );
+    }
+
+    function pintarActividad(lista) {
+      const filas = filtrada(lista);
+      const mostrar = filas.slice(0, visibles);
+      $("tablaActividad").innerHTML = mostrar.length ? mostrar.map((r) => {
+        const [nombreTipo, clase] = TIPOS[r.tipo] || [r.tipo, ""];
+        return `
+          <tr>
+            <td>${fmt(r.fecha)}</td>
+            <td><span class="cuenta-nombre">${esc(r.nombre)}</span><span class="cuenta-correo">${esc(r.email)}</span></td>
+            <td><span class="badge-estado ${clase}">${esc(nombreTipo)}</span></td>
+            <td class="detalle">${esc(r.detalle)}</td>
+            <td>${esc(r.pagina)}</td>
+            <td>${esc(r.dispositivo)}</td>
+          </tr>`;
+      }).join("") : '<tr><td colspan="6" class="vacio">No hay movimientos con estos filtros.</td></tr>';
+      $("contadorActividad").textContent = `Mostrando ${mostrar.length} de ${filas.length} movimientos`;
+      $("btnMas").style.display = filas.length > visibles ? "inline-block" : "none";
+    }
+
+    const refrescar = () => { visibles = POR_PAGINA; pintarActividad(todos()); };
+    ["fBuscar", "fTipo", "fDesde", "fHasta"].forEach((id) => $(id).addEventListener("input", refrescar));
+    $("fCuenta").addEventListener("change", (e) => { filtroCuenta = e.target.value; refrescar(); });
+
+    window.mostrarMas = () => { visibles += POR_PAGINA; pintarActividad(todos()); };
+    window.verCuenta = (k) => {
+      filtroCuenta = k; $("fCuenta").value = k; refrescar();
+      $("tablaActividad").closest(".card-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    window.limpiarFiltros = () => {
+      filtroCuenta = ""; ["fBuscar", "fCuenta", "fTipo", "fDesde", "fHasta"].forEach((id) => $(id).value = ""); refrescar();
     };
 
-    window.cambiarRolActivo = async function(uid, nuevoRol) {
-      await updateDoc(doc(db, "usuarios", uid), { rol: nuevoRol });
-      Swal.fire({ title: 'Rol actualizado', text: `Nuevo rol asignado: ${nuevoRol}`, icon: 'success', timer: 1200, showConfirmButton: false });
+    // ---------- 5. Exportar lo filtrado a CSV (se abre en Excel) ----------
+    window.exportarCSV = () => {
+      const filas = filtrada(todos());
+      const csv = [["Fecha", "Nombre", "Correo", "Tipo", "Detalle", "Pagina", "Dispositivo"]]
+        .concat(filas.map((r) => [fmt(r.fecha), r.nombre, r.email, TIPOS[r.tipo]?.[0] || r.tipo, r.detalle, r.pagina, r.dispositivo]))
+        .map((f) => f.map((v) => `"${String(v ?? "").replace(/"/g, '""')}"`).join(","))
+        .join("\r\n");
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `bitacora_cuentas_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
     };
 
-    window.desactivarUsuario = async function(uid, nombre) {
-      await updateDoc(doc(db, "usuarios", uid), { activo: false, estadoSolicitud: "REVOCADO" });
-      Swal.fire('Acceso revocado', `Se desactivó la cuenta de ${nombre}.`, 'info');
-      cargarUsuarios();
-    };
+    // "Hace X min" y "En línea" se actualizan solos cada minuto
+    setInterval(() => { const l = todos(); pintarIndicadores(l); pintarCuentas(l); }, 60000);
 
-    cargarUsuarios();
+    cargarHistorico();
   </script>
 </body>
 </html>

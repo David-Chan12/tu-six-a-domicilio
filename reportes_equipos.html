@@ -372,13 +372,13 @@
     }
   </style>
   <!-- 📐 Tema "plano técnico" (colores, botones, tablas, hojas y cajetín) -->
-  <link rel="stylesheet" href="plano.css?v=4">
-  <script src="plano.js?v=4" defer></script>
-  <!-- 🔒 Guardia de sesión: login obligatorio, permisos por rol (ADMINISTRADOR, TECNICO, CONSULTA) y cierre por inactividad -->
+  <link rel="stylesheet" href="plano.css?v=5">
+  <script src="plano.js?v=5" defer></script>
+  <!-- 🔒 Guardia de sesión: solo correos autorizados (acceso completo), bitácora y cierre por inactividad -->
   <style id="guardia-sesion">body{visibility:hidden}</style>
   <script type="module">
     import { protegerPagina } from "./seguridad.js";
-    protegerPagina(["ADMINISTRADOR", "TECNICO", "CONSULTA"]);
+    protegerPagina();
   </script>
 </head>
 <body>

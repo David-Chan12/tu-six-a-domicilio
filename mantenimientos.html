@@ -279,13 +279,13 @@
     }
   </style>
   <!-- 📐 Tema "plano técnico" (colores, botones, tablas, hojas y cajetín) -->
-  <link rel="stylesheet" href="plano.css?v=4">
-  <script src="plano.js?v=4" defer></script>
-  <!-- 🔒 Guardia de sesión: login obligatorio, permisos por rol (ADMINISTRADOR, TECNICO) y cierre por inactividad -->
+  <link rel="stylesheet" href="plano.css?v=5">
+  <script src="plano.js?v=5" defer></script>
+  <!-- 🔒 Guardia de sesión: solo correos autorizados (acceso completo), bitácora y cierre por inactividad -->
   <style id="guardia-sesion">body{visibility:hidden}</style>
   <script type="module">
     import { protegerPagina } from "./seguridad.js";
-    protegerPagina(["ADMINISTRADOR", "TECNICO"]);
+    protegerPagina();
   </script>
 </head>
 <body>
@@ -630,6 +630,7 @@
               const equipoDocRef = querySnapshot.docs[0].ref;
               await updateDoc(equipoDocRef, { estado: "MANTENIMIENTO" });
             }
+            window.registrarActividad?.("MANTENIMIENTO", `Registró servicio ${data.tipoServicio} al equipo ${data.codigoInterno} (técnico: ${data.tecnico})`);
 
             Swal.fire({
               title: '¡Registrado y Actualizado!',

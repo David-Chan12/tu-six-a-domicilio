@@ -1,0 +1,85 @@
+rules_version = '2';
+
+// =====================================================================
+//  Reglas de seguridad de Firestore
+//  Plataforma de Inventarios y Control de Equipos · Jurisdicción Sanitaria No. 2
+//
+//  Solo las cuentas de la lista pueden leer o escribir datos, con acceso
+//  completo. Así la base de datos queda protegida aunque alguien vea el
+//  código de la página en GitHub.
+//
+//  ⚠️ La lista de correos debe ser IGUAL a la de acceso.js.
+//     Escribe los correos en minúsculas.
+//
+//  Cómo aplicarlas: Consola de Firebase → Firestore Database → pestaña
+//  "Reglas" → borra lo que haya → pega todo este archivo → "Publicar".
+// =====================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Cuentas con acceso (igual que acceso.js) ----------
+    function correosAutorizados() {
+      return [
+        'admin@six.com'
+        // , 'jefe.jurisdiccion@salud.yucatan.gob.mx'
+        // , 'subjefe@salud.yucatan.gob.mx'
+      ];
+    }
+
+    // La persona inició sesión y su correo está en la lista
+    function autorizado() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && request.auth.token.email.lower() in correosAutorizados();
+    }
+
+    // El registro que se guarda es de la propia cuenta (nadie puede
+    // escribir en la bitácora a nombre de otra persona)
+    function esDeSuCuenta() {
+      return request.resource.data.email == request.auth.token.email.lower()
+        && request.resource.data.uid == request.auth.uid;
+    }
+
+    // ---------- Datos de trabajo: lectura y escritura completas ----------
+    match /equipos/{id} {
+      allow read, write: if autorizado();
+    }
+
+    match /mantenimientos/{id} {
+      allow read, write: if autorizado();
+    }
+
+    // ---------- Historiales y bitácora: se pueden agregar registros, ----------
+    // ---------- pero nunca modificar ni borrar (para que sean confiables) ----------
+    match /historial_movimientos/{id} {
+      allow read, create: if autorizado();
+      allow update, delete: if false;
+    }
+
+    match /historial_accesos/{id} {
+      allow read: if autorizado();
+      allow create: if autorizado() && esDeSuCuenta();
+      allow update, delete: if false;
+    }
+
+    match /actividad_usuarios/{id} {
+      allow read: if autorizado();
+      allow create: if autorizado() && esDeSuCuenta();
+      allow update, delete: if false;
+    }
+
+    // ---------- Fichas de usuario (solo para mostrar el nombre) ----------
+    // Ya no se crean desde la página; si quieres cambiar un nombre,
+    // hazlo desde la consola de Firebase.
+    match /usuarios/{uid} {
+      allow read: if autorizado();
+      allow write: if false;
+    }
+
+    // ---------- Cualquier otra colección: bloqueada ----------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

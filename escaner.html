@@ -233,13 +233,13 @@
     }
   </style>
   <!-- 📐 Tema "plano técnico" (colores, botones, tablas, hojas y cajetín) -->
-  <link rel="stylesheet" href="plano.css?v=4">
-  <script src="plano.js?v=4" defer></script>
-  <!-- 🔒 Guardia de sesión: login obligatorio, permisos por rol (ADMINISTRADOR, TECNICO, CONSULTA) y cierre por inactividad -->
+  <link rel="stylesheet" href="plano.css?v=5">
+  <script src="plano.js?v=5" defer></script>
+  <!-- 🔒 Guardia de sesión: solo correos autorizados (acceso completo), bitácora y cierre por inactividad -->
   <style id="guardia-sesion">body{visibility:hidden}</style>
   <script type="module">
     import { protegerPagina } from "./seguridad.js";
-    protegerPagina(["ADMINISTRADOR", "TECNICO", "CONSULTA"]);
+    protegerPagina();
   </script>
 </head>
 <body>
@@ -305,7 +305,8 @@
     const db = getFirestore(app);
 
     let html5QrCode;
-    let puedeEditar = false;
+    // Ya no hay roles: toda cuenta autorizada puede consultar y editar
+    let puedeEditar = true;
     let nombreUsuarioActual = "Usuario";
 
     onAuthStateChanged(auth, async (user) => {
@@ -313,22 +314,15 @@
         window.location.href = "login.html";
         return;
       }
-
       try {
         const snapUsuario = await getDoc(doc(db, "usuarios", user.uid));
         const dataUsuario = snapUsuario.exists() ? snapUsuario.data() : {};
-        const rol = dataUsuario.activo ? (dataUsuario.rol || "CONSULTA").toUpperCase() : "CONSULTA";
-
         nombreUsuarioActual = dataUsuario.nombre || user.email;
-        puedeEditar = ["ADMINISTRADOR", "TÉCNICO"].includes(rol);
-
-        document.body.classList.toggle("solo-lectura", !puedeEditar);
-        document.getElementById("estadoRolEscaner").innerText = `Rol: ${rol} ${puedeEditar ? "(Edición habilitada)" : "(Solo lectura)"}`;
       } catch (error) {
-        console.error("Error al verificar rol en escáner:", error);
-        puedeEditar = false;
-        document.body.classList.add("solo-lectura");
+        nombreUsuarioActual = user.email;
       }
+      document.body.classList.remove("solo-lectura");
+      document.getElementById("estadoRolEscaner").innerText = "Acceso completo · Edición habilitada";
     });
 
     function formatearFechaInput(campoFecha) {
@@ -526,6 +520,7 @@
               detalle: `Actualización desde escáner QR (Estado: ${result.value.estado})`,
               usuario: nombreUsuarioActual
             });
+            window.registrarActividad?.("EDICION", `Actualizó el equipo ${result.value.codigoInterno || eq.codigoInterno || "S/C"} desde el escáner QR (Estado: ${result.value.estado})`);
 
             Swal.fire({
               title: '¡Actualizado!',

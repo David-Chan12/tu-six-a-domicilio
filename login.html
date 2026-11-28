@@ -373,8 +373,22 @@
     }
   </style>
   <!-- 📐 Tema "plano técnico" (colores, botones, tablas, hojas y cajetín) -->
-  <link rel="stylesheet" href="plano.css?v=4">
-  <script src="plano.js?v=4" defer></script>
+  <link rel="stylesheet" href="plano.css?v=5">
+  <script src="plano.js?v=5" defer></script>
+  <style>
+    .aviso-acceso {
+      margin-top: 22px;
+      padding: 10px 12px;
+      border: 1px dashed var(--tinta-3, #999);
+      font-family: var(--mono, monospace);
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--tinta-3, #666);
+      text-align: center;
+    }
+    .aviso-acceso i { color: var(--ambar, #c9a227); margin-right: 6px; }
+  </style>
 </head>
 <body>
 
@@ -422,11 +436,8 @@
         <button type="submit" class="btn-submit">Acceder al Sistema</button>
       </form>
 
-      <div class="separator">¿No tienes cuenta?</div>
-
-      <a href="registro.html" class="btn-link-registro">
-        <i class="fa-solid fa-user-plus" style="color: var(--yucatan-dorado);"></i> Crear una cuenta nueva
-      </a>
+      <!-- El registro de cuentas nuevas se retiró: solo entran los correos autorizados (acceso.js) -->
+      <p class="aviso-acceso"><i class="fa-solid fa-lock"></i> Acceso exclusivo para cuentas autorizadas de la Jurisdicción.</p>
     </section>
 
   </main>
@@ -441,6 +452,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, collection, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { esCorreoAutorizado } from "./acceso.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
@@ -497,44 +509,58 @@
         });
 
         const credenciales = await signInWithEmailAndPassword(auth, email, password);
-        const uid = credenciales.user.uid;
+        const user = credenciales.user;
 
-        const docSnap = await getDoc(doc(db, "usuarios", uid));
-        if (docSnap.exists() && docSnap.data().activo) {
-          const usuarioData = docSnap.data();
-
-          // Guardar registro de auditoría en Firestore
-          await addDoc(collection(db, "historial_accesos"), {
-            uid: uid,
-            nombre: usuarioData.nombre,
-            email: email,
-            rol: usuarioData.rol,
-            fecha: Timestamp.now(),
-            navegador: navigator.platform || "Navegador Web"
-          });
-          
-          Swal.fire({
-            title: `¡Bienvenido, ${usuarioData.nombre}!`,
-            text: `Rol asignado: ${usuarioData.rol}`,
-            icon: 'success',
-            iconColor: '#8A1538',
-            timer: 1800,
-            showConfirmButton: false
-          }).then(() => {
-            // Marca el inicio de actividad (lo usa seguridad.js) y entra sin dejar el login en el historial
-            try { localStorage.setItem("js2_ultimaActividad", String(Date.now())); } catch {}
-            window.location.replace("index.html");
-          });
-        } else {
+        // Solo los correos de la lista (acceso.js) pueden entrar; todos con acceso completo
+        if (!esCorreoAutorizado(user.email)) {
           await signOut(auth);
           iniciandoSesion = false;
           Swal.fire({
             title: 'Acceso denegado',
-            text: 'El usuario no existe o se encuentra desactivado en la base de datos.',
-            icon: 'error',
-            confirmButtonColor: '#8A1538'
+            text: 'Esta cuenta no tiene acceso al sistema.',
+            icon: 'error'
           });
+          return;
         }
+
+        // Nombre para mostrar: ficha en "usuarios" si existe; si no, el correo
+        let nombre = user.displayName || (user.email || "").split("@")[0];
+        try {
+          const docSnap = await getDoc(doc(db, "usuarios", user.uid));
+          if (docSnap.exists() && docSnap.data().nombre) nombre = docSnap.data().nombre;
+        } catch (e) { /* sin ficha */ }
+
+        // Registro de auditoría: historial de accesos + bitácora de actividad
+        const registro = {
+          uid: user.uid,
+          nombre: nombre,
+          email: (user.email || "").toLowerCase(),
+          fecha: Timestamp.now(),
+          navegador: navigator.platform || "Navegador Web"
+        };
+        try {
+          await Promise.all([
+            addDoc(collection(db, "historial_accesos"), registro),
+            addDoc(collection(db, "actividad_usuarios"), {
+              uid: registro.uid, email: registro.email, nombre: registro.nombre,
+              tipo: "INICIO_SESION", detalle: "Inició sesión", pagina: "Acceso al sistema",
+              fecha: registro.fecha,
+              dispositivo: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "Celular / tableta" : "Computadora"
+            })
+          ]);
+        } catch (e) { console.warn("No se pudo guardar el registro de acceso:", e); }
+
+        Swal.fire({
+          title: `¡Bienvenido, ${nombre}!`,
+          text: 'Acceso completo al sistema',
+          icon: 'success',
+          timer: 1800,
+          showConfirmButton: false
+        }).then(() => {
+          // Marca el inicio de actividad (lo usa seguridad.js) y entra sin dejar el login en el historial
+          try { localStorage.setItem("js2_ultimaActividad", String(Date.now())); } catch {}
+          window.location.replace("index.html");
+        });
 
       } catch (error) {
         console.error("Error en login:", error);

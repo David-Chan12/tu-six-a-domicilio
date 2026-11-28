@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Auditoría de Accesos y Roles | Jurisdicción Sanitaria No. 2</title>
+  <title>Auditoría de Accesos | Jurisdicción Sanitaria No. 2</title>
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -210,13 +210,13 @@
     }
   </style>
   <!-- 📐 Tema "plano técnico" (colores, botones, tablas, hojas y cajetín) -->
-  <link rel="stylesheet" href="plano.css?v=4">
-  <script src="plano.js?v=4" defer></script>
-  <!-- 🔒 Guardia de sesión: login obligatorio, permisos por rol (ADMINISTRADOR) y cierre por inactividad -->
+  <link rel="stylesheet" href="plano.css?v=5">
+  <script src="plano.js?v=5" defer></script>
+  <!-- 🔒 Guardia de sesión: solo correos autorizados (acceso completo), bitácora y cierre por inactividad -->
   <style id="guardia-sesion">body{visibility:hidden}</style>
   <script type="module">
     import { protegerPagina } from "./seguridad.js";
-    protegerPagina(["ADMINISTRADOR"]);
+    protegerPagina();
   </script>
 </head>
 <body>
@@ -240,7 +240,7 @@
     <div class="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-info">
-          <h3>Usuarios Registrados</h3>
+          <h3>Cuentas Autorizadas</h3>
           <div class="number" id="kpiUsuarios">0</div>
         </div>
         <div class="kpi-icon" style="background: var(--yucatan-guinda-suave); color: var(--yucatan-guinda);">
@@ -250,7 +250,7 @@
 
       <div class="kpi-card">
         <div class="kpi-info">
-          <h3>Cuentas Activas</h3>
+          <h3>Cuentas que han Ingresado</h3>
           <div class="number" id="kpiActivos">0</div>
         </div>
         <div class="kpi-icon" style="background: #dcfce7; color: #166534;">
@@ -269,24 +269,24 @@
       </div>
     </div>
 
-    <!-- GRÁFICA DE ROLES Y DIRECTORIO DE USUARIOS -->
+    <!-- ACCESOS POR CUENTA Y DIRECTORIO DE CUENTAS AUTORIZADAS -->
     <div class="layout-2col">
       <div class="card-panel">
-        <h2><i class="fa-solid fa-id-badge"></i> Distribución de Roles</h2>
+        <h2><i class="fa-solid fa-chart-column"></i> Accesos por Cuenta</h2>
         <div style="height: 250px; display: flex; justify-content: center;">
           <canvas id="chartRoles"></canvas>
         </div>
       </div>
 
       <div class="card-panel">
-        <h2><i class="fa-solid fa-address-book"></i> Directorio de Personal y Permisos</h2>
+        <h2><i class="fa-solid fa-address-book"></i> Cuentas Autorizadas (acceso completo)</h2>
         <div class="table-wrapper">
           <table>
             <thead>
               <tr>
                 <th>Nombre</th>
                 <th>Correo Institucional</th>
-                <th>Rol Asignado</th>
+                <th>Último Acceso</th>
                 <th>Estado</th>
               </tr>
             </thead>
@@ -308,12 +308,11 @@
               <th>Fecha y Hora de Acceso</th>
               <th>Usuario</th>
               <th>Correo</th>
-              <th>Rol con el que ingresó</th>
               <th>Dispositivo / Navegador</th>
             </tr>
           </thead>
           <tbody id="tablaAccesos">
-            <tr><td colspan="5" style="text-align:center;">Cargando historial de accesos...</td></tr>
+            <tr><td colspan="4" style="text-align:center;">Cargando historial de accesos...</td></tr>
           </tbody>
         </table>
       </div>
@@ -327,6 +326,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { CORREOS_AUTORIZADOS } from "./acceso.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD_y1EWlyWL054e1k8T3mkB8ROUoMD3tWs",
@@ -341,93 +341,78 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // Ya no hay roles: la auditoría se basa en las cuentas autorizadas (acceso.js)
+    // y en el historial de inicios de sesión (colección historial_accesos).
     async function cargarAuditoria() {
       try {
-        // 1. Cargar Usuarios y Roles
-        const snapUsuarios = await getDocs(collection(db, "usuarios"));
-        let totalUsuarios = 0, activos = 0;
-        let conteoRoles = {};
-        let filasUsuarios = "";
+        const snapAccesos = await getDocs(collection(db, "historial_accesos"));
+        const listaAccesos = [];
+        snapAccesos.forEach(d => {
+          const a = d.data();
+          const fecha = a.fecha?.toDate ? a.fecha.toDate() : new Date();
+          listaAccesos.push({ ...a, email: (a.email || "").toLowerCase(), fechaObj: fecha });
+        });
+        listaAccesos.sort((a, b) => b.fechaObj - a.fechaObj);
 
-        snapUsuarios.forEach(doc => {
-          const u = doc.data();
-          totalUsuarios++;
-          if (u.activo) activos++;
-
-          const rol = (u.rol || "Sin Rol").toUpperCase();
-          conteoRoles[rol] = (conteoRoles[rol] || 0) + 1;
-
-          const estadoHtml = u.activo 
-            ? `<span class="status-dot status-active"></span>Activo` 
-            : `<span class="status-dot status-inactive"></span>Inactivo`;
-
-          filasUsuarios += `
-            <tr>
-              <td><strong>${u.nombre || 'Usuario'}</strong></td>
-              <td>${u.email || u.correo || '—'}</td>
-              <td><span class="role-badge">${rol}</span></td>
-              <td>${estadoHtml}</td>
-            </tr>
-          `;
+        // Resumen por cuenta
+        const porCuenta = {};
+        listaAccesos.forEach(a => {
+          const c = porCuenta[a.email] || (porCuenta[a.email] = { nombre: a.nombre, total: 0, ultimo: a.fechaObj });
+          c.total++;
         });
 
-        document.getElementById("kpiUsuarios").innerText = totalUsuarios;
-        document.getElementById("kpiActivos").innerText = activos;
-        document.getElementById("tablaUsuarios").innerHTML = filasUsuarios || `<tr><td colspan="4" style="text-align:center;">No hay usuarios registrados.</td></tr>`;
+        const autorizadas = CORREOS_AUTORIZADOS.map(c => c.toLowerCase());
+        document.getElementById("kpiUsuarios").innerText = autorizadas.length;
+        document.getElementById("kpiActivos").innerText = autorizadas.filter(c => porCuenta[c]).length;
+        document.getElementById("kpiTotalAccesos").innerText = listaAccesos.length;
 
-        // Gráfica de Roles
+        const fmt = (f) => f.toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+
+        document.getElementById("tablaUsuarios").innerHTML = autorizadas.map(correo => {
+          const c = porCuenta[correo];
+          return `
+            <tr>
+              <td><strong>${c?.nombre || correo.split("@")[0]}</strong></td>
+              <td>${correo}</td>
+              <td>${c ? fmt(c.ultimo) : "Aún no ingresa"}</td>
+              <td><span class="status-dot status-active"></span>Autorizada</td>
+            </tr>`;
+        }).join('') || `<tr><td colspan="4" style="text-align:center;">No hay cuentas autorizadas en acceso.js.</td></tr>`;
+
+        // Gráfica: accesos por cuenta
+        const etiquetas = Object.keys(porCuenta);
         new Chart(document.getElementById('chartRoles'), {
-          type: 'pie',
+          type: 'bar',
           data: {
-            labels: Object.keys(conteoRoles),
+            labels: etiquetas.map(e => porCuenta[e].nombre || e),
             datasets: [{
-              data: Object.values(conteoRoles),
-              backgroundColor: ['#8A1538', '#C59B49', '#2563eb', '#16a34a', '#71717a'],
-              borderWidth: 2,
-              borderColor: '#ffffff'
+              label: 'Inicios de sesión',
+              data: etiquetas.map(e => porCuenta[e].total),
+              backgroundColor: 'rgba(127, 220, 255, 0.35)',
+              borderColor: '#7fdcff',
+              borderWidth: 1
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } }
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
           }
         });
 
-        // 2. Cargar Historial de Accesos (colección historial_accesos)
-        const snapAccesos = await getDocs(collection(db, "historial_accesos"));
-        let listaAccesos = [];
-
-        snapAccesos.forEach(doc => {
-          const a = doc.data();
-          const fecha = a.fecha?.toDate ? a.fecha.toDate() : new Date();
-          listaAccesos.push({ ...a, fechaObj: fecha });
-        });
-
-        // Ordenar por más reciente
-        listaAccesos.sort((a, b) => b.fechaObj - a.fechaObj);
-        document.getElementById("kpiTotalAccesos").innerText = listaAccesos.length;
-
         const tbodyAccesos = document.getElementById("tablaAccesos");
         if (listaAccesos.length === 0) {
-          tbodyAccesos.innerHTML = `<tr><td colspan="5" style="text-align:center;">Aún no se han registrado inicios de sesión desde la actualización.</td></tr>`;
+          tbodyAccesos.innerHTML = `<tr><td colspan="4" style="text-align:center;">Aún no se han registrado inicios de sesión.</td></tr>`;
         } else {
-          tbodyAccesos.innerHTML = listaAccesos.map(acc => {
-            const fechaStr = acc.fechaObj.toLocaleDateString('es-MX', {
-              year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'
-            });
-            return `
+          tbodyAccesos.innerHTML = listaAccesos.map(acc => `
               <tr>
-                <td>${fechaStr}</td>
+                <td>${acc.fechaObj.toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' })}</td>
                 <td><strong>${acc.nombre || 'Usuario'}</strong></td>
                 <td>${acc.email || '—'}</td>
-                <td><span class="role-badge">${(acc.rol || 'USUARIO').toUpperCase()}</span></td>
-                <td style="font-size: 0.8rem; color: var(--texto-mutado);">${acc.navegador || 'Web Browser'}</td>
-              </tr>
-            `;
-          }).join('');
+                <td style="font-size: 0.8rem; color: var(--texto-mutado);">${acc.navegador || 'Navegador web'}</td>
+              </tr>`).join('');
         }
-
       } catch (error) {
         console.error("Error cargando auditoría:", error);
       }

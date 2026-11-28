@@ -272,13 +272,13 @@
     }
   </style>
   <!-- 📐 Tema "plano técnico" (colores, botones, tablas, hojas y cajetín) -->
-  <link rel="stylesheet" href="plano.css?v=4">
-  <script src="plano.js?v=4" defer></script>
-  <!-- 🔒 Guardia de sesión: login obligatorio, permisos por rol (ADMINISTRADOR) y cierre por inactividad -->
+  <link rel="stylesheet" href="plano.css?v=5">
+  <script src="plano.js?v=5" defer></script>
+  <!-- 🔒 Guardia de sesión: solo correos autorizados (acceso completo), bitácora y cierre por inactividad -->
   <style id="guardia-sesion">body{visibility:hidden}</style>
   <script type="module">
     import { protegerPagina } from "./seguridad.js";
-    protegerPagina(["ADMINISTRADOR"]);
+    protegerPagina();
   </script>
 </head>
 <body>
@@ -296,7 +296,7 @@
       <a href="index.html" class="btn-volver"><i class="fa-solid fa-arrow-left"></i> Inicio</a>
       <div class="nav-title">Alta de <span>Equipos</span></div>
     </div>
-    <span id="indicadorRolAlta" class="rol-pill">Verificando rol...</span>
+    <span id="indicadorRolAlta" class="rol-pill">Verificando acceso...</span>
   </nav>
 
   <!-- CONTENEDOR DEL FORMULARIO -->
@@ -437,43 +437,25 @@
     const db = getFirestore(app);
 
     let nombreResponsable = "Administrador";
-    let rolResponsable = "ADMINISTRADOR";
 
+    // Ya no hay roles: toda cuenta autorizada tiene acceso completo
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
         window.location.href = "login.html";
         return;
       }
-
       try {
         const snap = await getDoc(doc(db, "usuarios", user.uid));
         const data = snap.exists() ? snap.data() : {};
-        rolResponsable = data.activo ? (data.rol || "CONSULTA").toUpperCase() : "CONSULTA";
         nombreResponsable = data.nombre || user.email;
-        document.getElementById("indicadorRolAlta").innerText = `Rol: ${rolResponsable}`;
-
-        if (rolResponsable !== "ADMINISTRADOR") {
-          Swal.fire({
-            title: "Acceso restringido",
-            text: "El registro de nuevos equipos corresponde al rol ADMINISTRADOR.",
-            icon: "warning",
-            confirmButtonColor: "#8A1538"
-          }).then(() => {
-            window.location.href = "index.html";
-          });
-        }
       } catch (error) {
-        console.error("Error verificando rol en alta:", error);
+        nombreResponsable = user.email;
       }
+      document.getElementById("indicadorRolAlta").innerText = "Acceso completo";
     });
 
     window.registrarEquipo = async function(event) {
       event.preventDefault();
-
-      if (rolResponsable !== "ADMINISTRADOR") {
-        Swal.fire("Sin permiso", "Solo un ADMINISTRADOR puede dar de alta equipos.", "error");
-        return;
-      }
 
       const getVal = (id) => document.getElementById(id)?.value?.trim() || "";
 
@@ -536,6 +518,7 @@
           detalle: `Alta de ${tipoEquipo} ${marca} ${modelo} en área ${area}`,
           usuario: nombreResponsable
         });
+        window.registrarActividad?.("ALTA", `Alta del equipo ${codigoInterno} (${tipoEquipo} ${marca} ${modelo})`);
 
         generarYDescargarQR(codigoQr);
 

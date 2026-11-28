@@ -322,16 +322,16 @@
     }
   </style>
   <!-- 📐 Tema "plano técnico" (colores, botones, tablas, hojas y cajetín) -->
-  <link rel="stylesheet" href="plano.css?v=4">
-  <script src="plano.js?v=4" defer></script>
+  <link rel="stylesheet" href="plano.css?v=5">
+  <script src="plano.js?v=5" defer></script>
   <!-- 🎡 Menú en tambor 3D -->
-  <link rel="stylesheet" href="menu_tambor.css?v=1">
-  <script src="menu_tambor.js?v=1" defer></script>
-  <!-- 🔒 Guardia de sesión: login obligatorio, permisos por rol (cualquier rol activo) y cierre por inactividad -->
+  <link rel="stylesheet" href="menu_tambor.css?v=2">
+  <script src="menu_tambor.js?v=2" defer></script>
+  <!-- 🔒 Guardia de sesión: solo correos autorizados (acceso completo), bitácora y cierre por inactividad -->
   <style id="guardia-sesion">body{visibility:hidden}</style>
   <script type="module">
     import { protegerPagina } from "./seguridad.js";
-    protegerPagina([]);
+    protegerPagina();
   </script>
 </head>
 <body>
@@ -367,7 +367,7 @@
     <!-- DASHBOARD PRINCIPAL -->
     <!-- ===================================================================
          MENÚ PRINCIPAL EN "TAMBOR" 3D  (mecánica en menu_tambor.js)
-         Cada carta conserva su id para que el script de roles la bloquee.
+         Todas las cuentas autorizadas tienen acceso a todos los módulos.
          data-titulo / data-sub / data-manifiesto: líneas separadas por "|"
     ==================================================================== -->
     <section class="portal-container menu-tambor" id="menuTambor" aria-label="Módulos del sistema">
@@ -389,7 +389,7 @@
 
           <a href="alta.html" id="card-alta-equipos" class="carta-tambor" data-titulo="Registro|de equipos" data-sub="Alta de equipos nuevos|Generación de código QR|Ficha técnica completa" data-manifiesto="Alta|Etiqueta|Resguarda">
             <span class="ct-rayado"></span>
-            <span class="ct-arriba"><span class="ct-chip">01 / 08</span><span class="ct-chip ct-chip--rol">Admin</span></span>
+            <span class="ct-arriba"><span class="ct-chip">01 / 08</span><span class="ct-chip ct-chip--rol">Equipos</span></span>
             <span class="ct-centro"><i class="fa-solid fa-folder-plus"></i></span>
             <span class="ct-abajo"><span><span class="ct-kicker">Módulo 01</span><span class="ct-nombre">Registro de Equipos</span></span><span class="ct-flecha" aria-hidden="true"></span></span>
             <span class="ct-sombra"></span>
@@ -398,7 +398,7 @@
 
           <a href="escaner.html" id="card-escaner-qr" class="carta-tambor" data-titulo="Escanear|código QR" data-sub="Identificación inmediata|Cámara del dispositivo|Abre la ficha del equipo" data-manifiesto="Apunta|Escanea|Consulta">
             <span class="ct-rayado"></span>
-            <span class="ct-arriba"><span class="ct-chip">02 / 08</span><span class="ct-chip ct-chip--rol">Técnico · Consulta</span></span>
+            <span class="ct-arriba"><span class="ct-chip">02 / 08</span><span class="ct-chip ct-chip--rol">Equipos</span></span>
             <span class="ct-centro"><i class="fa-solid fa-qrcode"></i></span>
             <span class="ct-abajo"><span><span class="ct-kicker">Módulo 02</span><span class="ct-nombre">Escanear QR</span></span><span class="ct-flecha" aria-hidden="true"></span></span>
             <span class="ct-sombra"></span>
@@ -407,7 +407,7 @@
 
           <a href="inventario.html" id="card-consulta-inventario" class="carta-tambor" data-titulo="Inventario y|ubicación" data-sub="Equipos por código interno|Búsqueda y ordenamiento|Estado y área asignada" data-manifiesto="Cada|equipo|en su|lugar">
             <span class="ct-rayado"></span>
-            <span class="ct-arriba"><span class="ct-chip">03 / 08</span><span class="ct-chip ct-chip--rol">Técnico · Consulta</span></span>
+            <span class="ct-arriba"><span class="ct-chip">03 / 08</span><span class="ct-chip ct-chip--rol">Equipos</span></span>
             <span class="ct-centro"><i class="fa-solid fa-desktop"></i></span>
             <span class="ct-abajo"><span><span class="ct-kicker">Módulo 03</span><span class="ct-nombre">Inventario</span></span><span class="ct-flecha" aria-hidden="true"></span></span>
             <span class="ct-sombra"></span>
@@ -416,7 +416,7 @@
 
           <a href="mantenimientos.html" id="card-mantenimiento" class="carta-tambor" data-titulo="Mantenimiento|y servicios" data-sub="Preventivo y correctivo|Soporte técnico|Historial por equipo" data-manifiesto="Revisa|Repara|Registra">
             <span class="ct-rayado"></span>
-            <span class="ct-arriba"><span class="ct-chip">04 / 08</span><span class="ct-chip ct-chip--rol">Técnico</span></span>
+            <span class="ct-arriba"><span class="ct-chip">04 / 08</span><span class="ct-chip ct-chip--rol">Servicio</span></span>
             <span class="ct-centro"><i class="fa-solid fa-screwdriver-wrench"></i></span>
             <span class="ct-abajo"><span><span class="ct-kicker">Módulo 04</span><span class="ct-nombre">Mantenimiento</span></span><span class="ct-flecha" aria-hidden="true"></span></span>
             <span class="ct-sombra"></span>
@@ -425,7 +425,7 @@
 
           <a href="bajas.html" id="card-bajas-equipos" class="carta-tambor" data-titulo="Bajas de|equipos" data-sub="Equipos retirados|Motivo y fecha de baja|Trazabilidad completa" data-manifiesto="Retira|con|orden">
             <span class="ct-rayado"></span>
-            <span class="ct-arriba"><span class="ct-chip">05 / 08</span><span class="ct-chip ct-chip--rol">Admin · Técnico</span></span>
+            <span class="ct-arriba"><span class="ct-chip">05 / 08</span><span class="ct-chip ct-chip--rol">Equipos</span></span>
             <span class="ct-centro"><i class="fa-solid fa-ban"></i></span>
             <span class="ct-abajo"><span><span class="ct-kicker">Módulo 05</span><span class="ct-nombre">Bajas de Equipos</span></span><span class="ct-flecha" aria-hidden="true"></span></span>
             <span class="ct-sombra"></span>
@@ -434,7 +434,7 @@
 
           <a href="reportes_equipos.html" id="card-reportes-equipos" class="carta-tambor" data-titulo="Reportes de|equipos" data-sub="Indicadores del inventario|Filtros por fecha y mes|Gráficas por estado" data-manifiesto="Mide|Compara|Decide">
             <span class="ct-rayado"></span>
-            <span class="ct-arriba"><span class="ct-chip">06 / 08</span><span class="ct-chip ct-chip--rol">Todos</span></span>
+            <span class="ct-arriba"><span class="ct-chip">06 / 08</span><span class="ct-chip ct-chip--rol">Reportes</span></span>
             <span class="ct-centro"><i class="fa-solid fa-chart-line"></i></span>
             <span class="ct-abajo"><span><span class="ct-kicker">Módulo 06</span><span class="ct-nombre">Reportes</span></span><span class="ct-flecha" aria-hidden="true"></span></span>
             <span class="ct-sombra"></span>
@@ -443,18 +443,18 @@
 
           <a href="reportes_accesos.html" id="card-reportes-accesos" class="carta-tambor" data-titulo="Auditoría de|accesos" data-sub="Historial de sesiones|Quién entró y cuándo|Registro por usuario" data-manifiesto="Cada|acceso|queda|registrado">
             <span class="ct-rayado"></span>
-            <span class="ct-arriba"><span class="ct-chip">07 / 08</span><span class="ct-chip ct-chip--rol">Admin</span></span>
+            <span class="ct-arriba"><span class="ct-chip">07 / 08</span><span class="ct-chip ct-chip--rol">Auditoría</span></span>
             <span class="ct-centro"><i class="fa-solid fa-user-clock"></i></span>
             <span class="ct-abajo"><span><span class="ct-kicker">Módulo 07</span><span class="ct-nombre">Auditoría</span></span><span class="ct-flecha" aria-hidden="true"></span></span>
             <span class="ct-sombra"></span>
             <span class="ct-brillo"></span>
           </a>
 
-          <a href="gestion_usuarios.html" id="card-gestion-usuarios" class="carta-tambor" data-titulo="Usuarios|y roles" data-sub="Aprobación de cuentas|Asignación de permisos|Activar o desactivar" data-manifiesto="Control|de|acceso">
+          <a href="gestion_usuarios.html" id="card-gestion-usuarios" class="carta-tambor" data-titulo="Bitácora|de cuentas" data-sub="Cuentas que han ingresado|Páginas visitadas|Acciones realizadas" data-manifiesto="Cada|movimiento|queda|registrado">
             <span class="ct-rayado"></span>
-            <span class="ct-arriba"><span class="ct-chip">08 / 08</span><span class="ct-chip ct-chip--rol">Admin</span></span>
-            <span class="ct-centro"><i class="fa-solid fa-users-gear"></i></span>
-            <span class="ct-abajo"><span><span class="ct-kicker">Módulo 08</span><span class="ct-nombre">Usuarios y Roles</span></span><span class="ct-flecha" aria-hidden="true"></span></span>
+            <span class="ct-arriba"><span class="ct-chip">08 / 08</span><span class="ct-chip ct-chip--rol">Bitácora</span></span>
+            <span class="ct-centro"><i class="fa-solid fa-clipboard-list"></i></span>
+            <span class="ct-abajo"><span><span class="ct-kicker">Módulo 08</span><span class="ct-nombre">Bitácora</span></span><span class="ct-flecha" aria-hidden="true"></span></span>
             <span class="ct-sombra"></span>
             <span class="ct-brillo"></span>
           </a>
@@ -536,79 +536,21 @@
       return emailFallback || "Usuario";
     }
 
-    function aplicarPermisosPorRol(rolRaw) {
-      const rol = (rolRaw || "CONSULTA").toUpperCase();
-
-      const tarjetas = {
-        altaEquipos: document.getElementById("card-alta-equipos"),
-        escanerQR: document.getElementById("card-escaner-qr"),
-        consultaInventario: document.getElementById("card-consulta-inventario"),
-        mantenimiento: document.getElementById("card-mantenimiento"),
-        bajasEquipos: document.getElementById("card-bajas-equipos"),
-        reportesEquipos: document.getElementById("card-reportes-equipos"),
-        reportesAccesos: document.getElementById("card-reportes-accesos"),
-        gestionUsuarios: document.getElementById("card-gestion-usuarios")
-      };
-
-      const matrizPermisos = {
-        "ADMINISTRADOR": [
-          "altaEquipos",
-          "bajasEquipos",
-          "reportesEquipos",
-          "reportesAccesos",
-          "gestionUsuarios"
-        ],
-        "TÉCNICO": [
-          "escanerQR",
-          "consultaInventario",
-          "mantenimiento",
-          "bajasEquipos",
-          "reportesEquipos"
-        ],
-        "CONSULTA": [
-          "escanerQR",
-          "consultaInventario",
-          "reportesEquipos"
-        ]
-      };
-
-      const habilitados = matrizPermisos[rol] || matrizPermisos["CONSULTA"];
-
-      Object.entries(tarjetas).forEach(([clave, elemento]) => {
-        if (!elemento) return;
-        if (habilitados.includes(clave)) {
-          elemento.classList.remove("modulo-deshabilitado");
-        } else {
-          elemento.classList.add("modulo-deshabilitado");
-        }
-      });
-    }
-
+    // Ya no hay roles: toda cuenta autorizada (acceso.js) ve y abre todos los módulos
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
         window.location.href = "login.html";
         return;
       }
-
+      let nombre = user.email;
       try {
         const docSnap = await getDoc(doc(db, "usuarios", user.uid));
-        if (docSnap.exists() && docSnap.data().activo) {
-          const data = docSnap.data();
-          const rolActual = (data.rol || "CONSULTA").toUpperCase();
-
-          document.getElementById("nombreUsuario").innerText = obtenerSoloNombres(data, user.email);
-          document.getElementById("etiquetaRol").innerText = rolActual;
-          aplicarPermisosPorRol(rolActual);
-        } else {
-          await signOut(auth);
-          window.location.href = "login.html";
-        }
+        if (docSnap.exists()) nombre = obtenerSoloNombres(docSnap.data(), user.email);
       } catch (err) {
-        console.error("Error obteniendo rol de usuario:", err);
-        document.getElementById("nombreUsuario").innerText = user.email;
-        document.getElementById("etiquetaRol").innerText = "CONSULTA";
-        aplicarPermisosPorRol("CONSULTA");
+        console.warn("Sin ficha de usuario, se muestra el correo:", err);
       }
+      document.getElementById("nombreUsuario").innerText = nombre;
+      document.getElementById("etiquetaRol").innerText = "ACCESO TOTAL";
     });
 
     window.cerrarSesion = function() {
