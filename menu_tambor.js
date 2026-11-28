@@ -238,7 +238,7 @@
       c.style.visibility = opacidad < 0.01 ? "hidden" : "visible";
       c.style.filter = `blur(${desenfoque.toFixed(2)}px) brightness(${brillo.toFixed(2)})`;
       c.style.boxShadow = a < 0.35
-        ? "0 34px 75px -16px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(127, 220, 255, 0.35)"
+        ? "0 34px 75px -16px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(var(--cian-rgb), 0.35)"
         : "0 16px 36px -10px rgba(0, 0, 0, 0.45)";
       c.style.transform =
         `translate3d(-50%, calc(-50% + ${ty.toFixed(2)}px), ${tz.toFixed(2)}px) ` +

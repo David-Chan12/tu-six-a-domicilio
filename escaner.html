@@ -232,9 +232,11 @@
       background-size: var(--ala-ancho) auto;
     }
   </style>
+  <!-- 🌓 Aplica el modo de color guardado antes de pintar (evita parpadeo) -->
+  <script>try{document.documentElement.dataset.tema=localStorage.getItem("js2_tema")||"oscuro"}catch(e){document.documentElement.dataset.tema="oscuro"}</script>
   <!-- 📐 Tema "plano técnico" (colores, botones, tablas, hojas y cajetín) -->
-  <link rel="stylesheet" href="plano.css?v=5">
-  <script src="plano.js?v=5" defer></script>
+  <link rel="stylesheet" href="plano.css?v=6">
+  <script src="plano.js?v=6" defer></script>
   <!-- 🔒 Guardia de sesión: solo correos autorizados (acceso completo), bitácora y cierre por inactividad -->
   <style id="guardia-sesion">body{visibility:hidden}</style>
   <script type="module">
@@ -246,8 +248,10 @@
   <!-- 🏛️ Encabezado institucional permanente (igual en todas las páginas) -->
   <header class="header-institucional">
     <div class="encabezado-plano">
-      <img src="img/encabezado_plano_izq.png" alt="Gobierno del Estado de Yucatán - Servicios de Salud de Yucatán">
-      <img src="img/encabezado_plano_der.png" alt="Plataforma de Salud Yucatán">
+      <img class="img-tema-oscuro" src="img/encabezado_plano_izq.png" alt="Gobierno del Estado de Yucatán - Servicios de Salud de Yucatán">
+      <img class="img-tema-claro" src="img/encabezado_claro_izq.png" alt="Gobierno del Estado de Yucatán - Servicios de Salud de Yucatán">
+      <img class="img-tema-oscuro" src="img/encabezado_plano_der.png" alt="Plataforma de Salud Yucatán">
+      <img class="img-tema-claro" src="img/encabezado_claro_der.png" alt="Plataforma de Salud Yucatán">
     </div>
   </header>
 
