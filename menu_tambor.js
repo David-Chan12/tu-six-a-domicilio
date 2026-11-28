@@ -81,8 +81,10 @@
     const i = fisica.activa;
     if (i < 0) return;
     const bloq = bloqueada(i);
-    el.estado.textContent = bloq ? "Bloqueado para tu rol" : "Disponible";
-    el.estado.classList.toggle("bloqueado", bloq);
+    if (el.estado) {                       // indicador opcional (ya no se usa en el index)
+      el.estado.textContent = bloq ? "Bloqueado" : "Disponible";
+      el.estado.classList.toggle("bloqueado", bloq);
+    }
     [el.abrir, el.dockAbrir].forEach((b) => { b.disabled = bloq; });
     el.pildoras.querySelectorAll("button").forEach((b, k) => {
       b.classList.toggle("activa", k === i);
