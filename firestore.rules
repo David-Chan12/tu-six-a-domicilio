@@ -69,6 +69,12 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // ---------- Preferencias de cada cuenta (modo de color) ----------
+    // Cada quien solo puede leer y guardar SU propio documento
+    match /preferencias/{uid} {
+      allow read, write: if autorizado() && request.auth.uid == uid;
+    }
+
     // ---------- Fichas de usuario (solo para mostrar el nombre) ----------
     // Ya no se crean desde la página; si quieres cambiar un nombre,
     // hazlo desde la consola de Firebase.

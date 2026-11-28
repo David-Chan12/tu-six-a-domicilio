@@ -26,7 +26,7 @@
 
 import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { esCorreoAutorizado } from "./acceso.js";
 
 // ---------------- CONFIGURACIÓN ----------------
@@ -106,6 +106,32 @@ export async function registrarActividad(tipo, detalle = "") {
   }
 }
 window.registrarActividad = registrarActividad;
+
+// ---------------- MODO DE COLOR GUARDADO EN LA CUENTA ----------------
+// Colección "preferencias", un documento por cuenta (id = uid).
+const TEMAS_VALIDOS = ["claro", "medio", "oscuro"];
+
+export async function guardarPreferenciaTema(tema) {
+  const u = auth.currentUser;
+  if (!u || !TEMAS_VALIDOS.includes(tema)) return;
+  try {
+    await setDoc(doc(db, "preferencias", u.uid), {
+      tema, email: (u.email || "").toLowerCase(), actualizado: serverTimestamp()
+    }, { merge: true });
+  } catch (e) { console.warn("No se pudo guardar el modo de color en la cuenta:", e); }
+}
+window.guardarPreferenciaTema = guardarPreferenciaTema;
+
+async function recuperarPreferenciaTema(uid) {
+  try {
+    const snap = await getDoc(doc(db, "preferencias", uid));
+    const tema = snap.exists() ? snap.data().tema : null;
+    if (TEMAS_VALIDOS.includes(tema)) {
+      try { localStorage.setItem("js2_tema", tema); } catch {}
+      if (typeof window.aplicarTemaSistema === "function") window.aplicarTemaSistema(tema);
+    }
+  } catch (e) { /* sin preferencia guardada: se queda el modo del navegador */ }
+}
 
 // Cierra sesión y manda al login sin dejar la página en el historial
 export async function cerrarSesionSegura(motivo = "manual") {
@@ -263,6 +289,7 @@ export function protegerPagina(_sinUso, alAutorizar) {
     guardarActividad();
     iniciarControlInactividad();
     mostrarPagina();
+    recuperarPreferenciaTema(user.uid);
     registrarActividad("VISITA", "Entró a " + (PAGINAS[archivoActual] || archivoActual));
     if (typeof alAutorizar === "function") alAutorizar({ user, datos, nombre: usuarioActual.nombre });
   });

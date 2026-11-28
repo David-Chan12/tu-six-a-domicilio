@@ -376,7 +376,7 @@
   <script>try{document.documentElement.dataset.tema=localStorage.getItem("js2_tema")||"oscuro"}catch(e){document.documentElement.dataset.tema="oscuro"}</script>
   <!-- 📐 Tema "plano técnico" (colores, botones, tablas, hojas y cajetín) -->
   <link rel="stylesheet" href="plano.css?v=6">
-  <script src="plano.js?v=6" defer></script>
+  <script src="plano.js?v=7" defer></script>
   <style>
     .aviso-acceso {
       margin-top: 22px;
@@ -527,6 +527,16 @@
           });
           return;
         }
+
+        // Modo de color guardado en la cuenta: se aplica antes de abrir el menú
+        try {
+          const pref = await getDoc(doc(db, "preferencias", user.uid));
+          const tema = pref.exists() ? pref.data().tema : null;
+          if (["claro", "medio", "oscuro"].includes(tema)) {
+            localStorage.setItem("js2_tema", tema);
+            document.documentElement.dataset.tema = tema;
+          }
+        } catch (e) { /* sin preferencia: se conserva la del navegador */ }
 
         // Nombre para mostrar: ficha en "usuarios" si existe; si no, el correo
         let nombre = user.displayName || (user.email || "").split("@")[0];

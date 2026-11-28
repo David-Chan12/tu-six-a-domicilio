@@ -98,6 +98,15 @@
     colorearGraficas();
   }
 
+  // El modo SOLO cambia con el interruptor. La elección se guarda en el navegador
+  // y también en la cuenta (Firestore, lo hace seguridad.js), así se conserva
+  // al cerrar sesión y se recupera al volver a entrar, incluso en otro equipo.
+  function guardarEnCuenta(tema) {
+    if (typeof window.guardarPreferenciaTema === "function") window.guardarPreferenciaTema(tema);
+  }
+  // seguridad.js usa esto para aplicar el modo guardado en la cuenta al entrar
+  window.aplicarTemaSistema = (tema) => { if (tema && tema !== raizHtml.dataset.tema) aplicarTema(tema, true); };
+
   // Si el modo cambia en otra pestaña, esta también se actualiza
   window.addEventListener("storage", (e) => { if (e.key === CLAVE_TEMA && e.newValue) aplicarTema(e.newValue, true); });
 
@@ -111,6 +120,7 @@
         it.classList.remove("apretado"); void it.offsetWidth; it.classList.add("apretado");
         aplicarTema(b.dataset.tema, true);
         sonar(b.dataset.tema);
+        guardarEnCuenta(b.dataset.tema);
       });
       it.addEventListener("keydown", (e) => {
         const i = TEMAS.indexOf(raizHtml.dataset.tema);
@@ -122,6 +132,7 @@
           e.stopPropagation();
           aplicarTema(n, true);
           sonar(n);
+          guardarEnCuenta(n);
           it.querySelector(`[data-tema="${n}"]`).focus();
         }
       });
